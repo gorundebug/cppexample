@@ -1,5 +1,5 @@
 inventoryServiceApiAddress: dns:///inventoryservice:9202
-orderServiceConfigOverridePath: config/overrides.integration.yaml
+orderServiceConfigOverridePath: config/overrides.integration.generated.yaml
 orderServiceEnvironment: ""
 orderServiceGrpcHost: 0.0.0.0
 orderServiceGrpcPort: 9201

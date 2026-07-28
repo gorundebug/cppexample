@@ -1,5 +1,5 @@
 inventoryServiceApiAddress: dns:///inventoryservice:9202
-inventoryServiceConfigOverridePath: config/overrides.integration.yaml
+inventoryServiceConfigOverridePath: config/overrides.integration.generated.yaml
 inventoryServiceEnvironment: ""
 inventoryServiceGrpcHost: 0.0.0.0
 inventoryServiceGrpcPort: 9202
