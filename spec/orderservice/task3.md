@@ -31,7 +31,7 @@ Copy Order.ID into each emitted OrderItem.OrderID.
 - [ ] Inspect input type `Order` in `orderservice/internal/types/order.hpp`
 - [ ] Inspect output type `OrderItem` in `model/include/example/model/types/order_item.hpp`
 - [ ] Implement the C++ function object without retaining borrowed payload/context references
-- [ ] Run `./scripts/test.sh`
+- [ ] Run `./scripts/test.generated.sh`
 - [ ] Implement meaningful assertions in `orderservice/internal/functions/process_order_items_test.cpp`
 - [ ] Re-read this checklist
 - [ ] Append to `spec/progress.md`: `- [x] orderservice/task3.md — ProcessOrderItems — C++ — done`

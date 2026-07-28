@@ -38,9 +38,9 @@ user-owned extension points.
   it through collectors. Respect `Payload<T>` ownership; do not retain borrowed
   references beyond a synchronous call.
 - C++ builds and tests are Docker-canonical:
-  - build: `./scripts/build.sh`
-  - test: `./scripts/test.sh`
-  - lint: `./scripts/lint.sh`
+  - build: `./scripts/build.generated.sh`
+  - test: `./scripts/test.generated.sh`
+  - lint: `./scripts/lint.generated.sh`
 - Regenerate protobuf/OpenAPI bindings through the generated CMake/Docker
   workflow, never by invoking `protoc` or userver generators manually.
 - Implement the adjacent `*_test.cpp` file with userver `utest`.

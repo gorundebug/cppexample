@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Generated test command.
 set -euo pipefail
 
 # Configure and build first so this command also works with an empty build

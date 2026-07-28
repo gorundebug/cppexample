@@ -8,6 +8,8 @@
 
 #include <userver/utils/daemon_run.hpp>
 
+#include <servicelib/runtime/telemetry/userver/metrics.hpp>
+
 #include "orderservice/internal/app/service.generated.hpp"
 #include "orderservice/internal/app/http_service.generated.hpp"
 
@@ -21,6 +23,7 @@ int main(int argc, char* argv[]) {
               userver::ugrpc::client::MinimalComponentList())
 
           .Append<example::order_service::app::RuntimeConfigComponent>()
+          .Append<servicelib::telemetry::userver_adapter::MetricsHandler>()
           .Append<example::order_service::app::OrderServiceComponent>()
           .Append<example::order_service::app::ProcessOrderHTTPHandler>()
           ;

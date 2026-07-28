@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# merge.sh — merge a newly generated archive into the project.
+# merge.generated.sh — merge a newly generated archive into the project.
 #
 # Rules:
 #   ADD  — file is new (doesn't exist in project yet): always copied
 #   UPD  — existing file has "generated" in its filename: overwritten
 #   SKP  — any other existing file: left untouched
 #
-# Usage: bash scripts/merge.sh <archive.zip|archive.tar.gz>
+# Usage: bash scripts/merge.generated.sh <archive.zip|archive.tar.gz>
 #        make merge ARCHIVE=/path/to/archive.zip
 
 set -euo pipefail

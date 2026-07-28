@@ -35,8 +35,8 @@ cp CMakePresets.json Dockerfile.cmake docker-compose.cmake.yml \
 mkdir -p "${output_dir}/docker" "${output_dir}/tools" "${output_dir}/scripts"
 cp -R docker/. "${output_dir}/docker/"
 cp -R tools/userver "${output_dir}/tools/userver"
-cp scripts/cmake-docker.sh scripts/build.sh scripts/test.sh \
-  scripts/lint.sh scripts/format.generated.sh \
+cp scripts/cmake-docker.generated.sh scripts/build.generated.sh scripts/test.generated.sh \
+  scripts/lint.generated.sh scripts/format.generated.sh \
   scripts/configure-git-auth.generated.sh "${output_dir}/scripts/"
 
 # Generated source names make regeneration ownership explicit inside the

@@ -7,6 +7,8 @@
 
 #include <userver/utils/daemon_run.hpp>
 
+#include <servicelib/runtime/telemetry/userver/metrics.hpp>
+
 #include "inventoryservice/internal/app/service.generated.hpp"
 #include "inventoryservice/internal/app/grpc_service.generated.hpp"
 
@@ -19,6 +21,7 @@ int main(int argc, char* argv[]) {
               userver::ugrpc::server::DefaultComponentList())
 
           .Append<example::inventory_service::app::RuntimeConfigComponent>()
+          .Append<servicelib::telemetry::userver_adapter::MetricsHandler>()
           .Append<example::inventory_service::app::InventoryServiceComponent>()
           .Append<example::inventory_service::app::InventoryServiceApiGrpcService>()
           ;

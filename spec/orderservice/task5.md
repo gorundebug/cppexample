@@ -57,7 +57,7 @@ write JSON response, call Done(), return true.
 - [ ] Inspect input type `Order` in `orderservice/internal/types/order.hpp`
 - [ ] Inspect output type `OrderState` in `orderservice/internal/types/order_state.hpp`
 - [ ] Implement the C++ function object without retaining borrowed payload/context references
-- [ ] Run `./scripts/test.sh`
+- [ ] Run `./scripts/test.generated.sh`
 - [ ] Implement meaningful assertions in `orderservice/internal/functions/process_order_test.cpp`
 - [ ] Verify the endpoint/result lifecycle, including completion and error paths
 - [ ] Re-read this checklist

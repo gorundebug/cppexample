@@ -32,7 +32,7 @@ Otherwise compute time.Until(deadline) minus the margin: if the result is negati
 - [ ] Inspect input type `Order` in `orderservice/internal/types/order.hpp`
 - [ ] Inspect output type `Order` in `orderservice/internal/types/order.hpp`
 - [ ] Implement the C++ function object without retaining borrowed payload/context references
-- [ ] Run `./scripts/test.sh`
+- [ ] Run `./scripts/test.generated.sh`
 - [ ] Implement meaningful assertions in `orderservice/internal/functions/soft_deadline_test.cpp`
 - [ ] Re-read this checklist
 - [ ] Append to `spec/progress.md`: `- [x] orderservice/task4.md — SoftDeadline — C++ — done`

@@ -21,13 +21,13 @@ cpp-tools: ## Verify Docker is available for the canonical C++ toolchain
 	@docker compose version >/dev/null
 
 cpp-build: cpp-tools ## Build all C++ services in Docker
-	@./scripts/build.sh
+	@./scripts/build.generated.sh
 
 cpp-test: cpp-tools ## Run all C++ unit tests in Docker
-	@./scripts/test.sh
+	@./scripts/test.generated.sh
 
 cpp-lint: cpp-tools ## Run clang-format and clang-tidy checks in Docker
-	@./scripts/lint.sh
+	@./scripts/lint.generated.sh
 
 cpp-format: cpp-tools ## Format C++ sources in Docker
 	@./scripts/format.generated.sh
@@ -38,7 +38,7 @@ cpp-docker-build: cpp-build ## Build the C++ build/runtime Docker image
 	@docker compose -f docker-compose.cmake.yml build cpp-build
 
 cpp-integration-test: cpp-tools ## Run C++ integration tests
-	@./scripts/integration-test.sh
+	@./scripts/integration-test.generated.sh
 
 cpp-package: ## Package all C++ services as standalone repositories
 	@for service in $(CPP_SERVICE_DIRS); do \

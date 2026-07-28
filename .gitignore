@@ -41,3 +41,10 @@ Thumbs.db
 
 # Local temporary files
 tmp/
+
+# Services and modules restored by clone.sh
+/inventoryservice/
+/orderservice/
+/inventory_service_api/
+/model/
+/order_service_api/

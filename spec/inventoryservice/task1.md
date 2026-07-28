@@ -35,7 +35,7 @@ OrderItemResult{OrderID, ItemID, SKU, RequestedQty, UnitPrice, Reserved: false, 
 - [ ] Inspect input type `OrderItem` in `model/include/example/model/types/order_item.hpp`
 - [ ] Inspect output type `OrderItemResult` in `model/include/example/model/types/order_item_result.hpp`
 - [ ] Implement the C++ function object without retaining borrowed payload/context references
-- [ ] Run `./scripts/test.sh`
+- [ ] Run `./scripts/test.generated.sh`
 - [ ] Implement meaningful assertions in `inventoryservice/internal/functions/get_inventory_item_data_test.cpp`
 - [ ] Re-read this checklist
 - [ ] Append to `spec/progress.md`: `- [x] inventoryservice/task1.md — GetInventoryItemData — C++ — done`

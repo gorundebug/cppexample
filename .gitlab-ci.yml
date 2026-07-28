@@ -1,33 +1,7 @@
+# User-owned GitLab entrypoint. Generator-managed jobs live in included files.
 stages:
   - build
   - lint
 
-variables:
-  SERVICELIB_SOURCE_CONTEXT: .servicelib
-  USERVER_SOURCE_CONTEXT: .userver
-  DOCKER_HOST: tcp://docker:2375
-  DOCKER_TLS_CERTDIR: ""
-
-.cpp-dependencies:
-  image: docker:latest
-  services:
-    - docker:dind
-  before_script:
-    - apk add --no-cache bash git
-    - git clone "https://github.com/gorundebug/cppservicelib.git" .servicelib
-    - git -C .servicelib checkout "v2.1.5"
-    - git clone "https://github.com/userver-framework/userver.git" .userver
-    - git -C .userver checkout "c9f77729c0edce7e423def2d4a4450aa7fc9d259"
-
-build-test:
-  extends: .cpp-dependencies
-  stage: build
-  script:
-    - ./scripts/test.sh
-    - ./scripts/integration-test.sh
-
-lint:
-  extends: .cpp-dependencies
-  stage: lint
-  script:
-    - ./scripts/lint.sh
+include:
+  - local: .gitlab-ci.cpp.generated.yml

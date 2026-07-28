@@ -23,6 +23,10 @@ components_manager:
         port: 9091
         task_processor: main-task-processor
 
+    servicelib-metrics-handler:
+      path: /metrics
+      method: GET
+      task_processor: main-task-processor
 
     grpc-client-common:
       blocking-task-processor: grpc-blocking-task-processor

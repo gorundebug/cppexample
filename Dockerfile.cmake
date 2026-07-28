@@ -21,7 +21,7 @@ COPY --from=servicelib-source / /opt/servicelib
 COPY --from=userver-source / /opt/userver
 COPY tools/userver /opt/userver-patches
 
-RUN /opt/userver-patches/apply-patches.sh /opt/userver
+RUN /opt/userver-patches/apply-patches.generated.sh /opt/userver
 
 WORKDIR /workspace
 

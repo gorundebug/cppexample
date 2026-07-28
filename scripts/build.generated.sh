@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Generated project build command.
 set -euo pipefail
 
 # Docker is the canonical C++ build environment. The compose file deliberately

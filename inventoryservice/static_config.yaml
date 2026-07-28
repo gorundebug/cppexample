@@ -20,6 +20,10 @@ components_manager:
         port: 9092
         task_processor: main-task-processor
 
+    servicelib-metrics-handler:
+      path: /metrics
+      method: GET
+      task_processor: main-task-processor
 
     grpc-server:
       port: 9202

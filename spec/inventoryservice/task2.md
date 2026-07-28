@@ -42,7 +42,7 @@ copy OrderID, ItemID, AvailableQty, Reserved, Status, UnitPrice from response; p
 - [ ] Inspect input type `OrderItem` in `model/include/example/model/types/order_item.hpp`
 - [ ] Inspect output type `OrderItemResult` in `model/include/example/model/types/order_item_result.hpp`
 - [ ] Implement the C++ function object without retaining borrowed payload/context references
-- [ ] Run `./scripts/test.sh`
+- [ ] Run `./scripts/test.generated.sh`
 - [ ] Implement meaningful assertions in `inventoryservice/internal/functions/process_order_item_test.cpp`
 - [ ] Verify the endpoint/result lifecycle, including completion and error paths
 - [ ] Re-read this checklist
