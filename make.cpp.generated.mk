@@ -12,7 +12,9 @@ LANG_DOCKER_BUILD_TARGETS += cpp-docker-build
 LANG_INTEGRATION_TARGETS += cpp-integration-test
 
 .PHONY: cpp-build cpp-test cpp-lint cpp-format cpp-gen cpp-clean cpp-tools \
-	cpp-docker-build cpp-integration-test
+	cpp-docker-build cpp-integration-test cpp-package
+
+CPP_SERVICE_DIRS := inventoryservice orderservice
 
 cpp-tools: ## Verify Docker is available for the canonical C++ toolchain
 	@docker version >/dev/null
@@ -37,6 +39,20 @@ cpp-docker-build: cpp-build ## Build the C++ build/runtime Docker image
 
 cpp-integration-test: cpp-tools ## Run C++ integration tests
 	@./scripts/integration-test.sh
+
+cpp-package: ## Package all C++ services as standalone repositories
+	@for service in $(CPP_SERVICE_DIRS); do \
+	  rm -rf "dist/$$service"; \
+	  ./scripts/package-cpp-service.generated.sh "$$service" "dist/$$service"; \
+	done
+
+cpp-package-%: ## Package one C++ service (for example: make cpp-package-orderservice)
+	@case " $(CPP_SERVICE_DIRS) " in \
+	  *" $* "*) ;; \
+	  *) echo "unknown C++ service: $*" >&2; exit 2 ;; \
+	esac
+	@rm -rf "dist/$*"
+	@./scripts/package-cpp-service.generated.sh "$*" "dist/$*"
 
 cpp-clean: ## Remove C++ build and ccache volumes
 	@docker compose -f docker-compose.cmake.yml down --volumes --remove-orphans

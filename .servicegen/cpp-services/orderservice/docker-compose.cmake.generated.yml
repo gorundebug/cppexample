@@ -1,6 +1,6 @@
 services:
   cpp-build:
-    image: example-cpp-build
+    image: orderservice-cpp-build
     build:
       context: .
       dockerfile: Dockerfile.cmake

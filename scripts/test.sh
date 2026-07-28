@@ -5,6 +5,7 @@ set -euo pipefail
 # volume on a clean CI runner.
 exec docker compose -f docker-compose.cmake.yml run --build --rm cpp-build \
   /bin/bash -lc \
-  'cmake --preset docker-debug &&
+  'source scripts/configure-git-auth.generated.sh &&
+   cmake --preset docker-debug &&
    cmake --build --preset docker-debug &&
    ctest --preset docker-debug'

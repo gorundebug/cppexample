@@ -3,6 +3,7 @@ set -euo pipefail
 
 exec docker compose -f docker-compose.cmake.yml run --build --rm cpp-build \
   /bin/bash -lc '
+    source scripts/configure-git-auth.generated.sh
     cmake --preset docker-debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 
     mapfile -d "" sources < <(

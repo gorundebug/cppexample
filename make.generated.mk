@@ -135,7 +135,11 @@ define git-push-dir
 	  $(GH) repo create $$repo --private 2>/dev/null || true; \
 	fi; \
 	tmp=$$(mktemp -d); \
-	cp -r ./$(1)/. $$tmp/; \
+	if [ "$(4)" = "cpp-service" ]; then \
+	  ./scripts/package-cpp-service.generated.sh "./$(1)" "$$tmp"; \
+	else \
+	  cp -r ./$(1)/. $$tmp/; \
+	fi; \
 	cd $$tmp; \
 	git init -q; \
 	git -c user.email="local@dev" -c user.name="local" add .; \
@@ -177,7 +181,7 @@ git-delete-order_service_api: $(GH) $(GLAB) ## Delete module order_service_api f
 	fi
 
 git-push-inventoryservice: $(GH) $(GLAB) ## Push service Inventory Service to github.com/gorundebug/cppexample-inventoryservice
-	$(call git-push-dir,inventoryservice,$(MODULE_VERSION),github.com/gorundebug/cppexample-inventoryservice)
+	$(call git-push-dir,inventoryservice,$(MODULE_VERSION),github.com/gorundebug/cppexample-inventoryservice,cpp-service)
 
 git-delete-inventoryservice: $(GH) $(GLAB) ## Delete service Inventory Service from remote
 	@if echo "github.com/gorundebug/cppexample-inventoryservice" | grep -q '^gitlab.com/'; then \
@@ -187,7 +191,7 @@ git-delete-inventoryservice: $(GH) $(GLAB) ## Delete service Inventory Service f
 	fi
 
 git-push-orderservice: $(GH) $(GLAB) ## Push service Order Service to github.com/gorundebug/cppexample-orderservice
-	$(call git-push-dir,orderservice,$(MODULE_VERSION),github.com/gorundebug/cppexample-orderservice)
+	$(call git-push-dir,orderservice,$(MODULE_VERSION),github.com/gorundebug/cppexample-orderservice,cpp-service)
 
 git-delete-orderservice: $(GH) $(GLAB) ## Delete service Order Service from remote
 	@if echo "github.com/gorundebug/cppexample-orderservice" | grep -q '^gitlab.com/'; then \

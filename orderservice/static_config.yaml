@@ -23,6 +23,7 @@ components_manager:
         port: 9091
         task_processor: main-task-processor
 
+
     grpc-client-common:
       blocking-task-processor: grpc-blocking-task-processor
     grpc-client-factory:
@@ -31,7 +32,7 @@ components_manager:
     grpc-client-deadline-propagation:
     grpc-client-logging:
     servicelib-runtime:
-      config-path: orderservice/config/config.yaml
+      config-path: config/config.yaml
       override-path: $orderServiceConfigOverridePath
       fs-task-processor: fs-task-processor
     order-service: {}

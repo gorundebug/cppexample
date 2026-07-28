@@ -1,6 +1,6 @@
 services:
   cpp-build:
-    image: example-cpp-build
+    image: inventoryservice-cpp-build
     build:
       context: .
       dockerfile: Dockerfile.cmake

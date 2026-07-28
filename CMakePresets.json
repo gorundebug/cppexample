@@ -13,7 +13,7 @@
       "binaryDir": "${sourceDir}/build/host",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "SERVICEGEN_FETCH_CPP_DEPENDENCIES": "OFF",
+        "SERVICEGEN_FETCH_CPP_DEPENDENCIES": "ON",
         "SERVICELIB_SOURCE_DIR": "$env{SERVICELIB_SOURCE_DIR}",
         "USERVER_SOURCE_DIR": "$env{USERVER_SOURCE_DIR}"
       }

@@ -5,4 +5,6 @@ set -euo pipefail
 # leaves the platform unset so Docker selects the runner's native architecture.
 exec docker compose -f docker-compose.cmake.yml run --build --rm cpp-build \
   /bin/bash -lc \
-  'cmake --preset docker-debug && cmake --build --preset docker-debug'
+  'source scripts/configure-git-auth.generated.sh &&
+   cmake --preset docker-debug &&
+   cmake --build --preset docker-debug'

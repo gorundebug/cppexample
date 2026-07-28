@@ -1,0 +1,7 @@
+inventoryServiceApiAddress: dns:///localhost:9202
+orderServiceConfigOverridePath: config/overrides.yaml
+orderServiceEnvironment: ""
+orderServiceGrpcHost: 0.0.0.0
+orderServiceGrpcPort: 9201
+orderServiceHttpHost: 0.0.0.0
+orderServiceHttpPort: 9091
