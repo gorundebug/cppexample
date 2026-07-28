@@ -16,11 +16,9 @@ dataConnectors:
                 methodName: ProcessOrderItem
                 name: Process Order Item
                 publicFunction: false
-        implementation: google/grpc
-        implementations:
-            Cpp: userver/grpc
-            GoLang: google/grpc
-            Python: google/grpc
+        goImplementation: google/grpc
+        cppImplementation: userver/grpc
+        pythonImplementation: google/grpc
         module: inventory_service_api
         name: Inventory Service API
         type: gRPC
@@ -55,11 +53,9 @@ dataConnectors:
                 name: Process Order
                 path: /v1/processorder
                 publicFunction: false
-        implementation: net/http
-        implementations:
-            Cpp: userver/http
-            GoLang: net/http
-            Python: aiohttp
+        goImplementation: net/http
+        cppImplementation: userver/http
+        pythonImplementation: aiohttp
         module: order_service_api
         name: Order Service API
         type: HTTP

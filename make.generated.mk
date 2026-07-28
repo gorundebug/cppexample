@@ -137,6 +137,8 @@ define git-push-dir
 	tmp=$$(mktemp -d); \
 	if [ "$(4)" = "cpp-service" ]; then \
 	  ./scripts/package-cpp-service.generated.sh "./$(1)" "$$tmp"; \
+	elif [ "$(4)" = "python-service" ]; then \
+	  ./scripts/package-python-service.generated.sh "./$(1)" "$$tmp"; \
 	else \
 	  cp -r ./$(1)/. $$tmp/; \
 	fi; \

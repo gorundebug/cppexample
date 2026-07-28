@@ -295,7 +295,6 @@ inline Config MakeConfig() {
   cfg.types.order = TypeConfig{
       .name = "Order",
       .type = DataType::kStruct,
-      .package = "",
       .definitionFormat = TypeDefinitionFormat::kNative,
       .publicType = false,
       .transferByValue = false,
@@ -303,7 +302,6 @@ inline Config MakeConfig() {
   cfg.types.orderItem = TypeConfig{
       .name = "OrderItem",
       .type = DataType::kStruct,
-      .package = "",
       .module = "model",
       .definitionFormat = TypeDefinitionFormat::kNative,
       .publicType = false,
@@ -312,7 +310,6 @@ inline Config MakeConfig() {
   cfg.types.orderItemResult = TypeConfig{
       .name = "OrderItemResult",
       .type = DataType::kStruct,
-      .package = "",
       .module = "model",
       .definitionFormat = TypeDefinitionFormat::kNative,
       .publicType = false,
@@ -321,7 +318,6 @@ inline Config MakeConfig() {
   cfg.types.orderState = TypeConfig{
       .name = "OrderState",
       .type = DataType::kStruct,
-      .package = "",
       .definitionFormat = TypeDefinitionFormat::kNative,
       .publicType = false,
       .transferByValue = false,

@@ -1,6 +1,6 @@
 services:
   cpp-build:
-    image: orderservice-cpp-build
+    image: inventoryservice-cpp-build
     build:
       context: .
       dockerfile: Dockerfile.cmake
@@ -14,6 +14,7 @@ services:
       CCACHE_DIR: /ccache
       GITHUB_TOKEN: ${GITHUB_TOKEN:-}
       GITLAB_TOKEN: ${GITLAB_TOKEN:-}
+      SERVICEGEN_FETCH_CPP_DEPENDENCIES: ${SERVICEGEN_FETCH_CPP_DEPENDENCIES:-ON}
     volumes:
       - .:/workspace
       - cpp-cmake-build:/workspace/build
@@ -21,7 +22,7 @@ services:
     command:
       - /bin/bash
       - -lc
-      - source scripts/configure-git-auth.generated.sh && cmake --preset docker-debug && cmake --build --preset docker-debug && ctest --preset docker-debug
+      - source scripts/configure-git-auth.generated.sh && cmake --preset docker-debug -DSERVICEGEN_FETCH_CPP_DEPENDENCIES="${SERVICEGEN_FETCH_CPP_DEPENDENCIES:-ON}" && cmake --build --preset docker-debug && ctest --preset docker-debug
 
 volumes:
   cpp-cmake-build:

@@ -2,6 +2,8 @@
 
 .DEFAULT_GOAL := build
 
+export SERVICEGEN_FETCH_CPP_DEPENDENCIES := ON
+
 .PHONY: build test lint fmt clean docker-build docker-up docker-down \
 	docker-clean help
 
