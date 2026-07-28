@@ -14,7 +14,7 @@ jobs:
       - name: Checkout pinned cppservicelib
         run: |
           git clone "https://github.com/gorundebug/cppservicelib.git" .servicelib
-          git -C .servicelib checkout "v2.1.6"
+          git -C .servicelib checkout "v3.0.0"
 
       - name: Checkout pinned userver
         run: |
@@ -25,13 +25,13 @@ jobs:
         env:
           SERVICELIB_SOURCE_CONTEXT: .servicelib
           USERVER_SOURCE_CONTEXT: .userver
-        run: ./scripts/test.sh
+        run: ./scripts/test.generated.sh
 
       - name: Integration tests
         env:
           SERVICELIB_SOURCE_CONTEXT: .servicelib
           USERVER_SOURCE_CONTEXT: .userver
-        run: ./scripts/integration-test.sh
+        run: ./scripts/integration-test.generated.sh
 
   lint:
     runs-on: ubuntu-24.04
@@ -41,7 +41,7 @@ jobs:
       - name: Checkout pinned cppservicelib
         run: |
           git clone "https://github.com/gorundebug/cppservicelib.git" .servicelib
-          git -C .servicelib checkout "v2.1.6"
+          git -C .servicelib checkout "v3.0.0"
 
       - name: Checkout pinned userver
         run: |
@@ -52,4 +52,4 @@ jobs:
         env:
           SERVICELIB_SOURCE_CONTEXT: .servicelib
           USERVER_SOURCE_CONTEXT: .userver
-        run: ./scripts/lint.sh
+        run: ./scripts/lint.generated.sh

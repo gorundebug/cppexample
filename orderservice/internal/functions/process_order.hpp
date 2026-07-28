@@ -22,8 +22,8 @@
 #include <userver/utils/datetime_light.hpp>
 #include <userver/utils/uuid7.hpp>
 
-#include "datasource/http/userver.hpp"
-#include "runtime/common.hpp"
+#include <servicelib/datasource/http/userver.hpp>
+#include <servicelib/runtime/common.hpp>
 #include <handlers/order_service_api/processorder/requests.hpp>
 #include <handlers/order_service_api/processorder/responses.hpp>
 #include <model/include/example/model/types/order_item.hpp>

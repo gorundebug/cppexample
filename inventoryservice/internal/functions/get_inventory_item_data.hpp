@@ -10,7 +10,7 @@
 #include <utility>
 #include <vector>
 
-#include "runtime/context.hpp"
+#include <servicelib/runtime/context.hpp>
 #include <model/include/example/model/types/order_item.hpp>
 #include <model/include/example/model/types/order_item_result.hpp>
 

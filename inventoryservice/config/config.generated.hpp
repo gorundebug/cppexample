@@ -13,7 +13,7 @@
 #include <userver/formats/yaml/value.hpp>
 
 #include "inventoryservice/config/custom_config.hpp"
-#include "runtime/config/config.hpp"
+#include <servicelib/runtime/config/config.hpp>
 
 namespace example::inventory_service::config {
 
@@ -109,104 +109,128 @@ inline Config MakeConfig() {
   using namespace servicelib::api;
 
   Config cfg;
-  cfg.services.inventoryService = ServiceConfig{
-      .id = 1,
-      .name = "Inventory Service",
-      .color = "#D2E5FF",
-      .defaultCallSemantics = MakeCallSemanticsGroup(CallSemantics::kFunctionCall, "", 0),
-      .defaultGrpcTimeout = 0,
-      .environment = Environment::kUndefined,
-      .golangVersion = "1.25.4",
-      .grpcHost = "0.0.0.0",
-      .grpcPort = 9202,
-      .httpHost = "0.0.0.0",
-      .httpPort = 9092,
-      .metricsHandler = "metrics",
-      .modulePath = "github.com/gorundebug/cppexample-inventoryservice",
-      .shutdownTimeout = 30000,
-      .statusHandler = "status",
-  };
-  cfg.streams.getInventoryItemData = ProcessStreamConfig{
-      .id = 1,
-      .name = "Get Inventory Item Data",
-      .pipeline = "inventoryItem",
-      .idService = 1,
-      .idSource = 4,
-      .xPos = 400,
-      .yPos = -261,
-      .functionPackage = "",
-      .functionName = "GetInventoryItemData",
-      .functionDescription = "Look up the inventory record by OrderItem.SKU; retrieve current stock and UnitPrice from the record.\nAlways copy OrderID, ItemID, SKU, RequestedQty (=OrderItem.Quantity), UnitPrice into the result.\nIf stock >= OrderItem.Quantity: reserve the stock atomically and emit\nOrderItemResult{OrderID, ItemID, SKU, RequestedQty, UnitPrice, Reserved: true, Status: CONFIRMED, AvailableQty: OrderItem.Quantity} via out.\nIf stock is insufficient: emit\nOrderItemResult{OrderID, ItemID, SKU, RequestedQty, UnitPrice, Reserved: false, Status: OUT_OF_STOCK, AvailableQty: actual available} via rout.\n",
-      .functionInitializerGroup = "",
-      .functionModule = "",
-  };
-  cfg.streams.mergeInventoryResult = MergeStreamConfig{
-      .id = 3,
-      .name = "Merge Inventory Result",
-      .pipeline = "inventoryItem",
-      .idService = 1,
-      .idSources = {1, 2},
-      .xPos = 542,
-      .yPos = 33,
-  };
-  cfg.streams.processInventoryItem = InputStreamConfig{
-      .id = 4,
-      .name = "Process Inventory Item ",
-      .pipeline = "inventoryItem",
-      .idService = 1,
-      .idSource = 3,
-      .xPos = 131,
-      .yPos = -165,
-      .valueType = "OrderItem",
-      .idEndpoint = 1,
-  };
-  cfg.dataConnectors.inventoryServiceApi = GrpcDataConnectorConfig{
-      .id = 1,
-      .name = "Inventory Service API",
-      .implementation = DataConnectorImplementation::kUserverGRPC,
-      .module = "inventory_service_api",
-      .address = "dns:///localhost:9202",
-  };
-  cfg.endpoints.processOrderItem = GrpcEndpointConfig{
-      .id = 1,
-      .name = "Process Order Item",
-      .idDataConnector = 1,
-      .grpcMethodType = GrpcMethodType::kNoStreaming,
-      .methodName = "ProcessOrderItem",
-      .functionName = "ProcessOrderItem",
-      .functionPackage = "",
-      .publicFunction = false,
-      .functionDescription = "Outgoing unary gRPC call to the Inventory Service.\n[ConsumeMessage] map OrderItem → ProcessOrderItemRequest (OrderID, ItemID, SKU, Quantity); call sender.Send(req).\n[HandleResponse] map ProcessOrderItemResponse → OrderItemResult:\ncopy OrderID, ItemID, AvailableQty, Reserved, Status, UnitPrice from response; push downstream via sc.Collect.\n[EndRequest] log the outcome.\n",
-      .functionInitializerGroup = "",
-  };
-  cfg.modules.inventoryServiceApi = ModuleConfig{
-      .name = "inventory_service_api",
-      .path = "github.com/gorundebug/cppexample-inventory-service-api",
-  };
-  cfg.modules.model = ModuleConfig{
-      .name = "model",
-      .path = "github.com/gorundebug/cppexample-model",
-  };
-  cfg.modules.orderServiceApi = ModuleConfig{
-      .name = "order_service_api",
-      .path = "github.com/gorundebug/cppexample-order-service-api",
-  };
-  cfg.types.orderItem = TypeConfig{
-      .name = "OrderItem",
-      .type = DataType::kStruct,
-      .module = "model",
-      .definitionFormat = TypeDefinitionFormat::kNative,
-      .publicType = false,
-      .transferByValue = false,
-  };
-  cfg.types.orderItemResult = TypeConfig{
-      .name = "OrderItemResult",
-      .type = DataType::kStruct,
-      .module = "model",
-      .definitionFormat = TypeDefinitionFormat::kNative,
-      .publicType = false,
-      .transferByValue = false,
-  };
+  cfg.services.inventoryService = [] {
+    ServiceConfig value{};
+    value.id = 1;
+    value.name = "Inventory Service";
+    value.color = "#D2E5FF";
+    value.defaultCallSemantics = MakeCallSemanticsGroup(CallSemantics::kFunctionCall, "", 0);
+    value.defaultGrpcTimeout = 0;
+    value.environment = Environment::kUndefined;
+    value.golangVersion = "1.25.4";
+    value.grpcHost = "0.0.0.0";
+    value.grpcPort = 9202;
+    value.httpHost = "0.0.0.0";
+    value.httpPort = 9092;
+    value.metricsHandler = "metrics";
+    value.modulePath = "github.com/gorundebug/cppexample-inventoryservice";
+    value.shutdownTimeout = 30000;
+    value.statusHandler = "status";
+    return value;
+  }();
+  cfg.streams.getInventoryItemData = [] {
+    ProcessStreamConfig value{};
+    value.id = 1;
+    value.name = "Get Inventory Item Data";
+    value.pipeline = "inventoryItem";
+    value.idService = 1;
+    value.idSource = 4;
+    value.xPos = 400;
+    value.yPos = -261;
+    value.functionPackage = "";
+    value.functionName = "GetInventoryItemData";
+    value.functionDescription = "Look up the inventory record by OrderItem.SKU; retrieve current stock and UnitPrice from the record.\nAlways copy OrderID, ItemID, SKU, RequestedQty (=OrderItem.Quantity), UnitPrice into the result.\nIf stock >= OrderItem.Quantity: reserve the stock atomically and emit\nOrderItemResult{OrderID, ItemID, SKU, RequestedQty, UnitPrice, Reserved: true, Status: CONFIRMED, AvailableQty: OrderItem.Quantity} via out.\nIf stock is insufficient: emit\nOrderItemResult{OrderID, ItemID, SKU, RequestedQty, UnitPrice, Reserved: false, Status: OUT_OF_STOCK, AvailableQty: actual available} via rout.\n";
+    value.functionInitializerGroup = "";
+    value.functionModule = "";
+    return value;
+  }();
+  cfg.streams.mergeInventoryResult = [] {
+    MergeStreamConfig value{};
+    value.id = 3;
+    value.name = "Merge Inventory Result";
+    value.pipeline = "inventoryItem";
+    value.idService = 1;
+    value.idSources = {1, 2};
+    value.xPos = 542;
+    value.yPos = 33;
+    return value;
+  }();
+  cfg.streams.processInventoryItem = [] {
+    InputStreamConfig value{};
+    value.id = 4;
+    value.name = "Process Inventory Item ";
+    value.pipeline = "inventoryItem";
+    value.idService = 1;
+    value.idSource = 3;
+    value.xPos = 131;
+    value.yPos = -165;
+    value.valueType = "OrderItem";
+    value.idEndpoint = 1;
+    return value;
+  }();
+  cfg.dataConnectors.inventoryServiceApi = [] {
+    GrpcDataConnectorConfig value{};
+    value.id = 1;
+    value.name = "Inventory Service API";
+    value.implementation = DataConnectorImplementation::kUserverGRPC;
+    value.module = "inventory_service_api";
+    value.address = "dns:///localhost:9202";
+    return value;
+  }();
+  cfg.endpoints.processOrderItem = [] {
+    GrpcEndpointConfig value{};
+    value.id = 1;
+    value.name = "Process Order Item";
+    value.idDataConnector = 1;
+    value.grpcMethodType = GrpcMethodType::kNoStreaming;
+    value.methodName = "ProcessOrderItem";
+    value.functionName = "ProcessOrderItem";
+    value.functionPackage = "";
+    value.publicFunction = false;
+    value.functionDescription = "Outgoing unary gRPC call to the Inventory Service.\n[ConsumeMessage] map OrderItem → ProcessOrderItemRequest (OrderID, ItemID, SKU, Quantity); call sender.Send(req).\n[HandleResponse] map ProcessOrderItemResponse → OrderItemResult:\ncopy OrderID, ItemID, AvailableQty, Reserved, Status, UnitPrice from response; push downstream via sc.Collect.\n[EndRequest] log the outcome.\n";
+    value.functionInitializerGroup = "";
+    return value;
+  }();
+  cfg.modules.inventoryServiceApi = [] {
+    ModuleConfig value{};
+    value.name = "inventory_service_api";
+    value.path = "github.com/gorundebug/cppexample-inventory-service-api";
+    return value;
+  }();
+  cfg.modules.model = [] {
+    ModuleConfig value{};
+    value.name = "model";
+    value.path = "github.com/gorundebug/cppexample-model";
+    return value;
+  }();
+  cfg.modules.orderServiceApi = [] {
+    ModuleConfig value{};
+    value.name = "order_service_api";
+    value.path = "github.com/gorundebug/cppexample-order-service-api";
+    return value;
+  }();
+  cfg.types.orderItem = [] {
+    TypeConfig value{};
+    value.name = "OrderItem";
+    value.type = DataType::kStruct;
+    value.package = "";
+    value.module = "model";
+    value.definitionFormat = TypeDefinitionFormat::kNative;
+    value.publicType = false;
+    value.transferByValue = false;
+    return value;
+  }();
+  cfg.types.orderItemResult = [] {
+    TypeConfig value{};
+    value.name = "OrderItemResult";
+    value.type = DataType::kStruct;
+    value.package = "";
+    value.module = "model";
+    value.definitionFormat = TypeDefinitionFormat::kNative;
+    value.publicType = false;
+    value.transferByValue = false;
+    return value;
+  }();
   return cfg;
 }
 

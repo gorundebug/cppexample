@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# Generated integration test command.
 set -euo pipefail
 
 # Integration tests are ordinary CTest tests carrying the "integration" label.

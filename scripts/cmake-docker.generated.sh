@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# Generated CMake Docker command.
 set -euo pipefail
 
 # Docker selects the native linux/amd64 or linux/arm64 image automatically.

@@ -4,17 +4,26 @@
 
 export SERVICEGEN_FETCH_CPP_DEPENDENCIES := ON
 
-.PHONY: build test lint fmt clean docker-build docker-up docker-down \
-	docker-clean help
+.PHONY: build test release-build release-test release-up lint fmt clean \
+	docker-build docker-up docker-down docker-clean help
 
 build: ## Build the service in the canonical Docker toolchain
-	@./scripts/build.sh
+	@./scripts/build.generated.sh
 
 test: ## Build and run all service tests in Docker
-	@./scripts/test.sh
+	@./scripts/test.generated.sh
+
+release-build: ## Build the optimized service in Docker
+	@./scripts/build.generated.sh docker-release
+
+release-test: ## Build and test the optimized service in Docker
+	@./scripts/test.generated.sh docker-release
+
+release-up: release-build ## Start the service built with CMake Release
+	@docker compose up -d
 
 lint: ## Run clang-format and clang-tidy checks in Docker
-	@./scripts/lint.sh
+	@./scripts/lint.generated.sh
 
 fmt: ## Format C++ sources in Docker
 	@./scripts/format.generated.sh

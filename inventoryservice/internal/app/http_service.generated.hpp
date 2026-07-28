@@ -2,7 +2,7 @@
 #pragma once
 
 #include "inventoryservice/config/config.generated.hpp"
-#include "datasource/http/userver.hpp"
+#include <servicelib/datasource/http/userver.hpp>
 #include "inventoryservice/internal/app/service.hpp"
 
 namespace example::inventory_service::app {

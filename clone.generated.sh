@@ -19,12 +19,12 @@ clone_if_missing() {
 }
 
 echo "==> Cloning services..."
-clone_if_missing "inventoryservice" "https://github.com/gorundebug/cppexample-inventoryservice" "v0.0.1"
-clone_if_missing "orderservice" "https://github.com/gorundebug/cppexample-orderservice" "v0.0.1"
+clone_if_missing "inventoryservice" "https://github.com/gorundebug/cppexample-inventoryservice.git" "v0.0.1"
+clone_if_missing "orderservice" "https://github.com/gorundebug/cppexample-orderservice.git" "v0.0.1"
 
 echo "==> Cloning modules..."
-clone_if_missing "inventory_service_api" "https://github.com/gorundebug/cppexample-inventory-service-api" "v0.0.1"
-clone_if_missing "model" "https://github.com/gorundebug/cppexample-model" "v0.0.1"
-clone_if_missing "order_service_api" "https://github.com/gorundebug/cppexample-order-service-api" "v0.0.1"
+clone_if_missing "inventory_service_api" "https://github.com/gorundebug/cppexample-inventory-service-api.git" "v0.0.1"
+clone_if_missing "model" "https://github.com/gorundebug/cppexample-model.git" "v0.0.1"
+clone_if_missing "order_service_api" "https://github.com/gorundebug/cppexample-order-service-api.git" "v0.0.1"
 
 echo "==> Done."

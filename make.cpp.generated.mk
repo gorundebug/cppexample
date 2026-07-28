@@ -11,7 +11,8 @@ LANG_TOOL_TARGETS += cpp-tools
 LANG_DOCKER_BUILD_TARGETS += cpp-docker-build
 LANG_INTEGRATION_TARGETS += cpp-integration-test
 
-.PHONY: cpp-build cpp-test cpp-lint cpp-format cpp-gen cpp-clean cpp-tools \
+.PHONY: cpp-build cpp-test cpp-release-build cpp-release-test \
+	cpp-release-up cpp-lint cpp-format cpp-gen cpp-clean cpp-tools \
 	cpp-docker-build cpp-integration-test cpp-package
 
 CPP_SERVICE_DIRS := inventoryservice orderservice
@@ -25,6 +26,15 @@ cpp-build: cpp-tools ## Build all C++ services in Docker
 
 cpp-test: cpp-tools ## Run all C++ unit tests in Docker
 	@./scripts/test.generated.sh
+
+cpp-release-build: cpp-tools ## Build optimized C++ services in Docker
+	@./scripts/build.generated.sh docker-release
+
+cpp-release-test: cpp-tools ## Build and test optimized C++ services in Docker
+	@./scripts/test.generated.sh docker-release
+
+cpp-release-up: cpp-release-build ## Start services built with CMake Release
+	@docker compose up -d
 
 cpp-lint: cpp-tools ## Run clang-format and clang-tidy checks in Docker
 	@./scripts/lint.generated.sh

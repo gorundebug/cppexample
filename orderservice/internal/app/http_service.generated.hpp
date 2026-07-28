@@ -2,7 +2,7 @@
 #pragma once
 
 #include "orderservice/config/config.generated.hpp"
-#include "datasource/http/userver.hpp"
+#include <servicelib/datasource/http/userver.hpp>
 #include "orderservice/internal/app/service.hpp"
 
 namespace example::order_service::app {

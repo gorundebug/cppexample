@@ -15,13 +15,13 @@
 
 
 #include "inventoryservice/config/config.generated.hpp"
-#include "runtime/config/component.hpp"
-#include "runtime/serviceapp.hpp"
-#include "runtime/telemetry/userver/log.hpp"
-#include "runtime/telemetry/userver/metrics.hpp"
-#include "runtime/telemetry/userver/tracing.hpp"
-#include "transformation/streams.hpp"
-#include "datasource/grpc/userver.hpp"
+#include <servicelib/runtime/config/component.hpp>
+#include <servicelib/runtime/serviceapp.hpp>
+#include <servicelib/runtime/telemetry/userver/log.hpp>
+#include <servicelib/runtime/telemetry/userver/metrics.hpp>
+#include <servicelib/runtime/telemetry/userver/tracing.hpp>
+#include <servicelib/transformation/streams.hpp>
+#include <servicelib/datasource/grpc/userver.hpp>
 
 #include <inventoryservice/internal/functions/get_inventory_item_data.hpp>
 #include <inventoryservice/internal/functions/process_order_item.hpp>

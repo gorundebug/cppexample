@@ -16,14 +16,14 @@
 
 
 #include "orderservice/config/config.generated.hpp"
-#include "runtime/config/component.hpp"
-#include "runtime/serviceapp.hpp"
-#include "runtime/telemetry/userver/log.hpp"
-#include "runtime/telemetry/userver/metrics.hpp"
-#include "runtime/telemetry/userver/tracing.hpp"
-#include "transformation/streams.hpp"
-#include "datasink/grpc/userver.hpp"
-#include "datasource/http/userver.hpp"
+#include <servicelib/runtime/config/component.hpp>
+#include <servicelib/runtime/serviceapp.hpp>
+#include <servicelib/runtime/telemetry/userver/log.hpp>
+#include <servicelib/runtime/telemetry/userver/metrics.hpp>
+#include <servicelib/runtime/telemetry/userver/tracing.hpp>
+#include <servicelib/transformation/streams.hpp>
+#include <servicelib/datasink/grpc/userver.hpp>
+#include <servicelib/datasource/http/userver.hpp>
 
 #include <handlers/order_service_api/processorder/requests.hpp>
 #include <handlers/order_service_api/processorder/responses.hpp>

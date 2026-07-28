@@ -5,7 +5,7 @@ services:
       context: .
       dockerfile: Dockerfile.cmake
       additional_contexts:
-        servicelib-source: ${SERVICELIB_SOURCE_CONTEXT:-https://github.com/gorundebug/cppservicelib.git#v2.1.6}
+        servicelib-source: ${SERVICELIB_SOURCE_CONTEXT:-https://github.com/gorundebug/cppservicelib.git#v3.0.0}
         userver-source: ${USERVER_SOURCE_CONTEXT:-https://github.com/userver-framework/userver.git#c9f77729c0edce7e423def2d4a4450aa7fc9d259}
     working_dir: /workspace
     environment:
@@ -15,6 +15,7 @@ services:
       GITHUB_TOKEN: ${GITHUB_TOKEN:-}
       GITLAB_TOKEN: ${GITLAB_TOKEN:-}
       SERVICEGEN_FETCH_CPP_DEPENDENCIES: ${SERVICEGEN_FETCH_CPP_DEPENDENCIES:-ON}
+      USERVER_LTO: ${USERVER_LTO:-OFF}
     volumes:
       - .:/workspace
       - cpp-cmake-build:/workspace/build

@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# Generated userver patch command.
 set -euo pipefail
 
 if (($# != 1)); then

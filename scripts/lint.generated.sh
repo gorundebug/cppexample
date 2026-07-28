@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# Generated lint command.
 set -euo pipefail
 
 exec docker compose -f docker-compose.cmake.yml run --build --rm cpp-build \

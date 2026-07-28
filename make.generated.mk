@@ -127,17 +127,19 @@ $(GLAB):
 common-tools: $(ACT) $(GH) $(GLAB)
 
 define git-push-dir
-	@host=$$(echo "$(3)" | cut -d/ -f1); \
-	repo=$$(echo "$(3)" | sed "s|$$host/||"); \
+	@set -eu; \
+	host="$(3)"; \
+	repo="$(4)"; \
 	if [ "$$host" = "gitlab.com" ]; then \
 	  $(GLAB) repo create $$repo --private 2>/dev/null || true; \
 	else \
 	  $(GH) repo create $$repo --private 2>/dev/null || true; \
 	fi; \
 	tmp=$$(mktemp -d); \
-	if [ "$(4)" = "cpp-service" ]; then \
+	trap 'rm -rf "$$tmp"' EXIT INT TERM; \
+	if [ "$(5)" = "cpp-service" ]; then \
 	  ./scripts/package-cpp-service.generated.sh "./$(1)" "$$tmp"; \
-	elif [ "$(4)" = "python-service" ]; then \
+	elif [ "$(5)" = "python-service" ]; then \
 	  ./scripts/package-python-service.generated.sh "./$(1)" "$$tmp"; \
 	else \
 	  cp -r ./$(1)/. $$tmp/; \
@@ -149,72 +151,54 @@ define git-push-dir
 	git -c user.email="local@dev" -c user.name="local" commit -q -m "release $(2)"; \
 	git tag -f $(2); \
 	git push -qf git@$$host:$$repo.git HEAD:main; \
-	git push -qf git@$$host:$$repo.git refs/tags/$(2); \
-	code=$$?; rm -rf $$tmp; exit $$code
+	git push -qf git@$$host:$$repo.git refs/tags/$(2)
 endef
 
 git-push-inventory_service_api: $(GH) ## Push module inventory_service_api to github.com/gorundebug/cppexample-inventory-service-api
-	$(call git-push-dir,inventory_service_api,$(MODULE_VERSION),github.com/gorundebug/cppexample-inventory-service-api)
+	$(call git-push-dir,inventory_service_api,$(MODULE_VERSION),github.com,gorundebug/cppexample-inventory-service-api)
 
 git-delete-inventory_service_api: $(GH) ## Delete module inventory_service_api from remote
-	@if echo "github.com/gorundebug/cppexample-inventory-service-api" | grep -q '^gitlab.com/'; then \
-	  $(GLAB) repo delete github.com/gorundebug/cppexample-inventory-service-api --yes 2>/dev/null || true; \
-	else \
-	  $(GH) repo delete github.com/gorundebug/cppexample-inventory-service-api --yes 2>/dev/null || true; \
-	fi
+	@$(GH) repo delete gorundebug/cppexample-inventory-service-api --yes 2>/dev/null || true
+
 
 git-push-model: $(GH) ## Push module model to github.com/gorundebug/cppexample-model
-	$(call git-push-dir,model,$(MODULE_VERSION),github.com/gorundebug/cppexample-model)
+	$(call git-push-dir,model,$(MODULE_VERSION),github.com,gorundebug/cppexample-model)
 
 git-delete-model: $(GH) ## Delete module model from remote
-	@if echo "github.com/gorundebug/cppexample-model" | grep -q '^gitlab.com/'; then \
-	  $(GLAB) repo delete github.com/gorundebug/cppexample-model --yes 2>/dev/null || true; \
-	else \
-	  $(GH) repo delete github.com/gorundebug/cppexample-model --yes 2>/dev/null || true; \
-	fi
+	@$(GH) repo delete gorundebug/cppexample-model --yes 2>/dev/null || true
+
 
 git-push-order_service_api: $(GH) ## Push module order_service_api to github.com/gorundebug/cppexample-order-service-api
-	$(call git-push-dir,order_service_api,$(MODULE_VERSION),github.com/gorundebug/cppexample-order-service-api)
+	$(call git-push-dir,order_service_api,$(MODULE_VERSION),github.com,gorundebug/cppexample-order-service-api)
 
 git-delete-order_service_api: $(GH) ## Delete module order_service_api from remote
-	@if echo "github.com/gorundebug/cppexample-order-service-api" | grep -q '^gitlab.com/'; then \
-	  $(GLAB) repo delete github.com/gorundebug/cppexample-order-service-api --yes 2>/dev/null || true; \
-	else \
-	  $(GH) repo delete github.com/gorundebug/cppexample-order-service-api --yes 2>/dev/null || true; \
-	fi
+	@$(GH) repo delete gorundebug/cppexample-order-service-api --yes 2>/dev/null || true
+
 
 git-push-inventoryservice: $(GH) ## Push service Inventory Service to github.com/gorundebug/cppexample-inventoryservice
-	$(call git-push-dir,inventoryservice,$(MODULE_VERSION),github.com/gorundebug/cppexample-inventoryservice,cpp-service)
+	$(call git-push-dir,inventoryservice,$(MODULE_VERSION),github.com,gorundebug/cppexample-inventoryservice,cpp-service)
 
 git-delete-inventoryservice: $(GH) ## Delete service Inventory Service from remote
-	@if echo "github.com/gorundebug/cppexample-inventoryservice" | grep -q '^gitlab.com/'; then \
-	  $(GLAB) repo delete github.com/gorundebug/cppexample-inventoryservice --yes 2>/dev/null || true; \
-	else \
-	  $(GH) repo delete github.com/gorundebug/cppexample-inventoryservice --yes 2>/dev/null || true; \
-	fi
+	@$(GH) repo delete gorundebug/cppexample-inventoryservice --yes 2>/dev/null || true
+
 
 git-push-orderservice: $(GH) ## Push service Order Service to github.com/gorundebug/cppexample-orderservice
-	$(call git-push-dir,orderservice,$(MODULE_VERSION),github.com/gorundebug/cppexample-orderservice,cpp-service)
+	$(call git-push-dir,orderservice,$(MODULE_VERSION),github.com,gorundebug/cppexample-orderservice,cpp-service)
 
 git-delete-orderservice: $(GH) ## Delete service Order Service from remote
-	@if echo "github.com/gorundebug/cppexample-orderservice" | grep -q '^gitlab.com/'; then \
-	  $(GLAB) repo delete github.com/gorundebug/cppexample-orderservice --yes 2>/dev/null || true; \
-	else \
-	  $(GH) repo delete github.com/gorundebug/cppexample-orderservice --yes 2>/dev/null || true; \
-	fi
+	@$(GH) repo delete gorundebug/cppexample-orderservice --yes 2>/dev/null || true
+
 
 git-push-project: $(GH) ## Push project root to github.com/gorundebug/cppexample
-	$(call git-push-dir,.,$(MODULE_VERSION),github.com/gorundebug/cppexample)
+	$(call git-push-dir,.,$(MODULE_VERSION),github.com,gorundebug/cppexample)
 
 git-delete-project: $(GH) ## Delete project repository github.com/gorundebug/cppexample
-	@if echo "github.com/gorundebug/cppexample" | grep -q '^gitlab.com/'; then \
-	  $(GLAB) repo delete github.com/gorundebug/cppexample --yes 2>/dev/null || true; \
-	else \
-	  $(GH) repo delete github.com/gorundebug/cppexample --yes 2>/dev/null || true; \
-	fi
+	@$(GH) repo delete gorundebug/cppexample --yes 2>/dev/null || true
+
 
 git-push: $(GH) ## Push all modules, services, and project repositories
 	@$(GH) auth status >/dev/null 2>&1 || { echo "ERROR: authenticate first with: $(GH) auth login"; exit 1; }
+
 	@$(MAKE) git-push-inventory_service_api git-push-model git-push-order_service_api git-push-inventoryservice git-push-orderservice git-push-project
 
 git-delete: $(GH) ## Delete all generated remote repositories

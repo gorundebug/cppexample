@@ -39,7 +39,7 @@ cp scripts/cmake-docker.generated.sh scripts/build.generated.sh scripts/test.gen
   scripts/lint.generated.sh scripts/format.generated.sh \
   scripts/configure-git-auth.generated.sh "${output_dir}/scripts/"
 
-# Generated source names make regeneration ownership explicit inside the
+# Generated source names make replacement explicit inside the
 # workspace; a published repository receives conventional Compose filenames.
 cp "${service_dir}/docker-compose.generated.yml" \
   "${output_dir}/docker-compose.yml"

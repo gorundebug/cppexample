@@ -13,7 +13,7 @@
 #include <userver/formats/yaml/value.hpp>
 
 #include "orderservice/config/custom_config.hpp"
-#include "runtime/config/config.hpp"
+#include <servicelib/runtime/config/config.hpp>
 
 namespace example::order_service::config {
 
@@ -125,203 +125,247 @@ inline Config MakeConfig() {
   using namespace servicelib::api;
 
   Config cfg;
-  cfg.services.orderService = ServiceConfig{
-      .id = 2,
-      .name = "Order Service",
-      .color = "#D2E5FF",
-      .defaultCallSemantics = MakeCallSemanticsGroup(CallSemantics::kFunctionCall, "", 0),
-      .defaultGrpcTimeout = 0,
-      .environment = Environment::kUndefined,
-      .golangVersion = "1.25.4",
-      .grpcHost = "0.0.0.0",
-      .grpcPort = 9201,
-      .httpHost = "0.0.0.0",
-      .httpPort = 9091,
-      .metricsHandler = "metrics",
-      .modulePath = "github.com/gorundebug/cppexample-orderservice",
-      .shutdownTimeout = 30000,
-      .statusHandler = "status",
-  };
-  cfg.streams.mapOrderItemResultToOrderState = MapStreamConfig{
-      .id = 5,
-      .name = "Map Order Item Result To Order State",
-      .pipeline = "order",
-      .idService = 2,
-      .idSource = 9,
-      .xPos = 0,
-      .yPos = 0,
-      .valueType = "OrderState",
-      .functionPackage = "",
-      .functionName = "MapOrderItemResultToOrderState",
-      .functionDescription = "Convert a single OrderItemResult into an OrderState.\nSet OrderID from result.OrderID; set Status=CONFIRMED if result.Reserved==true, otherwise PARTIALLY_CONFIRMED.\nSet ConfirmedItems to a single-element slice containing result.\n",
-      .functionInitializerGroup = "",
-      .functionModule = "",
-  };
-  cfg.streams.mapToOrderState = MapStreamConfig{
-      .id = 6,
-      .name = "Map to Order State",
-      .pipeline = "order",
-      .idService = 2,
-      .idSource = 11,
-      .xPos = -459,
-      .yPos = 76,
-      .valueType = "OrderState",
-      .functionPackage = "",
-      .functionName = "MapToOrderState",
-      .functionDescription = "Convert an Order that reached the soft deadline into an OrderState.\nSet OrderID from Order.ID; set Status to TIMED_OUT; leave ConfirmedItems nil.\n",
-      .functionInitializerGroup = "",
-      .functionModule = "",
-  };
-  cfg.streams.mergeResults = MergeStreamConfig{
-      .id = 7,
-      .name = "Merge Results",
-      .pipeline = "order",
-      .idService = 2,
-      .idSources = {6, 5},
-      .xPos = -178,
-      .yPos = 24,
-  };
-  cfg.streams.processOrder = InputStreamConfig{
-      .id = 8,
-      .name = "Process Order",
-      .pipeline = "order",
-      .idService = 2,
-      .idSource = 7,
-      .xPos = -343,
-      .yPos = -229,
-      .valueType = "Order",
-      .idEndpoint = 2,
-  };
-  cfg.streams.processOrderItem = SinkStreamConfig{
-      .id = 9,
-      .name = "Process Order Item",
-      .pipeline = "order",
-      .idService = 2,
-      .idSource = 10,
-      .xPos = -75,
-      .yPos = -311,
-      .idEndpoint = 1,
-      .valueType = "OrderItemResult",
-  };
-  cfg.streams.processOrderItems = FlatMapStreamConfig{
-      .id = 10,
-      .name = "Process Order Items",
-      .pipeline = "order",
-      .idService = 2,
-      .idSource = 12,
-      .xPos = -197,
-      .yPos = -473,
-      .valueType = "OrderItem",
-      .functionPackage = "",
-      .functionName = "ProcessOrderItems",
-      .functionDescription = "Expand an Order into individual OrderItem messages — one sc.Collect call per element of Order.Items.\nCopy Order.ID into each emitted OrderItem.OrderID.\n",
-      .functionInitializerGroup = "",
-      .functionModule = "",
-  };
-  cfg.streams.softDeadline = DelayStreamConfig{
-      .id = 11,
-      .name = "Soft Deadline",
-      .pipeline = "order",
-      .idService = 2,
-      .idSource = 12,
-      .xPos = -706,
-      .yPos = -33,
-      .duration = 0,
-      .functionPackage = "",
-      .functionName = "SoftDeadline",
-      .functionDescription = "Cast stream.GetConfig() to *runtimecfg.DelayStreamConfig and convert cfg.Duration (int, milliseconds) to time.Duration — this is the safety margin.\nIf ctx has no deadline (ctx.Deadline() ok==false), return the margin directly.\nOtherwise compute time.Until(deadline) minus the margin: if the result is negative return 0, otherwise return it.\n",
-      .functionInitializerGroup = "",
-      .functionModule = "",
-  };
-  cfg.streams.splitPipeline = SplitStreamConfig{
-      .id = 12,
-      .name = "Split Pipeline",
-      .pipeline = "order",
-      .idService = 2,
-      .idSource = 8,
-      .xPos = -416,
-      .yPos = -472,
-  };
-  cfg.dataConnectors.inventoryServiceApi = GrpcDataConnectorConfig{
-      .id = 1,
-      .name = "Inventory Service API",
-      .implementation = DataConnectorImplementation::kUserverGRPC,
-      .module = "inventory_service_api",
-      .address = "dns:///localhost:9202",
-  };
-  cfg.dataConnectors.orderServiceApi = HttpDataConnectorConfig{
-      .id = 2,
-      .name = "Order Service API",
-      .implementation = DataConnectorImplementation::kUserverHTTP,
-      .module = "order_service_api",
-      .useDedicatedListener = false,
-  };
-  cfg.endpoints.processOrder = HttpEndpointConfig{
-      .id = 2,
-      .name = "Process Order",
-      .idDataConnector = 2,
-      .httpMethodType = HTTPMethodType::kPOST,
-      .path = "/v1/processorder",
-      .functionName = "ProcessOrder",
-      .functionPackage = "",
-      .publicFunction = false,
-      .functionDescription = "HTTP source handler for POST /v1/processorder.\n[Handler] holds timeout time.Duration read from config property 'timeout' (milliseconds, default 5000).\n[HandlerState] carries a context cancel function.\n[BeginRequest] attaches context timeout via WithTimeout, stores cancel in handler state.\n[ConsumeMessage] decodes JSON body; validates Items non-empty and all quantities positive (write 400 and return error on failure);\ngenerates order ID as UUID; maps each item to OrderItem (ItemId, SKU, Quantity);\nreads optional CustomerId; builds Order with CreatedAt=now;\nregisters result callback keyed on order ID; emits Order via sc.Collect.\n[Result callback] called once per result (N inventory results + possibly one TIMED_OUT);\ncaptures in its closure: sync.Mutex mu, accumulator []OrderItemResult, responseSent bool;\nlocks mu on each invocation;\nif responseSent return true;\nif Status==TIMED_OUT compute TotalAmount as sum of item.UnitPrice*item.RequestedQty for each accumulated item, write partial response with accumulated items, call Done(), return true;\notherwise append result.ConfirmedItems to accumulator and return false if len(accumulated) < N;\nwhen all N collected compute status (CONFIRMED if all items in accumulator have Reserved==true, else PARTIALLY_CONFIRMED),\ncompute TotalAmount as sum of item.UnitPrice * item.RequestedQty for each item in accumulator,\nwrite JSON response, call Done(), return true.\n[GetMessageID] returns OrderState.OrderID.\n[EndRequest] cancels context.\n[Private helper] converts OrderState to ProcessOrderResponse mapping all fields including optional ConfirmedItems slice.\n",
-      .functionInitializerGroup = "",
-  };
-  cfg.endpoints.processOrderItem = GrpcEndpointConfig{
-      .id = 1,
-      .name = "Process Order Item",
-      .idDataConnector = 1,
-      .grpcMethodType = GrpcMethodType::kNoStreaming,
-      .methodName = "ProcessOrderItem",
-      .functionName = "ProcessOrderItem",
-      .functionPackage = "",
-      .publicFunction = false,
-      .functionDescription = "Outgoing unary gRPC call to the Inventory Service.\n[ConsumeMessage] map OrderItem → ProcessOrderItemRequest (OrderID, ItemID, SKU, Quantity); call sender.Send(req).\n[HandleResponse] map ProcessOrderItemResponse → OrderItemResult:\ncopy OrderID, ItemID, AvailableQty, Reserved, Status, UnitPrice from response; push downstream via sc.Collect.\n[EndRequest] log the outcome.\n",
-      .functionInitializerGroup = "",
-  };
-  cfg.modules.inventoryServiceApi = ModuleConfig{
-      .name = "inventory_service_api",
-      .path = "github.com/gorundebug/cppexample-inventory-service-api",
-  };
-  cfg.modules.model = ModuleConfig{
-      .name = "model",
-      .path = "github.com/gorundebug/cppexample-model",
-  };
-  cfg.modules.orderServiceApi = ModuleConfig{
-      .name = "order_service_api",
-      .path = "github.com/gorundebug/cppexample-order-service-api",
-  };
-  cfg.types.order = TypeConfig{
-      .name = "Order",
-      .type = DataType::kStruct,
-      .definitionFormat = TypeDefinitionFormat::kNative,
-      .publicType = false,
-      .transferByValue = false,
-  };
-  cfg.types.orderItem = TypeConfig{
-      .name = "OrderItem",
-      .type = DataType::kStruct,
-      .module = "model",
-      .definitionFormat = TypeDefinitionFormat::kNative,
-      .publicType = false,
-      .transferByValue = false,
-  };
-  cfg.types.orderItemResult = TypeConfig{
-      .name = "OrderItemResult",
-      .type = DataType::kStruct,
-      .module = "model",
-      .definitionFormat = TypeDefinitionFormat::kNative,
-      .publicType = false,
-      .transferByValue = false,
-  };
-  cfg.types.orderState = TypeConfig{
-      .name = "OrderState",
-      .type = DataType::kStruct,
-      .definitionFormat = TypeDefinitionFormat::kNative,
-      .publicType = false,
-      .transferByValue = false,
-  };
+  cfg.services.orderService = [] {
+    ServiceConfig value{};
+    value.id = 2;
+    value.name = "Order Service";
+    value.color = "#D2E5FF";
+    value.defaultCallSemantics = MakeCallSemanticsGroup(CallSemantics::kFunctionCall, "", 0);
+    value.defaultGrpcTimeout = 0;
+    value.environment = Environment::kUndefined;
+    value.golangVersion = "1.25.4";
+    value.grpcHost = "0.0.0.0";
+    value.grpcPort = 9201;
+    value.httpHost = "0.0.0.0";
+    value.httpPort = 9091;
+    value.metricsHandler = "metrics";
+    value.modulePath = "github.com/gorundebug/cppexample-orderservice";
+    value.shutdownTimeout = 30000;
+    value.statusHandler = "status";
+    return value;
+  }();
+  cfg.streams.mapOrderItemResultToOrderState = [] {
+    MapStreamConfig value{};
+    value.id = 5;
+    value.name = "Map Order Item Result To Order State";
+    value.pipeline = "order";
+    value.idService = 2;
+    value.idSource = 9;
+    value.xPos = 0;
+    value.yPos = 0;
+    value.valueType = "OrderState";
+    value.functionPackage = "";
+    value.functionName = "MapOrderItemResultToOrderState";
+    value.functionDescription = "Convert a single OrderItemResult into an OrderState.\nSet OrderID from result.OrderID; set Status=CONFIRMED if result.Reserved==true, otherwise PARTIALLY_CONFIRMED.\nSet ConfirmedItems to a single-element slice containing result.\n";
+    value.functionInitializerGroup = "";
+    value.functionModule = "";
+    return value;
+  }();
+  cfg.streams.mapToOrderState = [] {
+    MapStreamConfig value{};
+    value.id = 6;
+    value.name = "Map to Order State";
+    value.pipeline = "order";
+    value.idService = 2;
+    value.idSource = 11;
+    value.xPos = -459;
+    value.yPos = 76;
+    value.valueType = "OrderState";
+    value.functionPackage = "";
+    value.functionName = "MapToOrderState";
+    value.functionDescription = "Convert an Order that reached the soft deadline into an OrderState.\nSet OrderID from Order.ID; set Status to TIMED_OUT; leave ConfirmedItems nil.\n";
+    value.functionInitializerGroup = "";
+    value.functionModule = "";
+    return value;
+  }();
+  cfg.streams.mergeResults = [] {
+    MergeStreamConfig value{};
+    value.id = 7;
+    value.name = "Merge Results";
+    value.pipeline = "order";
+    value.idService = 2;
+    value.idSources = {6, 5};
+    value.xPos = -178;
+    value.yPos = 24;
+    return value;
+  }();
+  cfg.streams.processOrder = [] {
+    InputStreamConfig value{};
+    value.id = 8;
+    value.name = "Process Order";
+    value.pipeline = "order";
+    value.idService = 2;
+    value.idSource = 7;
+    value.xPos = -343;
+    value.yPos = -229;
+    value.valueType = "Order";
+    value.idEndpoint = 2;
+    return value;
+  }();
+  cfg.streams.processOrderItem = [] {
+    SinkStreamConfig value{};
+    value.id = 9;
+    value.name = "Process Order Item";
+    value.pipeline = "order";
+    value.idService = 2;
+    value.idSource = 10;
+    value.xPos = -75;
+    value.yPos = -311;
+    value.idEndpoint = 1;
+    value.valueType = "OrderItemResult";
+    return value;
+  }();
+  cfg.streams.processOrderItems = [] {
+    FlatMapStreamConfig value{};
+    value.id = 10;
+    value.name = "Process Order Items";
+    value.pipeline = "order";
+    value.idService = 2;
+    value.idSource = 12;
+    value.xPos = -197;
+    value.yPos = -473;
+    value.valueType = "OrderItem";
+    value.functionPackage = "";
+    value.functionName = "ProcessOrderItems";
+    value.functionDescription = "Expand an Order into individual OrderItem messages — one sc.Collect call per element of Order.Items.\nCopy Order.ID into each emitted OrderItem.OrderID.\n";
+    value.functionInitializerGroup = "";
+    value.functionModule = "";
+    return value;
+  }();
+  cfg.streams.softDeadline = [] {
+    DelayStreamConfig value{};
+    value.id = 11;
+    value.name = "Soft Deadline";
+    value.pipeline = "order";
+    value.idService = 2;
+    value.idSource = 12;
+    value.xPos = -706;
+    value.yPos = -33;
+    value.duration = 0;
+    value.functionPackage = "";
+    value.functionName = "SoftDeadline";
+    value.functionDescription = "Cast stream.GetConfig() to *runtimecfg.DelayStreamConfig and convert cfg.Duration (int, milliseconds) to time.Duration — this is the safety margin.\nIf ctx has no deadline (ctx.Deadline() ok==false), return the margin directly.\nOtherwise compute time.Until(deadline) minus the margin: if the result is negative return 0, otherwise return it.\n";
+    value.functionInitializerGroup = "";
+    value.functionModule = "";
+    return value;
+  }();
+  cfg.streams.splitPipeline = [] {
+    SplitStreamConfig value{};
+    value.id = 12;
+    value.name = "Split Pipeline";
+    value.pipeline = "order";
+    value.idService = 2;
+    value.idSource = 8;
+    value.xPos = -416;
+    value.yPos = -472;
+    return value;
+  }();
+  cfg.dataConnectors.inventoryServiceApi = [] {
+    GrpcDataConnectorConfig value{};
+    value.id = 1;
+    value.name = "Inventory Service API";
+    value.implementation = DataConnectorImplementation::kUserverGRPC;
+    value.module = "inventory_service_api";
+    value.address = "dns:///localhost:9202";
+    return value;
+  }();
+  cfg.dataConnectors.orderServiceApi = [] {
+    HttpDataConnectorConfig value{};
+    value.id = 2;
+    value.name = "Order Service API";
+    value.implementation = DataConnectorImplementation::kUserverHTTP;
+    value.module = "order_service_api";
+    value.useDedicatedListener = false;
+    return value;
+  }();
+  cfg.endpoints.processOrder = [] {
+    HttpEndpointConfig value{};
+    value.id = 2;
+    value.name = "Process Order";
+    value.idDataConnector = 2;
+    value.httpMethodType = HTTPMethodType::kPOST;
+    value.path = "/v1/processorder";
+    value.functionName = "ProcessOrder";
+    value.functionPackage = "";
+    value.publicFunction = false;
+    value.functionDescription = "HTTP source handler for POST /v1/processorder.\n[Handler] holds timeout time.Duration read from config property 'timeout' (milliseconds, default 5000).\n[HandlerState] carries a context cancel function.\n[BeginRequest] attaches context timeout via WithTimeout, stores cancel in handler state.\n[ConsumeMessage] decodes JSON body; validates Items non-empty and all quantities positive (write 400 and return error on failure);\ngenerates order ID as UUID; maps each item to OrderItem (ItemId, SKU, Quantity);\nreads optional CustomerId; builds Order with CreatedAt=now;\nregisters result callback keyed on order ID; emits Order via sc.Collect.\n[Result callback] called once per result (N inventory results + possibly one TIMED_OUT);\ncaptures in its closure: sync.Mutex mu, accumulator []OrderItemResult, responseSent bool;\nlocks mu on each invocation;\nif responseSent return true;\nif Status==TIMED_OUT compute TotalAmount as sum of item.UnitPrice*item.RequestedQty for each accumulated item, write partial response with accumulated items, call Done(), return true;\notherwise append result.ConfirmedItems to accumulator and return false if len(accumulated) < N;\nwhen all N collected compute status (CONFIRMED if all items in accumulator have Reserved==true, else PARTIALLY_CONFIRMED),\ncompute TotalAmount as sum of item.UnitPrice * item.RequestedQty for each item in accumulator,\nwrite JSON response, call Done(), return true.\n[GetMessageID] returns OrderState.OrderID.\n[EndRequest] cancels context.\n[Private helper] converts OrderState to ProcessOrderResponse mapping all fields including optional ConfirmedItems slice.\n";
+    value.functionInitializerGroup = "";
+    return value;
+  }();
+  cfg.endpoints.processOrderItem = [] {
+    GrpcEndpointConfig value{};
+    value.id = 1;
+    value.name = "Process Order Item";
+    value.idDataConnector = 1;
+    value.grpcMethodType = GrpcMethodType::kNoStreaming;
+    value.methodName = "ProcessOrderItem";
+    value.functionName = "ProcessOrderItem";
+    value.functionPackage = "";
+    value.publicFunction = false;
+    value.functionDescription = "Outgoing unary gRPC call to the Inventory Service.\n[ConsumeMessage] map OrderItem → ProcessOrderItemRequest (OrderID, ItemID, SKU, Quantity); call sender.Send(req).\n[HandleResponse] map ProcessOrderItemResponse → OrderItemResult:\ncopy OrderID, ItemID, AvailableQty, Reserved, Status, UnitPrice from response; push downstream via sc.Collect.\n[EndRequest] log the outcome.\n";
+    value.functionInitializerGroup = "";
+    return value;
+  }();
+  cfg.modules.inventoryServiceApi = [] {
+    ModuleConfig value{};
+    value.name = "inventory_service_api";
+    value.path = "github.com/gorundebug/cppexample-inventory-service-api";
+    return value;
+  }();
+  cfg.modules.model = [] {
+    ModuleConfig value{};
+    value.name = "model";
+    value.path = "github.com/gorundebug/cppexample-model";
+    return value;
+  }();
+  cfg.modules.orderServiceApi = [] {
+    ModuleConfig value{};
+    value.name = "order_service_api";
+    value.path = "github.com/gorundebug/cppexample-order-service-api";
+    return value;
+  }();
+  cfg.types.order = [] {
+    TypeConfig value{};
+    value.name = "Order";
+    value.type = DataType::kStruct;
+    value.package = "";
+    value.definitionFormat = TypeDefinitionFormat::kNative;
+    value.publicType = false;
+    value.transferByValue = false;
+    return value;
+  }();
+  cfg.types.orderItem = [] {
+    TypeConfig value{};
+    value.name = "OrderItem";
+    value.type = DataType::kStruct;
+    value.package = "";
+    value.module = "model";
+    value.definitionFormat = TypeDefinitionFormat::kNative;
+    value.publicType = false;
+    value.transferByValue = false;
+    return value;
+  }();
+  cfg.types.orderItemResult = [] {
+    TypeConfig value{};
+    value.name = "OrderItemResult";
+    value.type = DataType::kStruct;
+    value.package = "";
+    value.module = "model";
+    value.definitionFormat = TypeDefinitionFormat::kNative;
+    value.publicType = false;
+    value.transferByValue = false;
+    return value;
+  }();
+  cfg.types.orderState = [] {
+    TypeConfig value{};
+    value.name = "OrderState";
+    value.type = DataType::kStruct;
+    value.package = "";
+    value.definitionFormat = TypeDefinitionFormat::kNative;
+    value.publicType = false;
+    value.transferByValue = false;
+    return value;
+  }();
   return cfg;
 }
 
