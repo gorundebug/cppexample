@@ -1,0 +1,13 @@
+.git
+.github
+.gitlab-ci.yml
+.editorconfig
+.actrc
+tools/*
+!tools/userver/
+!tools/userver/**
+grafana/
+*.md
+go.work.sum
+build/
+.cppservicelib/

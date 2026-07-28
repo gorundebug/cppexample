@@ -1,0 +1,35 @@
+components_manager:
+  task_processors:
+    main-task-processor:
+      worker_threads: 4
+    fs-task-processor:
+      worker_threads: 1
+
+  default_task_processor: main-task-processor
+  components:
+    logging:
+      fs-task-processor: fs-task-processor
+      loggers:
+        default:
+          file_path: '@stderr'
+          level: info
+          overflow_behavior: discard
+    testsuite-support:
+    server:
+      listener:
+        port: 9092
+        task_processor: main-task-processor
+
+
+    grpc-server:
+      port: 9202
+      completion-queue-count: 2
+    grpc-server-middlewares-pipeline:
+    servicelib-runtime:
+      config-path: inventoryservice/config/config.yaml
+      override-path: $inventoryServiceConfigOverridePath
+      fs-task-processor: fs-task-processor
+    inventory-service: {}
+    inventory-service-api:
+      task-processor: main-task-processor
+      disable-all-pipeline-middlewares: true

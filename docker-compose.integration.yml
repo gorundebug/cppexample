@@ -1,0 +1,30 @@
+services:
+  inventoryservice:
+    image: example-cpp-build
+    working_dir: /workspace
+    command:
+      - /workspace/build/inventoryservice/example_inventory_service
+      - --config
+      - /workspace/inventoryservice/static_config.yaml
+      - --config_vars
+      - /workspace/config_vars.integration.yaml
+    volumes:
+      - .:/workspace
+      - cpp-cmake-build:/workspace/build
+    stop_grace_period: 30000ms
+  orderservice:
+    image: example-cpp-build
+    working_dir: /workspace
+    command:
+      - /workspace/build/orderservice/example_order_service
+      - --config
+      - /workspace/orderservice/static_config.yaml
+      - --config_vars
+      - /workspace/config_vars.integration.yaml
+    volumes:
+      - .:/workspace
+      - cpp-cmake-build:/workspace/build
+    stop_grace_period: 30000ms
+
+volumes:
+  cpp-cmake-build:

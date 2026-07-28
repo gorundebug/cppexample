@@ -1,0 +1,60 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 24,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "host-debug",
+      "displayName": "Host debug (optional fast path)",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/host",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "SERVICEGEN_FETCH_CPP_DEPENDENCIES": "OFF",
+        "SERVICELIB_SOURCE_DIR": "$env{SERVICELIB_SOURCE_DIR}",
+        "USERVER_SOURCE_DIR": "$env{USERVER_SOURCE_DIR}"
+      }
+    },
+    {
+      "name": "docker-debug",
+      "displayName": "Docker debug",
+      "generator": "Ninja",
+      "binaryDir": "/workspace/build",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "SERVICEGEN_FETCH_CPP_DEPENDENCIES": "OFF",
+        "SERVICELIB_SOURCE_DIR": "$env{SERVICELIB_SOURCE_DIR}",
+        "USERVER_SOURCE_DIR": "$env{USERVER_SOURCE_DIR}"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "host-debug",
+      "configurePreset": "host-debug"
+    },
+    {
+      "name": "docker-debug",
+      "configurePreset": "docker-debug"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "host-debug",
+      "configurePreset": "host-debug",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "docker-debug",
+      "configurePreset": "docker-debug",
+      "output": {
+        "outputOnFailure": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'inventoryservice'
+    static_configs:
+      - targets: ['inventoryservice:9092']
+    metrics_path: '/metrics'
+  - job_name: 'orderservice'
+    static_configs:
+      - targets: ['orderservice:9091']
+    metrics_path: '/metrics'

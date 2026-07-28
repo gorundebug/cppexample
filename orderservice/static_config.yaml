@@ -1,0 +1,42 @@
+components_manager:
+  task_processors:
+    main-task-processor:
+      worker_threads: 4
+    fs-task-processor:
+      worker_threads: 1
+    grpc-blocking-task-processor:
+      worker_threads: 1
+      thread_name: grpc-worker
+
+  default_task_processor: main-task-processor
+  components:
+    logging:
+      fs-task-processor: fs-task-processor
+      loggers:
+        default:
+          file_path: '@stderr'
+          level: info
+          overflow_behavior: discard
+    testsuite-support:
+    server:
+      listener:
+        port: 9091
+        task_processor: main-task-processor
+
+    grpc-client-common:
+      blocking-task-processor: grpc-blocking-task-processor
+    grpc-client-factory:
+      channel-args: {}
+    grpc-client-middlewares-pipeline:
+    grpc-client-deadline-propagation:
+    grpc-client-logging:
+    servicelib-runtime:
+      config-path: orderservice/config/config.yaml
+      override-path: $orderServiceConfigOverridePath
+      fs-task-processor: fs-task-processor
+    order-service: {}
+
+    handler-process-order:
+      path: /v1/processorder
+      method: POST
+      task_processor: main-task-processor
