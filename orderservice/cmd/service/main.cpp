@@ -10,6 +10,10 @@
 
 #include <servicelib/runtime/telemetry/userver/metrics.hpp>
 
+
+#include <servicelib/runtime/telemetry/userver/status.hpp>
+
+
 #include "orderservice/internal/app/service.generated.hpp"
 #include "orderservice/internal/app/http_service.generated.hpp"
 
@@ -23,8 +27,15 @@ int main(int argc, char* argv[]) {
               userver::ugrpc::client::MinimalComponentList())
 
           .Append<example::order_service::app::RuntimeConfigComponent>()
-          .Append<servicelib::telemetry::userver_adapter::MetricsHandler>()
           .Append<example::order_service::app::OrderServiceComponent>()
+          .Append<servicelib::telemetry::userver_adapter::MetricsHandler>()
+
+          .Append<servicelib::telemetry::userver_adapter::StatusPageHandler>()
+          .Append<servicelib::telemetry::userver_adapter::StatusDataHandler>()
+          .Append<servicelib::telemetry::userver_adapter::StatusGraphHandler>()
+          .Append<servicelib::telemetry::userver_adapter::StatusJavaScriptHandler>()
+          .Append<servicelib::telemetry::userver_adapter::StatusCssHandler>()
+
           .Append<example::order_service::app::ProcessOrderHTTPHandler>()
           ;
   return userver::utils::DaemonMain(argc, argv, components);

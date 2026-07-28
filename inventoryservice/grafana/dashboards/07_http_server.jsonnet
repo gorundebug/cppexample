@@ -1,173 +1,138 @@
-// Dashboard: HTTP Server
+// Dashboard: HTTP Server (C++ / userver)
 //
-// Source: otelhttp.NewHandler (MetricsEngine.HTTPServerHandler)
-// OTel semconv → Prometheus exporter v0.65:
-//
-//   http_server_request_duration_seconds{http_request_method, http_response_status_code,
-//     http_route, url_scheme, server_address, server_port,
-//     network_protocol_name, network_protocol_version, error_type}  histogram
-//   http_server_request_body_size_bytes{...}                        histogram
-//   http_server_response_body_size_bytes{...}                       histogram
-//   http_server_active_requests{...}                                gauge
+// userver exports cumulative counters and percentile gauges:
+//   http_handler_rps{http_handler,http_path}
+//   http_handler_reply_codes{http_handler,http_path,http_code}
+//   http_handler_in_flight{http_handler,http_path}
+//   http_handler_timings{http_handler,http_path,percentile} (milliseconds)
 
 local g = import 'github.com/grafana/grafonnet/gen/grafonnet-v11.0.0/main.libsonnet';
 local lib = import '_lib.libsonnet';
 
-local jobFilter   = 'job=~"$job"';
-local srvFilter   = '%s, server_address=~"$server_address"' % jobFilter;
-local routeFilter = '%s, http_route=~"$http_route"' % srvFilter;
+local jobFilter = 'job=~"$job"';
+local handlerFilter = '%s, http_handler=~"$http_handler"' % jobFilter;
+local heatmapFilter = '%s, transport="http"' % jobFilter;
 
 lib.dashboard(
   title='%s / HTTP Server' % lib.svc,
   uid='%s-http-server' % lib.svc,
-  tags=['http', 'server'],
+  tags=['http', 'server', 'userver'],
   variables=[
     lib.dsVar,
-    lib.jobVar('http_server_request_duration_seconds_bucket'),
-    lib.labelVar('server_address', 'server_address', 'http_server_request_duration_seconds_bucket', jobFilter),
-    lib.labelVar('http_route',     'http_route',     'http_server_request_duration_seconds_bucket', srvFilter),
+    lib.jobVar('http_handler_rps'),
+    lib.labelVar('http_handler', 'http_handler', 'http_handler_rps', jobFilter),
   ],
   panels=[
-    // -------------------------------------------------------------------------
-    // Row: Traffic
-    // -------------------------------------------------------------------------
     lib.row('Traffic'),
-
     lib.ts(
       title='Active Requests',
       targets=[
         lib.promQ(
-          'http_server_active_requests{%s}' % routeFilter,
-          '{{http_route}} {{server_address}}'
+          'http_handler_in_flight{%s}' % handlerFilter,
+          '{{http_handler}} {{http_path}}'
         ),
       ],
       w=8, h=8,
       unit='short',
     ),
-
     lib.ts(
       title='Request Rate',
       targets=[
         lib.rate(
-          'http_server_request_duration_seconds_count',
-          routeFilter,
-          '{{http_request_method}} {{http_route}} {{http_response_status_code}}'
+          'http_handler_rps',
+          handlerFilter,
+          '{{http_handler}} {{http_path}}'
         ),
       ],
       w=16, h=8,
       unit='ops',
     ),
 
-    // -------------------------------------------------------------------------
-    // Row: Latency
-    // -------------------------------------------------------------------------
     lib.row('Latency'),
-
     lib.ts(
       title='Request Duration p50',
       targets=[
         lib.promQ(
-          'histogram_quantile(0.50, sum(rate(http_server_request_duration_seconds_bucket{%s}[$__rate_interval])) by (le, http_route, http_request_method))' % routeFilter,
-          'p50 {{http_request_method}} {{http_route}}'
+          'http_handler_timings{%s, percentile="p50"} / 1000' % handlerFilter,
+          'p50 {{http_handler}} {{http_path}}'
         ),
       ],
       w=8, h=8,
       unit='s',
     ),
-
     lib.ts(
       title='Request Duration p95',
       targets=[
         lib.promQ(
-          'histogram_quantile(0.95, sum(rate(http_server_request_duration_seconds_bucket{%s}[$__rate_interval])) by (le, http_route, http_request_method))' % routeFilter,
-          'p95 {{http_request_method}} {{http_route}}'
+          'http_handler_timings{%s, percentile="p95"} / 1000' % handlerFilter,
+          'p95 {{http_handler}} {{http_path}}'
         ),
       ],
       w=8, h=8,
       unit='s',
     ),
-
     lib.ts(
       title='Request Duration p99',
       targets=[
         lib.promQ(
-          'histogram_quantile(0.99, sum(rate(http_server_request_duration_seconds_bucket{%s}[$__rate_interval])) by (le, http_route, http_request_method))' % routeFilter,
-          'p99 {{http_request_method}} {{http_route}}'
+          'http_handler_timings{%s, percentile="p99"} / 1000' % handlerFilter,
+          'p99 {{http_handler}} {{http_path}}'
         ),
       ],
       w=8, h=8,
       unit='s',
     ),
 
-    // -------------------------------------------------------------------------
-    // Row: Latency Heatmap
-    // -------------------------------------------------------------------------
-    lib.row('Latency Heatmap'),
-
-    lib.heatmap(
-      title='Request Duration Heatmap',
-      metric='http_server_request_duration_seconds',
-      filters=routeFilter,
+    // userver exposes rolling percentiles, not histogram buckets. A real
+    // heatmap would require information that the exporter does not provide.
+    lib.row('Latency Distribution'),
+    lib.ts(
+      title='Request Duration Percentile Bands',
+      targets=[
+        lib.promQ(
+          'http_handler_timings{%s, percentile="p50"} / 1000' % handlerFilter,
+          'p50 {{http_handler}} {{http_path}}'
+        ),
+        lib.promQ(
+          'http_handler_timings{%s, percentile="p90"} / 1000' % handlerFilter,
+          'p90 {{http_handler}} {{http_path}}'
+        ),
+        lib.promQ(
+          'http_handler_timings{%s, percentile="p95"} / 1000' % handlerFilter,
+          'p95 {{http_handler}} {{http_path}}'
+        ),
+        lib.promQ(
+          'http_handler_timings{%s, percentile="p99"} / 1000' % handlerFilter,
+          'p99 {{http_handler}} {{http_path}}'
+        ),
+        lib.promQ(
+          'http_handler_timings{%s, percentile="p100"} / 1000' % handlerFilter,
+          'max {{http_handler}} {{http_path}}'
+        ),
+      ],
+      w=24, h=8,
+      unit='s',
     ),
 
-    // -------------------------------------------------------------------------
-    // Row: Errors
-    // -------------------------------------------------------------------------
-    lib.row('Errors'),
+    lib.row('Latency Heatmap'),
+    lib.heatmap(
+      title='Request Duration Heatmap',
+      metric='datasource_endpoint_request_duration_seconds',
+      filters=heatmapFilter,
+    ),
 
+    lib.row('Errors'),
     lib.ts(
       title='Error Rate (4xx + 5xx)',
       targets=[
         lib.rate(
-          'http_server_request_duration_seconds_count',
-          '%s, http_response_status_code=~"4..|5.."' % routeFilter,
-          '{{http_response_status_code}} {{http_request_method}} {{http_route}}'
+          'http_handler_reply_codes',
+          '%s, http_code=~"4..|5.."' % handlerFilter,
+          '{{http_code}} {{http_handler}} {{http_path}}'
         ),
       ],
-      w=12, h=8,
+      w=24, h=8,
       unit='ops',
-    ),
-
-    lib.ts(
-      title='Transport Error Rate',
-      targets=[
-        lib.rate(
-          'http_server_request_duration_seconds_count',
-          '%s, error_type!=""' % routeFilter,
-          '{{error_type}} {{http_request_method}} {{http_route}}'
-        ),
-      ],
-      w=12, h=8,
-      unit='ops',
-    ),
-
-    // -------------------------------------------------------------------------
-    // Row: Payload Size
-    // -------------------------------------------------------------------------
-    lib.row('Payload Size'),
-
-    lib.ts(
-      title='Request Body Size p95',
-      targets=[
-        lib.promQ(
-          'histogram_quantile(0.95, sum(rate(http_server_request_body_size_bytes_bucket{%s}[$__rate_interval])) by (le, http_route))' % routeFilter,
-          'p95 req {{http_route}}'
-        ),
-      ],
-      w=12, h=8,
-      unit='bytes',
-    ),
-
-    lib.ts(
-      title='Response Body Size p95',
-      targets=[
-        lib.promQ(
-          'histogram_quantile(0.95, sum(rate(http_server_response_body_size_bytes_bucket{%s}[$__rate_interval])) by (le, http_route))' % routeFilter,
-          'p95 resp {{http_route}}'
-        ),
-      ],
-      w=12, h=8,
-      unit='bytes',
     ),
   ]
 )

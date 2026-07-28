@@ -1,126 +1,157 @@
-// Dashboard: gRPC Server
+// Dashboard: gRPC Server (C++ / userver)
 //
-// Source: otelgrpc.NewServerHandler (MetricsEngine.GRPCStatsHandler)
-// OTel semconv v1.41 → otelgrpc v0.69:
-//
-//   rpc_server_call_duration_seconds{rpc_system_name, rpc_method,
-//     rpc_response_status_code}  histogram
-//
-// Note: rpc_service label removed in semconv v1.26+ (service is part of rpc_method).
-//       per-message metrics removed in otelgrpc v0.68+.
+// userver exports cumulative counters and percentile gauges:
+//   grpc_server_by_destination_rps{grpc_service,grpc_method,grpc_destination}
+//   grpc_server_by_destination_status{...,grpc_code}
+//   grpc_server_by_destination_active{...}
+//   grpc_server_by_destination_timings{...,percentile} (milliseconds)
 
 local g = import 'github.com/grafana/grafonnet/gen/grafonnet-v11.0.0/main.libsonnet';
 local lib = import '_lib.libsonnet';
 
-local jobFilter    = 'job=~"$job"';
-local baseFilter   = '%s, rpc_system_name="grpc"' % jobFilter;
-local methodFilter = '%s, rpc_method=~"$rpc_method"' % baseFilter;
+local jobFilter = 'job=~"$job"';
+local methodFilter = '%s, grpc_destination=~"$grpc_destination"' % jobFilter;
+local heatmapFilter = '%s, transport="grpc"' % jobFilter;
 
 lib.dashboard(
   title='%s / gRPC Server' % lib.svc,
   uid='%s-grpc-server' % lib.svc,
-  tags=['grpc', 'server'],
+  tags=['grpc', 'server', 'userver'],
   variables=[
     lib.dsVar,
-    lib.jobVar('rpc_server_call_duration_seconds_bucket'),
-    lib.labelVar('rpc_method', 'rpc_method', 'rpc_server_call_duration_seconds_bucket', baseFilter),
+    lib.jobVar('grpc_server_by_destination_rps'),
+    lib.labelVar(
+      'grpc_destination',
+      'grpc_destination',
+      'grpc_server_by_destination_rps',
+      jobFilter
+    ),
   ],
   panels=[
-    // -------------------------------------------------------------------------
-    // Row: Traffic
-    // -------------------------------------------------------------------------
     lib.row('Traffic'),
-
+    lib.ts(
+      title='Active RPCs',
+      targets=[
+        lib.promQ(
+          'grpc_server_by_destination_active{%s}' % methodFilter,
+          '{{grpc_destination}}'
+        ),
+      ],
+      w=8, h=8,
+      unit='short',
+    ),
     lib.ts(
       title='RPC Rate',
       targets=[
         lib.rate(
-          'rpc_server_call_duration_seconds_count',
+          'grpc_server_by_destination_rps',
           methodFilter,
-          '{{rpc_method}}'
+          '{{grpc_destination}}'
         ),
       ],
-      w=12, h=8,
+      w=16, h=8,
       unit='ops',
     ),
 
+    lib.row('Status'),
     lib.ts(
       title='Status Code Distribution',
       targets=[
         lib.rate(
-          'rpc_server_call_duration_seconds_count',
+          'grpc_server_by_destination_status',
           methodFilter,
-          '{{rpc_response_status_code}} {{rpc_method}}'
+          '{{grpc_code}} {{grpc_destination}}'
         ),
       ],
-      w=12, h=8,
+      w=24, h=8,
       unit='ops',
     ),
 
-    // -------------------------------------------------------------------------
-    // Row: Latency
-    // -------------------------------------------------------------------------
     lib.row('Latency'),
-
     lib.ts(
       title='Duration p50',
       targets=[
         lib.promQ(
-          'histogram_quantile(0.50, sum(rate(rpc_server_call_duration_seconds_bucket{%s}[$__rate_interval])) by (le, rpc_method))' % methodFilter,
-          'p50 {{rpc_method}}'
+          'grpc_server_by_destination_timings{%s, percentile="p50"} / 1000' % methodFilter,
+          'p50 {{grpc_destination}}'
         ),
       ],
       w=8, h=8,
       unit='s',
     ),
-
     lib.ts(
       title='Duration p95',
       targets=[
         lib.promQ(
-          'histogram_quantile(0.95, sum(rate(rpc_server_call_duration_seconds_bucket{%s}[$__rate_interval])) by (le, rpc_method))' % methodFilter,
-          'p95 {{rpc_method}}'
+          'grpc_server_by_destination_timings{%s, percentile="p95"} / 1000' % methodFilter,
+          'p95 {{grpc_destination}}'
         ),
       ],
       w=8, h=8,
       unit='s',
     ),
-
     lib.ts(
       title='Duration p99',
       targets=[
         lib.promQ(
-          'histogram_quantile(0.99, sum(rate(rpc_server_call_duration_seconds_bucket{%s}[$__rate_interval])) by (le, rpc_method))' % methodFilter,
-          'p99 {{rpc_method}}'
+          'grpc_server_by_destination_timings{%s, percentile="p99"} / 1000' % methodFilter,
+          'p99 {{grpc_destination}}'
         ),
       ],
       w=8, h=8,
       unit='s',
     ),
 
-    // -------------------------------------------------------------------------
-    // Row: Latency Heatmap
-    // -------------------------------------------------------------------------
-    lib.row('Latency Heatmap'),
-
-    lib.heatmap(
-      title='Call Duration Heatmap',
-      metric='rpc_server_call_duration_seconds',
-      filters=methodFilter,
+    // userver publishes rolling percentiles rather than Prometheus histogram
+    // buckets, so an exact latency heatmap cannot be reconstructed. Keep the
+    // same observability section with all native percentile bands instead.
+    lib.row('Latency Distribution'),
+    lib.ts(
+      title='Duration Percentile Bands',
+      targets=[
+        lib.promQ(
+          'grpc_server_by_destination_timings{%s, percentile="p50"} / 1000' % methodFilter,
+          'p50 {{grpc_destination}}'
+        ),
+        lib.promQ(
+          'grpc_server_by_destination_timings{%s, percentile="p90"} / 1000' % methodFilter,
+          'p90 {{grpc_destination}}'
+        ),
+        lib.promQ(
+          'grpc_server_by_destination_timings{%s, percentile="p95"} / 1000' % methodFilter,
+          'p95 {{grpc_destination}}'
+        ),
+        lib.promQ(
+          'grpc_server_by_destination_timings{%s, percentile="p99"} / 1000' % methodFilter,
+          'p99 {{grpc_destination}}'
+        ),
+        lib.promQ(
+          'grpc_server_by_destination_timings{%s, percentile="p100"} / 1000' % methodFilter,
+          'max {{grpc_destination}}'
+        ),
+      ],
+      w=24, h=8,
+      unit='s',
     ),
 
-    // -------------------------------------------------------------------------
-    // Row: Errors
-    // -------------------------------------------------------------------------
-    lib.row('Errors'),
+    // servicelib records an endpoint histogram around the complete request
+    // lifecycle, restoring the bucket data absent from userver's native
+    // percentile-only gRPC metrics.
+    lib.row('Latency Heatmap'),
+    lib.heatmap(
+      title='Call Duration Heatmap',
+      metric='datasource_endpoint_request_duration_seconds',
+      filters=heatmapFilter,
+    ),
 
+    lib.row('Errors'),
     lib.ts(
       title='Error Rate (non-OK)',
       targets=[
         lib.rate(
-          'rpc_server_call_duration_seconds_count',
-          '%s, rpc_response_status_code!="OK"' % methodFilter,
-          '{{rpc_response_status_code}} {{rpc_method}}'
+          'grpc_server_by_destination_status',
+          '%s, grpc_code!="OK"' % methodFilter,
+          '{{grpc_code}} {{grpc_destination}}'
         ),
       ],
       w=24, h=8,

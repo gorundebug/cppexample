@@ -19,11 +19,33 @@ components_manager:
       listener:
         port: 9092
         task_processor: main-task-processor
-
     servicelib-metrics-handler:
       path: /metrics
       method: GET
       task_processor: main-task-processor
+
+    servicelib-status-handler:
+      path: /status
+      method: GET
+      task_processor: main-task-processor
+    servicelib-status-data-handler:
+      path: /status/data
+      method: GET
+      task_processor: main-task-processor
+    servicelib-status-graph-handler:
+      path: /status/graph
+      method: GET
+      task_processor: main-task-processor
+    servicelib-status-js-handler:
+      path: /status/vis.min.js
+      method: GET
+      task_processor: main-task-processor
+    servicelib-status-css-handler:
+      path: /status/vis.min.css
+      method: GET
+      task_processor: main-task-processor
+
+
 
     grpc-server:
       port: 9202

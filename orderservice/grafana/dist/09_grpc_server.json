@@ -20,12 +20,12 @@
          },
          "fieldConfig": {
             "defaults": {
-               "unit": "ops"
+               "unit": "short"
             }
          },
          "gridPos": {
             "h": 8,
-            "w": 12,
+            "w": 8,
             "x": 0,
             "y": 1
          },
@@ -37,12 +37,12 @@
                   "type": "prometheus",
                   "uid": "$datasource"
                },
-               "expr": "rate(rpc_server_call_duration_seconds_count{job=~\"$job\", rpc_system_name=\"grpc\", rpc_method=~\"$rpc_method\"}[$__rate_interval])",
+               "expr": "grpc_server_by_destination_active{job=~\"$job\", grpc_destination=~\"$grpc_destination\"}",
                "intervalFactor": 2,
-               "legendFormat": "{{rpc_method}}"
+               "legendFormat": "{{grpc_destination}}"
             }
          ],
-         "title": "RPC Rate",
+         "title": "Active RPCs",
          "type": "timeseries"
       },
       {
@@ -57,8 +57,8 @@
          },
          "gridPos": {
             "h": 8,
-            "w": 12,
-            "x": 12,
+            "w": 16,
+            "x": 8,
             "y": 1
          },
          "id": 3,
@@ -69,12 +69,12 @@
                   "type": "prometheus",
                   "uid": "$datasource"
                },
-               "expr": "rate(rpc_server_call_duration_seconds_count{job=~\"$job\", rpc_system_name=\"grpc\", rpc_method=~\"$rpc_method\"}[$__rate_interval])",
+               "expr": "rate(grpc_server_by_destination_rps{job=~\"$job\", grpc_destination=~\"$grpc_destination\"}[$__rate_interval])",
                "intervalFactor": 2,
-               "legendFormat": "{{rpc_response_status_code}} {{rpc_method}}"
+               "legendFormat": "{{grpc_destination}}"
             }
          ],
-         "title": "Status Code Distribution",
+         "title": "RPC Rate",
          "type": "timeseries"
       },
       {
@@ -86,6 +86,51 @@
             "y": 9
          },
          "id": 4,
+         "panels": [ ],
+         "title": "Status",
+         "type": "row"
+      },
+      {
+         "datasource": {
+            "type": "datasource",
+            "uid": "-- Mixed --"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "unit": "ops"
+            }
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 10
+         },
+         "id": 5,
+         "pluginVersion": "v11.0.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "rate(grpc_server_by_destination_status{job=~\"$job\", grpc_destination=~\"$grpc_destination\"}[$__rate_interval])",
+               "intervalFactor": 2,
+               "legendFormat": "{{grpc_code}} {{grpc_destination}}"
+            }
+         ],
+         "title": "Status Code Distribution",
+         "type": "timeseries"
+      },
+      {
+         "collapsed": false,
+         "gridPos": {
+            "h": 1,
+            "w": 0,
+            "x": 24,
+            "y": 18
+         },
+         "id": 6,
          "panels": [ ],
          "title": "Latency",
          "type": "row"
@@ -104,9 +149,9 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 10
+            "y": 19
          },
-         "id": 5,
+         "id": 7,
          "pluginVersion": "v11.0.0",
          "targets": [
             {
@@ -114,9 +159,9 @@
                   "type": "prometheus",
                   "uid": "$datasource"
                },
-               "expr": "histogram_quantile(0.50, sum(rate(rpc_server_call_duration_seconds_bucket{job=~\"$job\", rpc_system_name=\"grpc\", rpc_method=~\"$rpc_method\"}[$__rate_interval])) by (le, rpc_method))",
+               "expr": "grpc_server_by_destination_timings{job=~\"$job\", grpc_destination=~\"$grpc_destination\", percentile=\"p50\"} / 1000",
                "intervalFactor": 2,
-               "legendFormat": "p50 {{rpc_method}}"
+               "legendFormat": "p50 {{grpc_destination}}"
             }
          ],
          "title": "Duration p50",
@@ -136,9 +181,9 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 10
+            "y": 19
          },
-         "id": 6,
+         "id": 8,
          "pluginVersion": "v11.0.0",
          "targets": [
             {
@@ -146,9 +191,9 @@
                   "type": "prometheus",
                   "uid": "$datasource"
                },
-               "expr": "histogram_quantile(0.95, sum(rate(rpc_server_call_duration_seconds_bucket{job=~\"$job\", rpc_system_name=\"grpc\", rpc_method=~\"$rpc_method\"}[$__rate_interval])) by (le, rpc_method))",
+               "expr": "grpc_server_by_destination_timings{job=~\"$job\", grpc_destination=~\"$grpc_destination\", percentile=\"p95\"} / 1000",
                "intervalFactor": 2,
-               "legendFormat": "p95 {{rpc_method}}"
+               "legendFormat": "p95 {{grpc_destination}}"
             }
          ],
          "title": "Duration p95",
@@ -168,9 +213,9 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 10
+            "y": 19
          },
-         "id": 7,
+         "id": 9,
          "pluginVersion": "v11.0.0",
          "targets": [
             {
@@ -178,9 +223,9 @@
                   "type": "prometheus",
                   "uid": "$datasource"
                },
-               "expr": "histogram_quantile(0.99, sum(rate(rpc_server_call_duration_seconds_bucket{job=~\"$job\", rpc_system_name=\"grpc\", rpc_method=~\"$rpc_method\"}[$__rate_interval])) by (le, rpc_method))",
+               "expr": "grpc_server_by_destination_timings{job=~\"$job\", grpc_destination=~\"$grpc_destination\", percentile=\"p99\"} / 1000",
                "intervalFactor": 2,
-               "legendFormat": "p99 {{rpc_method}}"
+               "legendFormat": "p99 {{grpc_destination}}"
             }
          ],
          "title": "Duration p99",
@@ -192,9 +237,90 @@
             "h": 1,
             "w": 0,
             "x": 24,
-            "y": 18
+            "y": 27
          },
-         "id": 8,
+         "id": 10,
+         "panels": [ ],
+         "title": "Latency Distribution",
+         "type": "row"
+      },
+      {
+         "datasource": {
+            "type": "datasource",
+            "uid": "-- Mixed --"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "unit": "s"
+            }
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 28
+         },
+         "id": 11,
+         "pluginVersion": "v11.0.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "grpc_server_by_destination_timings{job=~\"$job\", grpc_destination=~\"$grpc_destination\", percentile=\"p50\"} / 1000",
+               "intervalFactor": 2,
+               "legendFormat": "p50 {{grpc_destination}}"
+            },
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "grpc_server_by_destination_timings{job=~\"$job\", grpc_destination=~\"$grpc_destination\", percentile=\"p90\"} / 1000",
+               "intervalFactor": 2,
+               "legendFormat": "p90 {{grpc_destination}}"
+            },
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "grpc_server_by_destination_timings{job=~\"$job\", grpc_destination=~\"$grpc_destination\", percentile=\"p95\"} / 1000",
+               "intervalFactor": 2,
+               "legendFormat": "p95 {{grpc_destination}}"
+            },
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "grpc_server_by_destination_timings{job=~\"$job\", grpc_destination=~\"$grpc_destination\", percentile=\"p99\"} / 1000",
+               "intervalFactor": 2,
+               "legendFormat": "p99 {{grpc_destination}}"
+            },
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "grpc_server_by_destination_timings{job=~\"$job\", grpc_destination=~\"$grpc_destination\", percentile=\"p100\"} / 1000",
+               "intervalFactor": 2,
+               "legendFormat": "max {{grpc_destination}}"
+            }
+         ],
+         "title": "Duration Percentile Bands",
+         "type": "timeseries"
+      },
+      {
+         "collapsed": false,
+         "gridPos": {
+            "h": 1,
+            "w": 0,
+            "x": 24,
+            "y": 36
+         },
+         "id": 12,
          "panels": [ ],
          "title": "Latency Heatmap",
          "type": "row"
@@ -208,9 +334,9 @@
             "h": 10,
             "w": 24,
             "x": 0,
-            "y": 19
+            "y": 37
          },
-         "id": 9,
+         "id": 13,
          "options": {
             "calculate": false,
             "color": {
@@ -229,7 +355,7 @@
                   "type": "prometheus",
                   "uid": "$datasource"
                },
-               "expr": "sum(rate(rpc_server_call_duration_seconds_bucket{job=~\"$job\", rpc_system_name=\"grpc\", rpc_method=~\"$rpc_method\"}[$__rate_interval])) by (le)",
+               "expr": "sum(rate(datasource_endpoint_request_duration_seconds_bucket{job=~\"$job\", transport=\"grpc\"}[$__rate_interval])) by (le)",
                "format": "heatmap",
                "intervalFactor": 2,
                "legendFormat": "{{le}}"
@@ -244,9 +370,9 @@
             "h": 1,
             "w": 0,
             "x": 24,
-            "y": 29
+            "y": 47
          },
-         "id": 10,
+         "id": 14,
          "panels": [ ],
          "title": "Errors",
          "type": "row"
@@ -265,9 +391,9 @@
             "h": 8,
             "w": 24,
             "x": 0,
-            "y": 30
+            "y": 48
          },
-         "id": 11,
+         "id": 15,
          "pluginVersion": "v11.0.0",
          "targets": [
             {
@@ -275,9 +401,9 @@
                   "type": "prometheus",
                   "uid": "$datasource"
                },
-               "expr": "rate(rpc_server_call_duration_seconds_count{job=~\"$job\", rpc_system_name=\"grpc\", rpc_method=~\"$rpc_method\", rpc_response_status_code!=\"OK\"}[$__rate_interval])",
+               "expr": "rate(grpc_server_by_destination_status{job=~\"$job\", grpc_destination=~\"$grpc_destination\", grpc_code!=\"OK\"}[$__rate_interval])",
                "intervalFactor": 2,
-               "legendFormat": "{{rpc_response_status_code}} {{rpc_method}}"
+               "legendFormat": "{{grpc_code}} {{grpc_destination}}"
             }
          ],
          "title": "Error Rate (non-OK)",
@@ -289,7 +415,8 @@
    "tags": [
       "servicelib",
       "grpc",
-      "server"
+      "server",
+      "userver"
    ],
    "templating": {
       "list": [
@@ -308,7 +435,7 @@
             "label": "Job",
             "multi": false,
             "name": "job",
-            "query": "label_values(rpc_server_call_duration_seconds_bucket, job)",
+            "query": "label_values(grpc_server_by_destination_rps, job)",
             "regex": "orderservice",
             "type": "query"
          },
@@ -318,10 +445,10 @@
                "uid": "$datasource"
             },
             "includeAll": true,
-            "label": "Rpc_method",
+            "label": "Grpc_destination",
             "multi": true,
-            "name": "rpc_method",
-            "query": "label_values(rpc_server_call_duration_seconds_bucket{job=~\"$job\", rpc_system_name=\"grpc\"}, rpc_method)",
+            "name": "grpc_destination",
+            "query": "label_values(grpc_server_by_destination_rps{job=~\"$job\"}, grpc_destination)",
             "type": "query"
          }
       ]

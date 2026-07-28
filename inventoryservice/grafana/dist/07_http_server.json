@@ -37,9 +37,9 @@
                   "type": "prometheus",
                   "uid": "$datasource"
                },
-               "expr": "http_server_active_requests{job=~\"$job\", server_address=~\"$server_address\", http_route=~\"$http_route\"}",
+               "expr": "http_handler_in_flight{job=~\"$job\", http_handler=~\"$http_handler\"}",
                "intervalFactor": 2,
-               "legendFormat": "{{http_route}} {{server_address}}"
+               "legendFormat": "{{http_handler}} {{http_path}}"
             }
          ],
          "title": "Active Requests",
@@ -69,9 +69,9 @@
                   "type": "prometheus",
                   "uid": "$datasource"
                },
-               "expr": "rate(http_server_request_duration_seconds_count{job=~\"$job\", server_address=~\"$server_address\", http_route=~\"$http_route\"}[$__rate_interval])",
+               "expr": "rate(http_handler_rps{job=~\"$job\", http_handler=~\"$http_handler\"}[$__rate_interval])",
                "intervalFactor": 2,
-               "legendFormat": "{{http_request_method}} {{http_route}} {{http_response_status_code}}"
+               "legendFormat": "{{http_handler}} {{http_path}}"
             }
          ],
          "title": "Request Rate",
@@ -114,9 +114,9 @@
                   "type": "prometheus",
                   "uid": "$datasource"
                },
-               "expr": "histogram_quantile(0.50, sum(rate(http_server_request_duration_seconds_bucket{job=~\"$job\", server_address=~\"$server_address\", http_route=~\"$http_route\"}[$__rate_interval])) by (le, http_route, http_request_method))",
+               "expr": "http_handler_timings{job=~\"$job\", http_handler=~\"$http_handler\", percentile=\"p50\"} / 1000",
                "intervalFactor": 2,
-               "legendFormat": "p50 {{http_request_method}} {{http_route}}"
+               "legendFormat": "p50 {{http_handler}} {{http_path}}"
             }
          ],
          "title": "Request Duration p50",
@@ -146,9 +146,9 @@
                   "type": "prometheus",
                   "uid": "$datasource"
                },
-               "expr": "histogram_quantile(0.95, sum(rate(http_server_request_duration_seconds_bucket{job=~\"$job\", server_address=~\"$server_address\", http_route=~\"$http_route\"}[$__rate_interval])) by (le, http_route, http_request_method))",
+               "expr": "http_handler_timings{job=~\"$job\", http_handler=~\"$http_handler\", percentile=\"p95\"} / 1000",
                "intervalFactor": 2,
-               "legendFormat": "p95 {{http_request_method}} {{http_route}}"
+               "legendFormat": "p95 {{http_handler}} {{http_path}}"
             }
          ],
          "title": "Request Duration p95",
@@ -178,9 +178,9 @@
                   "type": "prometheus",
                   "uid": "$datasource"
                },
-               "expr": "histogram_quantile(0.99, sum(rate(http_server_request_duration_seconds_bucket{job=~\"$job\", server_address=~\"$server_address\", http_route=~\"$http_route\"}[$__rate_interval])) by (le, http_route, http_request_method))",
+               "expr": "http_handler_timings{job=~\"$job\", http_handler=~\"$http_handler\", percentile=\"p99\"} / 1000",
                "intervalFactor": 2,
-               "legendFormat": "p99 {{http_request_method}} {{http_route}}"
+               "legendFormat": "p99 {{http_handler}} {{http_path}}"
             }
          ],
          "title": "Request Duration p99",
@@ -196,6 +196,87 @@
          },
          "id": 8,
          "panels": [ ],
+         "title": "Latency Distribution",
+         "type": "row"
+      },
+      {
+         "datasource": {
+            "type": "datasource",
+            "uid": "-- Mixed --"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "unit": "s"
+            }
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 19
+         },
+         "id": 9,
+         "pluginVersion": "v11.0.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "http_handler_timings{job=~\"$job\", http_handler=~\"$http_handler\", percentile=\"p50\"} / 1000",
+               "intervalFactor": 2,
+               "legendFormat": "p50 {{http_handler}} {{http_path}}"
+            },
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "http_handler_timings{job=~\"$job\", http_handler=~\"$http_handler\", percentile=\"p90\"} / 1000",
+               "intervalFactor": 2,
+               "legendFormat": "p90 {{http_handler}} {{http_path}}"
+            },
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "http_handler_timings{job=~\"$job\", http_handler=~\"$http_handler\", percentile=\"p95\"} / 1000",
+               "intervalFactor": 2,
+               "legendFormat": "p95 {{http_handler}} {{http_path}}"
+            },
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "http_handler_timings{job=~\"$job\", http_handler=~\"$http_handler\", percentile=\"p99\"} / 1000",
+               "intervalFactor": 2,
+               "legendFormat": "p99 {{http_handler}} {{http_path}}"
+            },
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "http_handler_timings{job=~\"$job\", http_handler=~\"$http_handler\", percentile=\"p100\"} / 1000",
+               "intervalFactor": 2,
+               "legendFormat": "max {{http_handler}} {{http_path}}"
+            }
+         ],
+         "title": "Request Duration Percentile Bands",
+         "type": "timeseries"
+      },
+      {
+         "collapsed": false,
+         "gridPos": {
+            "h": 1,
+            "w": 0,
+            "x": 24,
+            "y": 27
+         },
+         "id": 10,
+         "panels": [ ],
          "title": "Latency Heatmap",
          "type": "row"
       },
@@ -208,9 +289,9 @@
             "h": 10,
             "w": 24,
             "x": 0,
-            "y": 19
+            "y": 28
          },
-         "id": 9,
+         "id": 11,
          "options": {
             "calculate": false,
             "color": {
@@ -229,7 +310,7 @@
                   "type": "prometheus",
                   "uid": "$datasource"
                },
-               "expr": "sum(rate(http_server_request_duration_seconds_bucket{job=~\"$job\", server_address=~\"$server_address\", http_route=~\"$http_route\"}[$__rate_interval])) by (le)",
+               "expr": "sum(rate(datasource_endpoint_request_duration_seconds_bucket{job=~\"$job\", transport=\"http\"}[$__rate_interval])) by (le)",
                "format": "heatmap",
                "intervalFactor": 2,
                "legendFormat": "{{le}}"
@@ -244,9 +325,9 @@
             "h": 1,
             "w": 0,
             "x": 24,
-            "y": 29
+            "y": 38
          },
-         "id": 10,
+         "id": 12,
          "panels": [ ],
          "title": "Errors",
          "type": "row"
@@ -263,11 +344,11 @@
          },
          "gridPos": {
             "h": 8,
-            "w": 12,
+            "w": 24,
             "x": 0,
-            "y": 30
+            "y": 39
          },
-         "id": 11,
+         "id": 13,
          "pluginVersion": "v11.0.0",
          "targets": [
             {
@@ -275,121 +356,12 @@
                   "type": "prometheus",
                   "uid": "$datasource"
                },
-               "expr": "rate(http_server_request_duration_seconds_count{job=~\"$job\", server_address=~\"$server_address\", http_route=~\"$http_route\", http_response_status_code=~\"4..|5..\"}[$__rate_interval])",
+               "expr": "rate(http_handler_reply_codes{job=~\"$job\", http_handler=~\"$http_handler\", http_code=~\"4..|5..\"}[$__rate_interval])",
                "intervalFactor": 2,
-               "legendFormat": "{{http_response_status_code}} {{http_request_method}} {{http_route}}"
+               "legendFormat": "{{http_code}} {{http_handler}} {{http_path}}"
             }
          ],
          "title": "Error Rate (4xx + 5xx)",
-         "type": "timeseries"
-      },
-      {
-         "datasource": {
-            "type": "datasource",
-            "uid": "-- Mixed --"
-         },
-         "fieldConfig": {
-            "defaults": {
-               "unit": "ops"
-            }
-         },
-         "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 12,
-            "y": 30
-         },
-         "id": 12,
-         "pluginVersion": "v11.0.0",
-         "targets": [
-            {
-               "datasource": {
-                  "type": "prometheus",
-                  "uid": "$datasource"
-               },
-               "expr": "rate(http_server_request_duration_seconds_count{job=~\"$job\", server_address=~\"$server_address\", http_route=~\"$http_route\", error_type!=\"\"}[$__rate_interval])",
-               "intervalFactor": 2,
-               "legendFormat": "{{error_type}} {{http_request_method}} {{http_route}}"
-            }
-         ],
-         "title": "Transport Error Rate",
-         "type": "timeseries"
-      },
-      {
-         "collapsed": false,
-         "gridPos": {
-            "h": 1,
-            "w": 0,
-            "x": 24,
-            "y": 38
-         },
-         "id": 13,
-         "panels": [ ],
-         "title": "Payload Size",
-         "type": "row"
-      },
-      {
-         "datasource": {
-            "type": "datasource",
-            "uid": "-- Mixed --"
-         },
-         "fieldConfig": {
-            "defaults": {
-               "unit": "bytes"
-            }
-         },
-         "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 0,
-            "y": 39
-         },
-         "id": 14,
-         "pluginVersion": "v11.0.0",
-         "targets": [
-            {
-               "datasource": {
-                  "type": "prometheus",
-                  "uid": "$datasource"
-               },
-               "expr": "histogram_quantile(0.95, sum(rate(http_server_request_body_size_bytes_bucket{job=~\"$job\", server_address=~\"$server_address\", http_route=~\"$http_route\"}[$__rate_interval])) by (le, http_route))",
-               "intervalFactor": 2,
-               "legendFormat": "p95 req {{http_route}}"
-            }
-         ],
-         "title": "Request Body Size p95",
-         "type": "timeseries"
-      },
-      {
-         "datasource": {
-            "type": "datasource",
-            "uid": "-- Mixed --"
-         },
-         "fieldConfig": {
-            "defaults": {
-               "unit": "bytes"
-            }
-         },
-         "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 12,
-            "y": 39
-         },
-         "id": 15,
-         "pluginVersion": "v11.0.0",
-         "targets": [
-            {
-               "datasource": {
-                  "type": "prometheus",
-                  "uid": "$datasource"
-               },
-               "expr": "histogram_quantile(0.95, sum(rate(http_server_response_body_size_bytes_bucket{job=~\"$job\", server_address=~\"$server_address\", http_route=~\"$http_route\"}[$__rate_interval])) by (le, http_route))",
-               "intervalFactor": 2,
-               "legendFormat": "p95 resp {{http_route}}"
-            }
-         ],
-         "title": "Response Body Size p95",
          "type": "timeseries"
       }
    ],
@@ -398,7 +370,8 @@
    "tags": [
       "servicelib",
       "http",
-      "server"
+      "server",
+      "userver"
    ],
    "templating": {
       "list": [
@@ -417,7 +390,7 @@
             "label": "Job",
             "multi": false,
             "name": "job",
-            "query": "label_values(http_server_request_duration_seconds_bucket, job)",
+            "query": "label_values(http_handler_rps, job)",
             "regex": "inventoryservice",
             "type": "query"
          },
@@ -427,22 +400,10 @@
                "uid": "$datasource"
             },
             "includeAll": true,
-            "label": "Server_address",
+            "label": "Http_handler",
             "multi": true,
-            "name": "server_address",
-            "query": "label_values(http_server_request_duration_seconds_bucket{job=~\"$job\"}, server_address)",
-            "type": "query"
-         },
-         {
-            "datasource": {
-               "type": "prometheus",
-               "uid": "$datasource"
-            },
-            "includeAll": true,
-            "label": "Http_route",
-            "multi": true,
-            "name": "http_route",
-            "query": "label_values(http_server_request_duration_seconds_bucket{job=~\"$job\", server_address=~\"$server_address\"}, http_route)",
+            "name": "http_handler",
+            "query": "label_values(http_handler_rps{job=~\"$job\"}, http_handler)",
             "type": "query"
          }
       ]

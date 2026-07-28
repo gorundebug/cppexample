@@ -7,7 +7,9 @@ scrape_configs:
     static_configs:
       - targets: ['inventoryservice:9092']
     metrics_path: '/metrics'
+    fallback_scrape_protocol: PrometheusText0.0.4
   - job_name: 'orderservice'
     static_configs:
       - targets: ['orderservice:9091']
     metrics_path: '/metrics'
+    fallback_scrape_protocol: PrometheusText0.0.4
