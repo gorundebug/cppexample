@@ -3,8 +3,8 @@
 #
 # Rules:
 #   ADD  — file is new (doesn't exist in project yet): always copied
-#   UPD  — manifest marks an existing file as generated: overwritten
-#   SKP  — manifest marks an existing file as user-owned: left untouched
+#   UPD  — existing file has "generated" in its filename: overwritten
+#   SKP  — any other existing file: left untouched
 #
 # Usage: bash scripts/merge.sh <archive.zip|archive.tar.gz>
 #        make merge ARCHIVE=/path/to/archive.zip
@@ -60,60 +60,29 @@ fi
 # Remove trailing slash for clean path arithmetic.
 SRC_ROOT="${SRC_ROOT%/}"
 
-MANIFEST="$SRC_ROOT/.servicegen/manifest.tsv"
-if [[ ! -f "$MANIFEST" ]]; then
-    echo "Error: archive does not contain .servicegen/manifest.tsv" >&2
-    rm -rf "$TMP_DIR"
-    exit 1
-fi
-
 ADDED=0
 UPDATED=0
 SKIPPED=0
 
 echo ""
-while IFS=$'\t' read -r ownership mode rel; do
-    if [[ -z "$ownership" || "$ownership" == \#* ]]; then
-        continue
-    fi
-    if [[ "$ownership" != "generated" && "$ownership" != "user-owned" ]]; then
-        echo "Error: invalid ownership '$ownership' for '$rel'" >&2
-        exit 1
-    fi
-    if [[ ! "$mode" =~ ^0[0-7]{3}$ ]]; then
-        echo "Error: invalid mode '$mode' for '$rel'" >&2
-        exit 1
-    fi
-    case "$rel" in
-        ""|/*|..|../*|*/../*|*/..)
-            echo "Error: unsafe manifest path '$rel'" >&2
-            exit 1
-            ;;
-    esac
-
-    src="$SRC_ROOT/$rel"
+while IFS= read -r src; do
+    rel="${src#"$SRC_ROOT"/}"
     dst="$PROJECT_DIR/$rel"
-    if [[ ! -f "$src" ]]; then
-        echo "Error: manifest file '$rel' is missing from archive" >&2
-        exit 1
-    fi
 
     if [[ ! -f "$dst" ]]; then
         mkdir -p "$(dirname "$dst")"
-        cp "$src" "$dst"
-        chmod "$mode" "$dst"
+        cp -p "$src" "$dst"
         echo "  ADD  $rel"
         ADDED=$((ADDED + 1))
-    elif [[ "$ownership" == "generated" ]]; then
-        cp "$src" "$dst"
-        chmod "$mode" "$dst"
+    elif [[ "$(basename "$rel")" == *generated* ]]; then
+        cp -p "$src" "$dst"
         echo "  UPD  $rel"
         UPDATED=$((UPDATED + 1))
     else
         echo "  SKP  $rel"
         SKIPPED=$((SKIPPED + 1))
     fi
-done < "$MANIFEST"
+done < <(find "$SRC_ROOT" -type f -print | LC_ALL=C sort)
 
 echo ""
 echo "Merge complete: ${ADDED} added, ${UPDATED} updated, ${SKIPPED} skipped."
