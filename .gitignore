@@ -12,8 +12,10 @@ compile_commands.json
 *.out
 coverage.out
 
-# Tools (downloaded binaries)
-tools/
+# Tools (downloaded binaries); userver source patches are project inputs.
+tools/*
+!tools/userver/
+!tools/userver/**
 
 # Proto descriptors (binary, regenerated)
 descriptors/
