@@ -62,7 +62,7 @@ class Config final : public servicelib::config::IConfig {
   } pools;
 
   struct Links final {
-    servicelib::config::LinkConfig splitPipelineToProcessOrderItems;
+    servicelib::config::LinkConfig splitPipelineToSoftDeadline;
   } links;
 
   struct Modules final {
@@ -107,7 +107,7 @@ class Config final : public servicelib::config::IConfig {
 
   std::vector<const servicelib::config::LinkConfig*> GetLinks()
       const override {
-    return { &links.splitPipelineToProcessOrderItems,  };
+    return { &links.splitPipelineToSoftDeadline,  };
   }
 
   std::vector<const servicelib::config::ModuleConfig*> GetModules()
@@ -307,10 +307,10 @@ inline Config MakeConfig() {
     value.functionInitializerGroup = "";
     return value;
   }();
-  cfg.links.splitPipelineToProcessOrderItems = [] {
+  cfg.links.splitPipelineToSoftDeadline = [] {
     LinkConfig value{};
     value.from = 12;
-    value.to = 10;
+    value.to = 11;
     value.callSemantics =
         MakeCallSemanticsGroup(CallSemantics::kParallelCall, "", 0);
     return value;

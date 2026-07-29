@@ -151,10 +151,10 @@ services:
         modulePath: github.com/gorundebug/cppexample-orderservice
         name: Order Service
         links:
-            processOrderItems:
+            softDeadline:
                 callSemantics: ParallelCall
                 from: splitPipeline
-                to: processOrderItems
+                to: softDeadline
         pipelines:
             order:
                 mapOrderItemResultToOrderState:
