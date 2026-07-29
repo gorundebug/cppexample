@@ -62,6 +62,7 @@ class Config final : public servicelib::config::IConfig {
   } pools;
 
   struct Links final {
+    servicelib::config::LinkConfig splitPipelineToProcessOrderItems;
   } links;
 
   struct Modules final {
@@ -106,7 +107,7 @@ class Config final : public servicelib::config::IConfig {
 
   std::vector<const servicelib::config::LinkConfig*> GetLinks()
       const override {
-    return {  };
+    return { &links.splitPipelineToProcessOrderItems,  };
   }
 
   std::vector<const servicelib::config::ModuleConfig*> GetModules()
@@ -304,6 +305,14 @@ inline Config MakeConfig() {
     value.publicFunction = false;
     value.functionDescription = "Outgoing unary gRPC call to the Inventory Service.\n[ConsumeMessage] map OrderItem → ProcessOrderItemRequest (OrderID, ItemID, SKU, Quantity); call sender.Send(req).\n[HandleResponse] map ProcessOrderItemResponse → OrderItemResult:\ncopy OrderID, ItemID, AvailableQty, Reserved, Status, UnitPrice from response; push downstream via sc.Collect.\n[EndRequest] log the outcome.\n";
     value.functionInitializerGroup = "";
+    return value;
+  }();
+  cfg.links.splitPipelineToProcessOrderItems = [] {
+    LinkConfig value{};
+    value.from = 12;
+    value.to = 10;
+    value.callSemantics =
+        MakeCallSemanticsGroup(CallSemantics::kParallelCall, "", 0);
     return value;
   }();
   cfg.modules.inventoryServiceApi = [] {

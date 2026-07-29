@@ -73,6 +73,11 @@ services:
         metricsHandler: metrics
         modulePath: github.com/gorundebug/cppexample-orderservice
         name: Order Service
+        links:
+            processOrderItems:
+                callSemantics: ParallelCall
+                from: splitPipeline
+                to: processOrderItems
         pipelines:
             order:
                 mapOrderItemResultToOrderState:
