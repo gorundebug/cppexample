@@ -159,7 +159,6 @@ endif()
 add_executable(example_order_service
     cmd/service/main.cpp
     internal/app/service.generated.cpp
-    internal/app/grpc_service.generated.cpp
     internal/app/service.cpp
     internal/functions/map_order_item_result_to_order_state.cpp
     internal/functions/map_to_order_state.cpp
