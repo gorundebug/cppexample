@@ -80,21 +80,32 @@ class ServiceGenerated
   void initDataSources(const config::Config& config);
   void releaseRuntime() noexcept;
 
-  using Input8 =
+  using ProcessOrderInput =
       servicelib::InputStream<example::order_service::types::Order, example::order_service::types::OrderState, std::exception_ptr,
                               ServiceGenerated>;
-  std::shared_ptr<Input8> input_8_;
 
 
 
-  struct SinkBinding9 final {
+  struct ServiceStreams final {
+    std::shared_ptr<ProcessOrderInput> process_order;
+    servicelib::StreamBase* split_pipeline{nullptr};
+    servicelib::StreamBase* process_order_items{nullptr};
+    servicelib::StreamBase* process_order_item{nullptr};
+    servicelib::StreamBase* map_order_item_result_to_order_state{nullptr};
+    servicelib::StreamBase* soft_deadline{nullptr};
+    servicelib::StreamBase* map_to_order_state{nullptr};
+    servicelib::StreamBase* merge_results{nullptr};
+  };
+  ServiceStreams streams_;
+
+  struct ProcessOrderItemSinkBinding final {
     std::function<void(servicelib::MessageContext, const example::model::types::OrderItem&)>
         consume;
     std::function<void(servicelib::MessageContext,
                        servicelib::Payload<example::model::types::OrderItemResult>)>
         consumeResult;
     struct Function final {
-      std::shared_ptr<SinkBinding9> binding;
+      std::shared_ptr<ProcessOrderItemSinkBinding> binding;
       void operator()(servicelib::MessageContext context,
                       const example::model::types::OrderItem& value) const {
         if (!binding->consume) {
@@ -104,11 +115,15 @@ class ServiceGenerated
       }
     };
   };
-  std::shared_ptr<SinkBinding9> sink_binding_9_;
+
+  struct ServiceBindings final {
+    std::shared_ptr<ProcessOrderItemSinkBinding> process_order_item;
+  };
+  ServiceBindings bindings_;
 
 
 
-  struct GrpcClientFunction9 final {
+  struct ProcessOrderItemGrpcClientFunction final {
     inventoryserviceapi::InventoryServiceApiClient* client;
     decltype(auto) operator()(
         const processorderitem::ProcessOrderItemRequest& request,
@@ -116,21 +131,15 @@ class ServiceGenerated
       return client->ProcessOrderItem(request, std::move(options));
     }
   };
-  using GrpcSinkEndpoint9 =
+  using ProcessOrderItemGrpcSinkEndpoint =
       servicelib::datasink::grpc::NoStreamingEndpoint<
           processorderitem::ProcessOrderItemRequest, processorderitem::ProcessOrderItemResponse, example::model::types::OrderItem, example::model::types::OrderItemResult,
-          functions::ProcessOrderItem, GrpcClientFunction9>;
-  std::shared_ptr<GrpcSinkEndpoint9> grpc_sink_endpoint_9_;
+          functions::ProcessOrderItem, ProcessOrderItemGrpcClientFunction>;
 
-  std::optional<inventoryserviceapi::InventoryServiceApiClient> grpc_client_1_;
-  std::shared_ptr<
-      servicelib::datasink::grpc::UserverDataSink> grpc_sink_1_;
-
-  using HTTPSourceConsumer8 =
+  using ProcessOrderHTTPSourceConsumer =
       servicelib::datasource::http::UserverEndpointConsumer<
           example::order_service::types::Order, example::order_service::types::OrderState, std::exception_ptr,
           ServiceGenerated, functions::ProcessOrder>;
-  std::shared_ptr<HTTPSourceConsumer8> http_source_consumer_8_;
 
  public:
   std::shared_ptr<servicelib::datasource::http::IUserverEndpoint>
@@ -138,13 +147,25 @@ class ServiceGenerated
  private:
 
 
-  std::shared_ptr<
-      servicelib::datasource::http::UserverDataSource> http_source_2_;
 
 
 
 
 
+  struct ServiceEndpoints final {
+    std::shared_ptr<ProcessOrderItemGrpcSinkEndpoint> process_order_item;
+    std::shared_ptr<ProcessOrderHTTPSourceConsumer> process_order;
+  };
+  ServiceEndpoints endpoints_;
+
+  struct ServiceConnectors final {
+    std::optional<inventoryserviceapi::InventoryServiceApiClient> inventory_service_api_client;
+    std::shared_ptr<
+        servicelib::datasink::grpc::UserverDataSink> inventory_service_api_sink;
+    std::shared_ptr<
+        servicelib::datasource::http::UserverDataSource> order_service_api_source;
+  };
+  ServiceConnectors connectors_;
 
   const userver::components::ComponentContext& component_context_;
   servicelib::telemetry::userver_adapter::UserverMetrics metrics_;

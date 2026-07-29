@@ -68,36 +68,43 @@ class ServiceGenerated
   void initDataSources(const config::Config& config);
   void releaseRuntime() noexcept;
 
-  using Input4 =
+  using ProcessInventoryItemInput =
       servicelib::InputStream<example::model::types::OrderItem, example::model::types::OrderItemResult, std::exception_ptr,
                               ServiceGenerated>;
-  std::shared_ptr<Input4> input_4_;
 
-  using Detached2 =
+  using GetInventoryItemErrorDetached =
       servicelib::DetachedStream<example::model::types::OrderItemResult, ServiceGenerated>;
-  std::shared_ptr<Detached2> detached_2_;
 
 
+  struct ServiceStreams final {
+    std::shared_ptr<ProcessInventoryItemInput> process_inventory_item;
+    std::shared_ptr<GetInventoryItemErrorDetached> get_inventory_item_error;
+    servicelib::StreamBase* get_inventory_item_data{nullptr};
+    servicelib::StreamBase* merge_inventory_result{nullptr};
+  };
+  ServiceStreams streams_;
 
-  using GrpcSourceEndpoint4 =
+
+  struct ServiceBindings final {
+  };
+  ServiceBindings bindings_;
+
+  using ProcessInventoryItemGrpcSourceEndpoint =
       servicelib::datasource::grpc::NoStreamingEndpoint<
           processorderitem::ProcessOrderItemRequest, processorderitem::ProcessOrderItemResponse, example::model::types::OrderItem, example::model::types::OrderItemResult,
           functions::ProcessOrderItem, std::exception_ptr>;
-  using GrpcSourceConsumer4 =
+  using ProcessInventoryItemGrpcSourceConsumer =
       servicelib::datasource::grpc::EndpointConsumer<
-          Input4, GrpcSourceEndpoint4, functions::ProcessOrderItem>;
-  std::shared_ptr<GrpcSourceConsumer4> grpc_source_consumer_4_;
+          ProcessInventoryItemInput, ProcessInventoryItemGrpcSourceEndpoint, functions::ProcessOrderItem>;
 
  public:
-  std::shared_ptr<GrpcSourceEndpoint4> grpcSourceEndpoint4() const noexcept {
-    return grpc_source_consumer_4_ ? grpc_source_consumer_4_->endpoint() : nullptr;
+  std::shared_ptr<ProcessInventoryItemGrpcSourceEndpoint> grpcSourceEndpointProcessInventoryItem() const noexcept {
+    return endpoints_.process_inventory_item ? endpoints_.process_inventory_item->endpoint() : nullptr;
   }
 
  private:
 
 
-  std::shared_ptr<
-      servicelib::datasource::grpc::UserverDataSource> grpc_source_1_;
 
 
 
@@ -106,7 +113,16 @@ class ServiceGenerated
 
 
 
+  struct ServiceEndpoints final {
+    std::shared_ptr<ProcessInventoryItemGrpcSourceConsumer> process_inventory_item;
+  };
+  ServiceEndpoints endpoints_;
 
+  struct ServiceConnectors final {
+    std::shared_ptr<
+        servicelib::datasource::grpc::UserverDataSource> inventory_service_api_source;
+  };
+  ServiceConnectors connectors_;
 
   const userver::components::ComponentContext& component_context_;
   servicelib::telemetry::userver_adapter::UserverMetrics metrics_;

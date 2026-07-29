@@ -54,51 +54,58 @@ void ServiceGenerated::initRuntime() {
 }
 
 void ServiceGenerated::initStreams(const config::Config& cfg) {
-  input_8_ = servicelib::makeInputStream<example::order_service::types::Order, example::order_service::types::OrderState, std::exception_ptr, ServiceGenerated>(cfg.streams.processOrder, nullptr, *this);
-  auto& stream_12 = (*input_8_).template split<2>(cfg.streams.splitPipeline);
-  auto& stream_10 = stream_12.template get<0>().flatMap(cfg.streams.processOrderItems, servicelib::StreamType<example::model::types::OrderItem>{}, servicelib::StreamFunction(functions::ProcessOrderItems{}));
-  sink_binding_9_ = std::make_shared<SinkBinding9>();
-  auto& stream_9 = stream_10.sinkWithResult(cfg.streams.processOrderItem, servicelib::StreamType<example::model::types::OrderItemResult>{}, servicelib::StreamFunction(SinkBinding9::Function{sink_binding_9_}));
-  sink_binding_9_->consumeResult = [&stream_9](servicelib::MessageContext context, servicelib::Payload<example::model::types::OrderItemResult> payload) { stream_9.consumeResult(std::move(context), std::move(payload)); };
-  auto& stream_5 = stream_9.map(cfg.streams.mapOrderItemResultToOrderState, servicelib::StreamType<example::order_service::types::OrderState>{}, servicelib::StreamFunction(functions::MapOrderItemResultToOrderState{}));
-  auto& stream_11 = stream_12.template get<1>().delay(cfg.streams.softDeadline, servicelib::StreamFunction(functions::SoftDeadline{std::chrono::milliseconds{cfg.streams.softDeadline.duration}}));
-  auto& stream_6 = stream_11.map(cfg.streams.mapToOrderState, servicelib::StreamType<example::order_service::types::OrderState>{}, servicelib::StreamFunction(functions::MapToOrderState{}));
-  auto& stream_7 = stream_6.merge(cfg.streams.mergeResults, stream_5);
-  input_8_->setSource(stream_7);
+  streams_.process_order = servicelib::makeInputStream<example::order_service::types::Order, example::order_service::types::OrderState, std::exception_ptr, ServiceGenerated>(cfg.streams.processOrder, nullptr, *this);
+  auto& split_pipeline = (*streams_.process_order).template split<2>(cfg.streams.splitPipeline);
+  streams_.split_pipeline = std::addressof(split_pipeline);
+  auto& process_order_items = split_pipeline.template get<0>().flatMap(cfg.streams.processOrderItems, servicelib::StreamType<example::model::types::OrderItem>{}, servicelib::StreamFunction(functions::ProcessOrderItems{}));
+  streams_.process_order_items = std::addressof(process_order_items);
+  bindings_.process_order_item = std::make_shared<ProcessOrderItemSinkBinding>();
+  auto& process_order_item = process_order_items.sinkWithResult(cfg.streams.processOrderItem, servicelib::StreamType<example::model::types::OrderItemResult>{}, servicelib::StreamFunction(ProcessOrderItemSinkBinding::Function{bindings_.process_order_item}));
+  bindings_.process_order_item->consumeResult = [&process_order_item](servicelib::MessageContext context, servicelib::Payload<example::model::types::OrderItemResult> payload) { process_order_item.consumeResult(std::move(context), std::move(payload)); };
+  streams_.process_order_item = std::addressof(process_order_item);
+  auto& map_order_item_result_to_order_state = process_order_item.map(cfg.streams.mapOrderItemResultToOrderState, servicelib::StreamType<example::order_service::types::OrderState>{}, servicelib::StreamFunction(functions::MapOrderItemResultToOrderState{}));
+  streams_.map_order_item_result_to_order_state = std::addressof(map_order_item_result_to_order_state);
+  auto& soft_deadline = split_pipeline.template get<1>().delay(cfg.streams.softDeadline, servicelib::StreamFunction(functions::SoftDeadline{std::chrono::milliseconds{cfg.streams.softDeadline.duration}}));
+  streams_.soft_deadline = std::addressof(soft_deadline);
+  auto& map_to_order_state = soft_deadline.map(cfg.streams.mapToOrderState, servicelib::StreamType<example::order_service::types::OrderState>{}, servicelib::StreamFunction(functions::MapToOrderState{}));
+  streams_.map_to_order_state = std::addressof(map_to_order_state);
+  auto& merge_results = map_to_order_state.merge(cfg.streams.mergeResults, map_order_item_result_to_order_state);
+  streams_.merge_results = std::addressof(merge_results);
+  streams_.process_order->setSource(merge_results);
 }
 
 void ServiceGenerated::initDataSinks(const config::Config& cfg) {
 
-  grpc_client_1_.emplace(
+  connectors_.inventory_service_api_client.emplace(
       component_context_
           .FindComponent<userver::ugrpc::client::ClientFactoryComponent>()
           .GetFactory()
           .MakeClient<inventoryserviceapi::InventoryServiceApiClient>(
               "inventory-service-api",
               cfg.dataConnectors.inventoryServiceApi.address));
-  grpc_sink_1_ =
+  connectors_.inventory_service_api_sink =
       std::make_shared<servicelib::datasink::grpc::UserverDataSink>(
           *this, cfg.dataConnectors.inventoryServiceApi.id);
-  grpc_sink_endpoint_9_ = std::make_shared<GrpcSinkEndpoint9>(
+  endpoints_.process_order_item = std::make_shared<ProcessOrderItemGrpcSinkEndpoint>(
       *this, cfg.endpoints.processOrderItem.id, functions::ProcessOrderItem{},
-      GrpcClientFunction9{&*grpc_client_1_},
-      [binding = sink_binding_9_](
+      ProcessOrderItemGrpcClientFunction{&*connectors_.inventory_service_api_client},
+      [binding = bindings_.process_order_item](
           servicelib::MessageContext context,
           servicelib::Payload<example::model::types::OrderItemResult> result) {
         if (binding->consumeResult) {
           binding->consumeResult(std::move(context), std::move(result));
         }
       },
-      typename GrpcSinkEndpoint9::ErrorOutput{}
+      typename ProcessOrderItemGrpcSinkEndpoint::ErrorOutput{}
   );
-  sink_binding_9_->consume =
-      [endpoint = grpc_sink_endpoint_9_](
+  bindings_.process_order_item->consume =
+      [endpoint = endpoints_.process_order_item](
           servicelib::MessageContext context, const example::model::types::OrderItem& value) {
         endpoint->consume(std::move(context),
                           servicelib::Payload<example::model::types::OrderItem>::make(value));
       };
-  grpc_sink_1_->addEndpoint(grpc_sink_endpoint_9_);
-  registerDataSink(grpc_sink_1_);
+  connectors_.inventory_service_api_sink->addEndpoint(endpoints_.process_order_item);
+  registerDataSink(connectors_.inventory_service_api_sink);
 
 
 
@@ -107,13 +114,13 @@ void ServiceGenerated::initDataSinks(const config::Config& cfg) {
 void ServiceGenerated::initDataSources(
     const config::Config& cfg) {
 
-  http_source_2_ =
+  connectors_.order_service_api_source =
       std::make_shared<servicelib::datasource::http::UserverDataSource>(
           *this, cfg.dataConnectors.orderServiceApi.id);
-  http_source_consumer_8_ = HTTPSourceConsumer8::make(
-      *this, input_8_, functions::ProcessOrder{});
-  http_source_2_->addEndpoint(http_source_consumer_8_->endpoint());
-  registerDataSource(http_source_2_);
+  endpoints_.process_order = ProcessOrderHTTPSourceConsumer::make(
+      *this, streams_.process_order, functions::ProcessOrder{});
+  connectors_.order_service_api_source->addEndpoint(endpoints_.process_order->endpoint());
+  registerDataSource(connectors_.order_service_api_source);
 
 
 }
@@ -154,29 +161,32 @@ void ServiceGenerated::stop() noexcept {
 }
 
 void ServiceGenerated::releaseRuntime() noexcept {
-  grpc_sink_1_.reset();
+  connectors_.inventory_service_api_sink.reset();
 
-  http_source_2_.reset();
+  connectors_.order_service_api_source.reset();
 
-  http_source_consumer_8_.reset();
+  endpoints_.process_order.reset();
 
-  grpc_sink_endpoint_9_.reset();
-  grpc_client_1_.reset();
-
-
-  sink_binding_9_.reset();
+  endpoints_.process_order_item.reset();
+  connectors_.inventory_service_api_client.reset();
 
 
+  bindings_.process_order_item.reset();
 
-  input_8_.reset();
 
+
+  streams_.process_order.reset();
+
+  // Runtime owns non-root streams. Clear the generated named view only after
+  // ServiceApp::stop() has completed and released the runtime graph.
+  streams_ = {};
 }
 
 std::shared_ptr<
     servicelib::datasource::http::IUserverEndpoint>
 ServiceGenerated::httpDataSourceEndpoint(int endpoint_id) const {
-  if (auto endpoint = http_source_2_
-          ? http_source_2_->endpoint(endpoint_id) : nullptr) {
+  if (auto endpoint = connectors_.order_service_api_source
+          ? connectors_.order_service_api_source->endpoint(endpoint_id) : nullptr) {
     return endpoint;
   }
   throw std::invalid_argument(

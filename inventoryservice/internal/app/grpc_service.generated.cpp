@@ -15,7 +15,7 @@ InventoryServiceApiGrpcService::InventoryServiceApiGrpcService(
 InventoryServiceApiGrpcService::ProcessOrderItemResult InventoryServiceApiGrpcService::ProcessOrderItem(
     CallContext& context,
     processorderitem::ProcessOrderItemRequest&& request) {
-  const auto endpoint = service_component_.service().grpcSourceEndpoint4();
+  const auto endpoint = service_component_.service().grpcSourceEndpointProcessInventoryItem();
   if (!endpoint) {
     throw std::runtime_error("gRPC datasource endpoint is not started");
   }

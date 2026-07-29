@@ -53,23 +53,25 @@ void ServiceGenerated::initRuntime() {
 }
 
 void ServiceGenerated::initStreams(const config::Config& cfg) {
-  input_4_ = servicelib::makeInputStream<example::model::types::OrderItem, example::model::types::OrderItemResult, std::exception_ptr, ServiceGenerated>(cfg.streams.processInventoryItem, nullptr, *this);
-  detached_2_ = servicelib::makeDetachedStream<example::model::types::OrderItemResult, ServiceGenerated>(2, "Get Inventory Item Error", nullptr, *this);
-  auto& stream_1 = (*input_4_).process(cfg.streams.getInventoryItemData, servicelib::StreamType<example::model::types::OrderItemResult>{}, servicelib::StreamType<example::model::types::OrderItemResult>{}, servicelib::StreamFunction(functions::GetInventoryItemData{}));
-  auto& stream_3 = stream_1.merge(cfg.streams.mergeInventoryResult, (*detached_2_));
-  stream_1.setErrorConsumer(*detached_2_);
-  input_4_->setSource(stream_3);
+  streams_.process_inventory_item = servicelib::makeInputStream<example::model::types::OrderItem, example::model::types::OrderItemResult, std::exception_ptr, ServiceGenerated>(cfg.streams.processInventoryItem, nullptr, *this);
+  streams_.get_inventory_item_error = servicelib::makeDetachedStream<example::model::types::OrderItemResult, ServiceGenerated>(2, "Get Inventory Item Error", nullptr, *this);
+  auto& get_inventory_item_data = (*streams_.process_inventory_item).process(cfg.streams.getInventoryItemData, servicelib::StreamType<example::model::types::OrderItemResult>{}, servicelib::StreamType<example::model::types::OrderItemResult>{}, servicelib::StreamFunction(functions::GetInventoryItemData{}));
+  streams_.get_inventory_item_data = std::addressof(get_inventory_item_data);
+  auto& merge_inventory_result = get_inventory_item_data.merge(cfg.streams.mergeInventoryResult, (*streams_.get_inventory_item_error));
+  streams_.merge_inventory_result = std::addressof(merge_inventory_result);
+  get_inventory_item_data.setErrorConsumer(*streams_.get_inventory_item_error);
+  streams_.process_inventory_item->setSource(merge_inventory_result);
 }
 
 void ServiceGenerated::initDataSources(
     const config::Config& cfg) {
-  grpc_source_1_ =
+  connectors_.inventory_service_api_source =
       std::make_shared<servicelib::datasource::grpc::UserverDataSource>(
           *this, cfg.dataConnectors.inventoryServiceApi.id);
-  grpc_source_consumer_4_ = GrpcSourceConsumer4::make(
-      *this, input_4_, functions::ProcessOrderItem{});
-  grpc_source_1_->addEndpoint(grpc_source_consumer_4_->endpoint());
-  registerDataSource(grpc_source_1_);
+  endpoints_.process_inventory_item = ProcessInventoryItemGrpcSourceConsumer::make(
+      *this, streams_.process_inventory_item, functions::ProcessOrderItem{});
+  connectors_.inventory_service_api_source->addEndpoint(endpoints_.process_inventory_item->endpoint());
+  registerDataSource(connectors_.inventory_service_api_source);
 
 
 
@@ -111,19 +113,22 @@ void ServiceGenerated::stop() noexcept {
 }
 
 void ServiceGenerated::releaseRuntime() noexcept {
-  grpc_source_1_.reset();
+  connectors_.inventory_service_api_source.reset();
 
 
 
-  grpc_source_consumer_4_.reset();
+  endpoints_.process_inventory_item.reset();
 
 
 
-  detached_2_.reset();
+  streams_.get_inventory_item_error.reset();
 
 
-  input_4_.reset();
+  streams_.process_inventory_item.reset();
 
+  // Runtime owns non-root streams. Clear the generated named view only after
+  // ServiceApp::stop() has completed and released the runtime graph.
+  streams_ = {};
 }
 
 
