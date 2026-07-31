@@ -54,6 +54,7 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
 
   if(USERVER_SOURCE_DIR)
     set(USERVER_FEATURE_GRPC ON CACHE BOOL "" FORCE)
+    set(USERVER_FEATURE_OTLP ON CACHE BOOL "" FORCE)
     set(USERVER_FEATURE_CHAOTIC_EXPERIMENTAL ON CACHE BOOL "" FORCE)
     add_subdirectory(
         "${USERVER_SOURCE_DIR}"
@@ -62,7 +63,7 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     userver_setup_environment()
     list(APPEND CMAKE_MODULE_PATH "${USERVER_SOURCE_DIR}/cmake")
   else()
-    find_package(userver QUIET COMPONENTS core grpc)
+    find_package(userver QUIET COMPONENTS core grpc otlp)
   endif()
 
   if(SERVICELIB_SOURCE_DIR)
@@ -149,7 +150,7 @@ target_compile_features(example_inventory_service PRIVATE cxx_std_20)
 target_include_directories(example_inventory_service PRIVATE
     "${_servicegen_include_root}")
 target_link_libraries(example_inventory_service PRIVATE
-    servicelib::servicelib userver-core userver-grpc
+    servicelib::servicelib userver-core userver-grpc userver-otlp
       example_inventory_service_api
       example_model
 

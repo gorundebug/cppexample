@@ -60,6 +60,11 @@ dataConnectors:
         name: Order Service API
         type: HTTP
         useDedicatedListener: false
+pools:
+    orderWorkers:
+        executorsCount: 2
+        name: Order Workers
+        queueCapacity: 256
 services:
     orderService:
         color: '#D2E5FF'
@@ -74,6 +79,11 @@ services:
         modulePath: github.com/gorundebug/cppexample-orderservice
         name: Order Service
         links:
+            processOrderItems:
+                callSemantics: TaskPool
+                from: splitPipeline
+                poolName: Order Workers
+                to: processOrderItems
             softDeadline:
                 callSemantics: ParallelCall
                 from: splitPipeline
@@ -148,7 +158,7 @@ services:
                     xPos: -197
                     yPos: -473
                 softDeadline:
-                    duration: 0
+                    duration: 1000
                     functionDescription: |
                         Cast stream.GetConfig() to *runtimecfg.DelayStreamConfig and convert cfg.Duration (int, milliseconds) to time.Duration — this is the safety margin.
                         If ctx has no deadline (ctx.Deadline() ok==false), return the margin directly.

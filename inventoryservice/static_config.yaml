@@ -3,7 +3,10 @@ components_manager:
     main-task-processor:
       worker_threads: 4
     fs-task-processor:
-      worker_threads: 1
+      worker_threads: 4
+    grpc-blocking-task-processor:
+      worker_threads: 4
+      thread_name: grpc-worker
 
   default_task_processor: main-task-processor
   components:
@@ -49,8 +52,24 @@ components_manager:
 
     grpc-server:
       port: 9202
-      completion-queue-count: 2
+      completion-queue-count: 4
     grpc-server-middlewares-pipeline:
+    grpc-client-common:
+      blocking-task-processor: grpc-blocking-task-processor
+    grpc-otlp-factory:
+      channel-args: {}
+      middlewares:
+        grpc-client-logging:
+          enabled: false
+    otlp-logger:
+      logs-endpoint: $inventoryServiceOtlpEndpoint
+      tracing-endpoint: $inventoryServiceOtlpEndpoint
+      client-factory-name: grpc-otlp-factory
+      service-name: inventoryservice
+      log-level: info
+      sinks:
+        logs: default
+        tracing: otlp
     servicelib-runtime:
       config-path: config/config.yaml
       override-path: $inventoryServiceConfigOverridePath

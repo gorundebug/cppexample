@@ -32,9 +32,8 @@ cp -R "${service_dir}/." "${output_dir}/"
 cp CMakePresets.json Dockerfile.cmake docker-compose.cmake.yml \
   .clang-format .clang-tidy .dockerignore .gitignore "${output_dir}/"
 
-mkdir -p "${output_dir}/docker" "${output_dir}/tools" "${output_dir}/scripts"
+mkdir -p "${output_dir}/docker" "${output_dir}/scripts"
 cp -R docker/. "${output_dir}/docker/"
-cp -R tools/userver "${output_dir}/tools/userver"
 cp scripts/cmake-docker.generated.sh scripts/build.generated.sh scripts/test.generated.sh \
   scripts/lint.generated.sh scripts/format.generated.sh \
   scripts/configure-git-auth.generated.sh "${output_dir}/scripts/"

@@ -6,6 +6,8 @@
 #include <userver/ugrpc/client/client_factory_component.hpp>
 #include <userver/ugrpc/client/component_list.hpp>
 
+#include <userver/otlp/logs/component.hpp>
+
 #include <userver/utils/daemon_run.hpp>
 
 #include <servicelib/runtime/telemetry/userver/metrics.hpp>
@@ -23,6 +25,8 @@ int main(int argc, char* argv[]) {
       userver::components::MinimalServerComponentList()
           .Append<userver::components::TestsuiteSupport>()
           .Append<userver::ugrpc::client::ClientFactoryComponent>()
+          .Append<userver::ugrpc::client::ClientFactoryComponent>(
+              "grpc-otlp-factory")
           .AppendComponentList(
               userver::ugrpc::client::MinimalComponentList())
 
@@ -37,6 +41,7 @@ int main(int argc, char* argv[]) {
           .Append<servicelib::telemetry::userver_adapter::StatusCssHandler>()
 
           .Append<example::order_service::app::ProcessOrderHTTPHandler>()
+          .Append<userver::otlp::LoggerComponent>()
           ;
   return userver::utils::DaemonMain(argc, argv, components);
 }

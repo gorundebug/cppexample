@@ -45,9 +45,11 @@ class Config final : public servicelib::config::IConfig {
   } endpoints;
 
   struct Pools final {
+    servicelib::config::PoolConfig inventoryPriorityWorkers;
   } pools;
 
   struct Links final {
+    servicelib::config::LinkConfig processInventoryItemToGetInventoryItemData;
   } links;
 
   struct Modules final {
@@ -85,12 +87,12 @@ class Config final : public servicelib::config::IConfig {
 
   std::vector<const servicelib::config::PoolConfig*> GetPools()
       const override {
-    return {  };
+    return { &pools.inventoryPriorityWorkers,  };
   }
 
   std::vector<const servicelib::config::LinkConfig*> GetLinks()
       const override {
-    return {  };
+    return { &links.processInventoryItemToGetInventoryItemData,  };
   }
 
   std::vector<const servicelib::config::ModuleConfig*> GetModules()
@@ -189,6 +191,21 @@ inline Config MakeConfig() {
     value.publicFunction = false;
     value.functionDescription = "Outgoing unary gRPC call to the Inventory Service.\n[ConsumeMessage] map OrderItem → ProcessOrderItemRequest (OrderID, ItemID, SKU, Quantity); call sender.Send(req).\n[HandleResponse] map ProcessOrderItemResponse → OrderItemResult:\ncopy OrderID, ItemID, AvailableQty, Reserved, Status, UnitPrice from response; push downstream via sc.Collect.\n[EndRequest] log the outcome.\n";
     value.functionInitializerGroup = "";
+    return value;
+  }();
+  cfg.pools.inventoryPriorityWorkers = [] {
+    PoolConfig value{};
+    value.name = "Inventory Priority Workers";
+    value.executorsCount = 2;
+    value.queueCapacity = 256;
+    return value;
+  }();
+  cfg.links.processInventoryItemToGetInventoryItemData = [] {
+    LinkConfig value{};
+    value.from = 4;
+    value.to = 1;
+    value.callSemantics = MakeCallSemanticsGroup(
+        CallSemantics::kPriorityTaskPool, "Inventory Priority Workers", 10);
     return value;
   }();
   cfg.modules.inventoryServiceApi = [] {

@@ -87,7 +87,7 @@ void ServiceGenerated::initDataSinks(const config::Config& cfg) {
       std::make_shared<servicelib::datasink::grpc::UserverDataSink>(
           *this, cfg.dataConnectors.inventoryServiceApi.id);
   endpoints_.process_order_item = std::make_shared<ProcessOrderItemGrpcSinkEndpoint>(
-      *this, cfg.endpoints.processOrderItem.id, functions::ProcessOrderItem{},
+      *this, cfg.endpoints.processOrderItem.id, 9, functions::ProcessOrderItem{},
       ProcessOrderItemGrpcClientFunction{&*connectors_.inventory_service_api_client},
       [binding = bindings_.process_order_item](
           servicelib::MessageContext context,

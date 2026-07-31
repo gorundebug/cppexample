@@ -5,6 +5,10 @@
 
 #include <userver/ugrpc/server/component_list.hpp>
 
+#include <userver/otlp/logs/component.hpp>
+#include <userver/ugrpc/client/client_factory_component.hpp>
+#include <userver/ugrpc/client/component_list.hpp>
+
 #include <userver/utils/daemon_run.hpp>
 
 #include <servicelib/runtime/telemetry/userver/metrics.hpp>
@@ -23,7 +27,10 @@ int main(int argc, char* argv[]) {
           .Append<userver::components::TestsuiteSupport>()
           .AppendComponentList(
               userver::ugrpc::server::DefaultComponentList())
-
+          .Append<userver::ugrpc::client::ClientFactoryComponent>(
+              "grpc-otlp-factory")
+          .AppendComponentList(
+              userver::ugrpc::client::MinimalComponentList())
           .Append<example::inventory_service::app::RuntimeConfigComponent>()
           .Append<example::inventory_service::app::InventoryServiceComponent>()
           .Append<servicelib::telemetry::userver_adapter::MetricsHandler>()
@@ -35,6 +42,7 @@ int main(int argc, char* argv[]) {
           .Append<servicelib::telemetry::userver_adapter::StatusCssHandler>()
 
           .Append<example::inventory_service::app::InventoryServiceApiGrpcService>()
+          .Append<userver::otlp::LoggerComponent>()
           ;
   return userver::utils::DaemonMain(argc, argv, components);
 }

@@ -15,8 +15,6 @@ coverage.out
 
 # Tools (downloaded binaries); userver source patches are project inputs.
 tools/*
-!tools/userver/
-!tools/userver/**
 
 # Proto descriptors (binary, regenerated)
 descriptors/

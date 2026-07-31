@@ -4,8 +4,6 @@
 .editorconfig
 .actrc
 tools/*
-!tools/userver/
-!tools/userver/**
 grafana/
 *.md
 go.work.sum

@@ -2,13 +2,13 @@
 FROM servicelib-source AS servicelib-source
 FROM userver-source AS userver-source
 
-FROM --platform=$TARGETPLATFORM ubuntu:26.04
+FROM --platform=$TARGETPLATFORM ubuntu:24.04
 
 ARG TARGETARCH
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Etc/UTC
 
-COPY docker/userver-packages-ubuntu-26.04.txt /tmp/userver-packages.txt
+COPY docker/userver-packages-ubuntu-24.04.txt /tmp/userver-packages.txt
 
 RUN apt-get update \
     && xargs apt-get install --yes --no-install-recommends \
@@ -19,9 +19,6 @@ RUN apt-get update \
 
 COPY --from=servicelib-source / /opt/servicelib
 COPY --from=userver-source / /opt/userver
-COPY tools/userver /opt/userver-patches
-
-RUN /opt/userver-patches/apply-patches.generated.sh /opt/userver
 
 WORKDIR /workspace
 

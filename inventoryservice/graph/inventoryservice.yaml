@@ -22,6 +22,11 @@ dataConnectors:
         module: inventory_service_api
         name: Inventory Service API
         type: gRPC
+pools:
+    inventoryPriorityWorkers:
+        executorsCount: 2
+        name: Inventory Priority Workers
+        queueCapacity: 256
 services:
     inventoryService:
         color: '#D2E5FF'
@@ -35,6 +40,13 @@ services:
         metricsHandler: metrics
         modulePath: github.com/gorundebug/cppexample-inventoryservice
         name: Inventory Service
+        links:
+            getInventoryItemData:
+                callSemantics: PriorityTaskPool
+                from: processInventoryItem
+                poolName: Inventory Priority Workers
+                priority: 10
+                to: getInventoryItemData
         pipelines:
             inventoryItem:
                 getInventoryItemData:

@@ -25,6 +25,8 @@ services:
       - SYS_PTRACE
     networks:
       - app_net
+    depends_on:
+      - jaeger
 
   orderservice:
     image: example-cpp-build
@@ -52,6 +54,8 @@ services:
       - SYS_PTRACE
     networks:
       - app_net
+    depends_on:
+      - jaeger
 
 
 
@@ -77,6 +81,15 @@ services:
       - ./grafana/provisioning:/etc/grafana/provisioning:ro
       - ./inventoryservice/grafana/dist:/etc/grafana/dashboards/inventoryservice:ro
       - ./orderservice/grafana/dist:/etc/grafana/dashboards/orderservice:ro
+    networks:
+      - app_net
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.62.0
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+    ports:
+      - "16686:16686"
     networks:
       - app_net
 

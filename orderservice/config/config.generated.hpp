@@ -59,9 +59,11 @@ class Config final : public servicelib::config::IConfig {
   } endpoints;
 
   struct Pools final {
+    servicelib::config::PoolConfig orderWorkers;
   } pools;
 
   struct Links final {
+    servicelib::config::LinkConfig splitPipelineToProcessOrderItems;
     servicelib::config::LinkConfig splitPipelineToSoftDeadline;
   } links;
 
@@ -102,12 +104,12 @@ class Config final : public servicelib::config::IConfig {
 
   std::vector<const servicelib::config::PoolConfig*> GetPools()
       const override {
-    return {  };
+    return { &pools.orderWorkers,  };
   }
 
   std::vector<const servicelib::config::LinkConfig*> GetLinks()
       const override {
-    return { &links.splitPipelineToSoftDeadline,  };
+    return { &links.splitPipelineToProcessOrderItems, &links.splitPipelineToSoftDeadline,  };
   }
 
   std::vector<const servicelib::config::ModuleConfig*> GetModules()
@@ -242,7 +244,7 @@ inline Config MakeConfig() {
     value.idSource = 12;
     value.xPos = -706;
     value.yPos = -33;
-    value.duration = 0;
+    value.duration = 1000;
     value.functionPackage = "";
     value.functionName = "SoftDeadline";
     value.functionDescription = "Cast stream.GetConfig() to *runtimecfg.DelayStreamConfig and convert cfg.Duration (int, milliseconds) to time.Duration — this is the safety margin.\nIf ctx has no deadline (ctx.Deadline() ok==false), return the margin directly.\nOtherwise compute time.Until(deadline) minus the margin: if the result is negative return 0, otherwise return it.\n";
@@ -305,6 +307,21 @@ inline Config MakeConfig() {
     value.publicFunction = false;
     value.functionDescription = "Outgoing unary gRPC call to the Inventory Service.\n[ConsumeMessage] map OrderItem → ProcessOrderItemRequest (OrderID, ItemID, SKU, Quantity); call sender.Send(req).\n[HandleResponse] map ProcessOrderItemResponse → OrderItemResult:\ncopy OrderID, ItemID, AvailableQty, Reserved, Status, UnitPrice from response; push downstream via sc.Collect.\n[EndRequest] log the outcome.\n";
     value.functionInitializerGroup = "";
+    return value;
+  }();
+  cfg.pools.orderWorkers = [] {
+    PoolConfig value{};
+    value.name = "Order Workers";
+    value.executorsCount = 2;
+    value.queueCapacity = 256;
+    return value;
+  }();
+  cfg.links.splitPipelineToProcessOrderItems = [] {
+    LinkConfig value{};
+    value.from = 12;
+    value.to = 10;
+    value.callSemantics =
+        MakeCallSemanticsGroup(CallSemantics::kTaskPool, "Order Workers", 0);
     return value;
   }();
   cfg.links.splitPipelineToSoftDeadline = [] {

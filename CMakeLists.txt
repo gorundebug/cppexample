@@ -18,7 +18,7 @@ set(SERVICELIB_REPOSITORY
     "https://github.com/gorundebug/cppservicelib.git" CACHE STRING
     "Standalone cppservicelib repository")
 set(SERVICELIB_REVISION
-    "v3.0.1" CACHE STRING
+    "v3.0.3" CACHE STRING
     "Pinned cppservicelib revision")
 set(USERVER_REPOSITORY
     "https://github.com/userver-framework/userver.git" CACHE STRING
@@ -55,6 +55,7 @@ endif()
 
 if(USERVER_SOURCE_DIR)
   set(USERVER_FEATURE_GRPC ON CACHE BOOL "" FORCE)
+  set(USERVER_FEATURE_OTLP ON CACHE BOOL "" FORCE)
 
   set(USERVER_FEATURE_CHAOTIC_EXPERIMENTAL ON CACHE BOOL "" FORCE)
   add_subdirectory(
@@ -64,7 +65,7 @@ if(USERVER_SOURCE_DIR)
   userver_setup_environment()
   list(APPEND CMAKE_MODULE_PATH "${USERVER_SOURCE_DIR}/cmake")
 else()
-  find_package(userver QUIET COMPONENTS core grpc)
+  find_package(userver QUIET COMPONENTS core grpc otlp)
 endif()
 
 if(SERVICELIB_SOURCE_DIR)

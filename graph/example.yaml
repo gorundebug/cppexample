@@ -70,6 +70,15 @@ modules:
     orderServiceApi:
         modulePath: github.com/gorundebug/cppexample-order-service-api
         name: order_service_api
+pools:
+    inventoryPriorityWorkers:
+        executorsCount: 2
+        name: Inventory Priority Workers
+        queueCapacity: 256
+    orderWorkers:
+        executorsCount: 2
+        name: Order Workers
+        queueCapacity: 256
 services:
     inventoryService:
         color: '#D2E5FF'
@@ -83,6 +92,13 @@ services:
         metricsHandler: metrics
         modulePath: github.com/gorundebug/cppexample-inventoryservice
         name: Inventory Service
+        links:
+            getInventoryItemData:
+                callSemantics: PriorityTaskPool
+                from: processInventoryItem
+                poolName: Inventory Priority Workers
+                priority: 10
+                to: getInventoryItemData
         pipelines:
             inventoryItem:
                 getInventoryItemData:
@@ -151,6 +167,11 @@ services:
         modulePath: github.com/gorundebug/cppexample-orderservice
         name: Order Service
         links:
+            processOrderItems:
+                callSemantics: TaskPool
+                from: splitPipeline
+                poolName: Order Workers
+                to: processOrderItems
             softDeadline:
                 callSemantics: ParallelCall
                 from: splitPipeline
@@ -225,7 +246,7 @@ services:
                     xPos: -197
                     yPos: -473
                 softDeadline:
-                    duration: 0
+                    duration: 1000
                     functionDescription: |
                         Cast stream.GetConfig() to *runtimecfg.DelayStreamConfig and convert cfg.Duration (int, milliseconds) to time.Duration — this is the safety margin.
                         If ctx has no deadline (ctx.Deadline() ok==false), return the margin directly.

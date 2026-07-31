@@ -3,9 +3,9 @@ components_manager:
     main-task-processor:
       worker_threads: 4
     fs-task-processor:
-      worker_threads: 1
+      worker_threads: 4
     grpc-blocking-task-processor:
-      worker_threads: 1
+      worker_threads: 4
       thread_name: grpc-worker
 
   default_task_processor: main-task-processor
@@ -54,6 +54,20 @@ components_manager:
       blocking-task-processor: grpc-blocking-task-processor
     grpc-client-factory:
       channel-args: {}
+    grpc-otlp-factory:
+      channel-args: {}
+      middlewares:
+        grpc-client-logging:
+          enabled: false
+    otlp-logger:
+      logs-endpoint: $orderServiceOtlpEndpoint
+      tracing-endpoint: $orderServiceOtlpEndpoint
+      client-factory-name: grpc-otlp-factory
+      service-name: orderservice
+      log-level: info
+      sinks:
+        logs: default
+        tracing: otlp
     grpc-client-middlewares-pipeline:
     grpc-client-deadline-propagation:
     grpc-client-logging:
