@@ -59,11 +59,9 @@ class Config final : public servicelib::config::IConfig {
   } endpoints;
 
   struct Pools final {
-    servicelib::config::PoolConfig orderWorkers;
   } pools;
 
   struct Links final {
-    servicelib::config::LinkConfig splitPipelineToProcessOrderItems;
     servicelib::config::LinkConfig splitPipelineToSoftDeadline;
   } links;
 
@@ -104,12 +102,12 @@ class Config final : public servicelib::config::IConfig {
 
   std::vector<const servicelib::config::PoolConfig*> GetPools()
       const override {
-    return { &pools.orderWorkers,  };
+    return {  };
   }
 
   std::vector<const servicelib::config::LinkConfig*> GetLinks()
       const override {
-    return { &links.splitPipelineToProcessOrderItems, &links.splitPipelineToSoftDeadline,  };
+    return { &links.splitPipelineToSoftDeadline,  };
   }
 
   std::vector<const servicelib::config::ModuleConfig*> GetModules()
@@ -309,27 +307,11 @@ inline Config MakeConfig() {
     value.functionInitializerGroup = "";
     return value;
   }();
-  cfg.pools.orderWorkers = [] {
-    PoolConfig value{};
-    value.name = "Order Workers";
-    value.executorsCount = 2;
-    value.queueCapacity = 256;
-    return value;
-  }();
-  cfg.links.splitPipelineToProcessOrderItems = [] {
-    LinkConfig value{};
-    value.from = 12;
-    value.to = 10;
-    value.callSemantics =
-        MakeCallSemanticsGroup(CallSemantics::kTaskPool, "Order Workers", 0);
-    return value;
-  }();
   cfg.links.splitPipelineToSoftDeadline = [] {
     LinkConfig value{};
     value.from = 12;
     value.to = 11;
-    value.callSemantics =
-        MakeCallSemanticsGroup(CallSemantics::kParallelCall, "", 0);
+    value.callSemantics = MakeCallSemanticsGroup(CallSemantics::kParallelCall, "", 0);
     return value;
   }();
   cfg.modules.inventoryServiceApi = [] {
@@ -354,6 +336,7 @@ inline Config MakeConfig() {
     TypeConfig value{};
     value.name = "Order";
     value.type = DataType::kStruct;
+    value.package = "";
     value.definitionFormat = TypeDefinitionFormat::kNative;
     value.publicType = false;
     value.transferByValue = false;
@@ -363,6 +346,7 @@ inline Config MakeConfig() {
     TypeConfig value{};
     value.name = "OrderItem";
     value.type = DataType::kStruct;
+    value.package = "";
     value.module = "model";
     value.definitionFormat = TypeDefinitionFormat::kNative;
     value.publicType = false;
@@ -373,6 +357,7 @@ inline Config MakeConfig() {
     TypeConfig value{};
     value.name = "OrderItemResult";
     value.type = DataType::kStruct;
+    value.package = "";
     value.module = "model";
     value.definitionFormat = TypeDefinitionFormat::kNative;
     value.publicType = false;
@@ -383,6 +368,7 @@ inline Config MakeConfig() {
     TypeConfig value{};
     value.name = "OrderState";
     value.type = DataType::kStruct;
+    value.package = "";
     value.definitionFormat = TypeDefinitionFormat::kNative;
     value.publicType = false;
     value.transferByValue = false;

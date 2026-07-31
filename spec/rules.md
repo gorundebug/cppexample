@@ -7,7 +7,7 @@ user-owned extension points.
 ## Project invariants
 
 - Project root: `example/`
-- Graph: `example/graph/example.yaml`
+- Graph: `example/graph/example.generated.yaml`
 - Never edit a file whose name contains `generated`; those files are replaced
   during project merge.
 - Never change generated signatures, topology wiring, IDs, config keys, or

@@ -1,6 +1,7 @@
 dataConnectors:
     inventoryServiceApi:
         address: dns:///localhost:9202
+        cppImplementation: userver/grpc
         endpoints:
             processOrderItem:
                 functionDescription: |
@@ -17,12 +18,12 @@ dataConnectors:
                 name: Process Order Item
                 publicFunction: false
         goImplementation: google/grpc
-        cppImplementation: userver/grpc
-        pythonImplementation: google/grpc
         module: inventory_service_api
         name: Inventory Service API
+        pythonImplementation: google/grpc
         type: gRPC
     orderServiceApi:
+        cppImplementation: userver/http
         endpoints:
             processOrder:
                 functionDescription: |
@@ -54,17 +55,11 @@ dataConnectors:
                 path: /v1/processorder
                 publicFunction: false
         goImplementation: net/http
-        cppImplementation: userver/http
-        pythonImplementation: aiohttp
         module: order_service_api
         name: Order Service API
+        pythonImplementation: aiohttp
         type: HTTP
         useDedicatedListener: false
-pools:
-    orderWorkers:
-        executorsCount: 2
-        name: Order Workers
-        queueCapacity: 256
 services:
     orderService:
         color: '#D2E5FF'
@@ -75,19 +70,14 @@ services:
         grpcPort: 9201
         httpHost: 0.0.0.0
         httpPort: 9091
-        metricsHandler: metrics
-        modulePath: github.com/gorundebug/cppexample-orderservice
-        name: Order Service
         links:
-            processOrderItems:
-                callSemantics: TaskPool
-                from: splitPipeline
-                poolName: Order Workers
-                to: processOrderItems
-            softDeadline:
+            link1:
                 callSemantics: ParallelCall
                 from: splitPipeline
                 to: softDeadline
+        metricsHandler: metrics
+        modulePath: github.com/gorundebug/cppexample-orderservice
+        name: Order Service
         pipelines:
             order:
                 mapOrderItemResultToOrderState:

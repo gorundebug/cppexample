@@ -1,6 +1,7 @@
 dataConnectors:
     inventoryServiceApi:
         address: dns:///localhost:9202
+        cppImplementation: userver/grpc
         endpoints:
             processOrderItem:
                 functionDescription: |
@@ -17,10 +18,9 @@ dataConnectors:
                 name: Process Order Item
                 publicFunction: false
         goImplementation: google/grpc
-        cppImplementation: userver/grpc
-        pythonImplementation: google/grpc
         module: inventory_service_api
         name: Inventory Service API
+        pythonImplementation: google/grpc
         type: gRPC
 pools:
     inventoryPriorityWorkers:
@@ -37,16 +37,16 @@ services:
         grpcPort: 9202
         httpHost: 0.0.0.0
         httpPort: 9092
-        metricsHandler: metrics
-        modulePath: github.com/gorundebug/cppexample-inventoryservice
-        name: Inventory Service
         links:
-            getInventoryItemData:
+            link1:
                 callSemantics: PriorityTaskPool
                 from: processInventoryItem
                 poolName: Inventory Priority Workers
                 priority: 10
                 to: getInventoryItemData
+        metricsHandler: metrics
+        modulePath: github.com/gorundebug/cppexample-inventoryservice
+        name: Inventory Service
         pipelines:
             inventoryItem:
                 getInventoryItemData:

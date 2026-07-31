@@ -61,4 +61,4 @@ Use `make help` to see all generated build, test, lint, formatting, and
 observability commands.
 
 The source architecture used to generate the project is available in
-`graph/example.yaml`.
+`graph/example.generated.yaml`.
