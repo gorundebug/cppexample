@@ -18,23 +18,23 @@ class OrderItemResultSerde final : public servicelib::serde::Serde<example::mode
 
   servicelib::serde::SerdeData Serialize(
       const example::model::types::OrderItemResult& value) const override {
+    servicelib::serde::SerdeData result;
+    SerializeTo(result, value);
+    return result;
+  }
+
+  void SerializeTo(servicelib::serde::SerdeData& output,
+                    const example::model::types::OrderItemResult& value) const override {
     const auto json = userver::formats::json::ValueBuilder(value).ExtractValue();
     const auto text = userver::formats::json::ToString(json);
-    servicelib::serde::SerdeData result;
-    result.reserve(text.size());
-    for (const char byte : text) {
-      result.push_back(static_cast<std::byte>(byte));
-    }
-    return result;
+    const auto* bytes = reinterpret_cast<const std::byte*>(text.data());
+    output.insert(output.end(), bytes, bytes + text.size());
   }
 
   example::model::types::OrderItemResult Deserialize(
       servicelib::serde::SerdeView data) const override {
-    std::string text;
-    text.reserve(data.size());
-    for (const auto byte : data) {
-      text.push_back(static_cast<char>(std::to_integer<unsigned char>(byte)));
-    }
+    const auto* chars = reinterpret_cast<const char*>(data.data());
+    const std::string text(chars, data.size());
     return userver::formats::json::FromString(text).As<example::model::types::OrderItemResult>();
   }
 };
