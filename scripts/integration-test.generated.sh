@@ -11,6 +11,6 @@ cleanup() {
 }
 trap cleanup EXIT
 
-docker compose -f docker-compose.cmake.yml run --build --rm cpp-build \
+docker compose -f docker-compose.cmake.generated.yml run --build --rm cpp-build \
   /bin/bash -lc \
   'ctest --preset docker-debug -L integration --no-tests=ignore'

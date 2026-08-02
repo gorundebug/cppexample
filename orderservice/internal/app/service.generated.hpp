@@ -84,10 +84,13 @@ class ServiceGenerated
       servicelib::InputStream<example::order_service::types::Order, example::order_service::types::OrderState, std::exception_ptr,
                               ServiceGenerated>;
 
+  using ProcessOrderItemErrorDetached =
+      servicelib::DetachedStream<example::order_service::types::OrderState, ServiceGenerated>;
 
 
   struct ServiceStreams final {
     std::shared_ptr<ProcessOrderInput> process_order;
+    std::shared_ptr<ProcessOrderItemErrorDetached> process_order_item_error;
     servicelib::StreamBase* split_pipeline{nullptr};
     servicelib::StreamBase* process_order_items{nullptr};
     servicelib::StreamBase* process_order_item{nullptr};
@@ -104,6 +107,9 @@ class ServiceGenerated
     std::function<void(servicelib::MessageContext,
                        servicelib::Payload<example::model::types::OrderItemResult>)>
         consumeResult;
+    std::function<void(servicelib::MessageContext,
+                       servicelib::Payload<example::order_service::types::OrderState>)>
+        consumeError;
     struct Function final {
       std::shared_ptr<ProcessOrderItemSinkBinding> binding;
       void operator()(servicelib::MessageContext context,
@@ -134,7 +140,7 @@ class ServiceGenerated
   using ProcessOrderItemGrpcSinkEndpoint =
       servicelib::datasink::grpc::NoStreamingEndpoint<
           processorderitem::ProcessOrderItemRequest, processorderitem::ProcessOrderItemResponse, example::model::types::OrderItem, example::model::types::OrderItemResult,
-          functions::ProcessOrderItem, ProcessOrderItemGrpcClientFunction>;
+          functions::ProcessOrderItem, ProcessOrderItemGrpcClientFunction, example::order_service::types::OrderState>;
 
   using ProcessOrderHTTPSourceConsumer =
       servicelib::datasource::http::UserverEndpointConsumer<

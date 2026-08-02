@@ -12,7 +12,7 @@ case "$preset" in
     ;;
 esac
 
-exec docker compose -f docker-compose.cmake.yml run --build --rm \
+exec docker compose -f docker-compose.cmake.generated.yml run --build --rm \
   -e SERVICEGEN_CPP_CMAKE_PRESET="$preset" cpp-build \
   /bin/bash -lc \
   'source scripts/configure-git-auth.generated.sh &&

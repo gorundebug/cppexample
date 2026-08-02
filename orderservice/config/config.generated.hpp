@@ -18,14 +18,14 @@
 namespace example::order_service::config {
 
 inline constexpr int kOrderServiceServiceId = 2;
-inline constexpr int kMapOrderItemResultToOrderStateStreamId = 5;
-inline constexpr int kMapToOrderStateStreamId = 6;
-inline constexpr int kMergeResultsStreamId = 7;
-inline constexpr int kProcessOrderStreamId = 8;
-inline constexpr int kProcessOrderItemStreamId = 9;
-inline constexpr int kProcessOrderItemsStreamId = 10;
-inline constexpr int kSoftDeadlineStreamId = 11;
-inline constexpr int kSplitPipelineStreamId = 12;
+inline constexpr int kMapOrderItemResultToOrderStateStreamId = 6;
+inline constexpr int kMapToOrderStateStreamId = 7;
+inline constexpr int kMergeResultsStreamId = 8;
+inline constexpr int kProcessOrderStreamId = 9;
+inline constexpr int kProcessOrderItemStreamId = 10;
+inline constexpr int kProcessOrderItemsStreamId = 11;
+inline constexpr int kSoftDeadlineStreamId = 12;
+inline constexpr int kSplitPipelineStreamId = 13;
 inline constexpr int kProcessOrderEndpointId = 2;
 inline constexpr int kProcessOrderItemEndpointId = 1;
 inline constexpr int kInventoryServiceApiConnectorId = 1;
@@ -59,9 +59,12 @@ class Config final : public servicelib::config::IConfig {
   } endpoints;
 
   struct Pools final {
+    servicelib::config::PoolConfig defaultPool;
   } pools;
 
   struct Links final {
+    servicelib::config::LinkConfig processOrderToSplitPipeline;
+    servicelib::config::LinkConfig splitPipelineToProcessOrderItems;
     servicelib::config::LinkConfig splitPipelineToSoftDeadline;
   } links;
 
@@ -102,12 +105,12 @@ class Config final : public servicelib::config::IConfig {
 
   std::vector<const servicelib::config::PoolConfig*> GetPools()
       const override {
-    return {  };
+    return { &pools.defaultPool,  };
   }
 
   std::vector<const servicelib::config::LinkConfig*> GetLinks()
       const override {
-    return { &links.splitPipelineToSoftDeadline,  };
+    return { &links.processOrderToSplitPipeline, &links.splitPipelineToProcessOrderItems, &links.splitPipelineToSoftDeadline,  };
   }
 
   std::vector<const servicelib::config::ModuleConfig*> GetModules()
@@ -147,13 +150,13 @@ inline Config MakeConfig() {
   }();
   cfg.streams.mapOrderItemResultToOrderState = [] {
     MapStreamConfig value{};
-    value.id = 5;
+    value.id = 6;
     value.name = "Map Order Item Result To Order State";
     value.pipeline = "order";
     value.idService = 2;
-    value.idSource = 9;
-    value.xPos = 0;
-    value.yPos = 0;
+    value.idSource = 10;
+    value.xPos = 103;
+    value.yPos = -52;
     value.valueType = "OrderState";
     value.functionPackage = "";
     value.functionName = "MapOrderItemResultToOrderState";
@@ -164,13 +167,13 @@ inline Config MakeConfig() {
   }();
   cfg.streams.mapToOrderState = [] {
     MapStreamConfig value{};
-    value.id = 6;
+    value.id = 7;
     value.name = "Map to Order State";
     value.pipeline = "order";
     value.idService = 2;
-    value.idSource = 11;
-    value.xPos = -459;
-    value.yPos = 76;
+    value.idSource = 12;
+    value.xPos = -453;
+    value.yPos = 73;
     value.valueType = "OrderState";
     value.functionPackage = "";
     value.functionName = "MapToOrderState";
@@ -181,50 +184,50 @@ inline Config MakeConfig() {
   }();
   cfg.streams.mergeResults = [] {
     MergeStreamConfig value{};
-    value.id = 7;
+    value.id = 8;
     value.name = "Merge Results";
     value.pipeline = "order";
     value.idService = 2;
-    value.idSources = {6, 5};
-    value.xPos = -178;
-    value.yPos = 24;
+    value.idSources = {7, 6, 5};
+    value.xPos = -228;
+    value.yPos = 130;
     return value;
   }();
   cfg.streams.processOrder = [] {
     InputStreamConfig value{};
-    value.id = 8;
+    value.id = 9;
     value.name = "Process Order";
     value.pipeline = "order";
     value.idService = 2;
-    value.idSource = 7;
-    value.xPos = -343;
-    value.yPos = -229;
+    value.idSource = 8;
+    value.xPos = -382;
+    value.yPos = -315;
     value.valueType = "Order";
     value.idEndpoint = 2;
     return value;
   }();
   cfg.streams.processOrderItem = [] {
     SinkStreamConfig value{};
-    value.id = 9;
+    value.id = 10;
     value.name = "Process Order Item";
     value.pipeline = "order";
     value.idService = 2;
-    value.idSource = 10;
-    value.xPos = -75;
-    value.yPos = -311;
+    value.idSource = 11;
+    value.xPos = -52;
+    value.yPos = -362;
     value.idEndpoint = 1;
     value.valueType = "OrderItemResult";
     return value;
   }();
   cfg.streams.processOrderItems = [] {
     FlatMapStreamConfig value{};
-    value.id = 10;
+    value.id = 11;
     value.name = "Process Order Items";
     value.pipeline = "order";
     value.idService = 2;
-    value.idSource = 12;
-    value.xPos = -197;
-    value.yPos = -473;
+    value.idSource = 13;
+    value.xPos = -198;
+    value.yPos = -662;
     value.valueType = "OrderItem";
     value.functionPackage = "";
     value.functionName = "ProcessOrderItems";
@@ -235,14 +238,14 @@ inline Config MakeConfig() {
   }();
   cfg.streams.softDeadline = [] {
     DelayStreamConfig value{};
-    value.id = 11;
+    value.id = 12;
     value.name = "Soft Deadline";
     value.pipeline = "order";
     value.idService = 2;
-    value.idSource = 12;
-    value.xPos = -706;
-    value.yPos = -33;
-    value.duration = 1000;
+    value.idSource = 13;
+    value.xPos = -745;
+    value.yPos = -235;
+    value.duration = 0;
     value.functionPackage = "";
     value.functionName = "SoftDeadline";
     value.functionDescription = "Cast stream.GetConfig() to *runtimecfg.DelayStreamConfig and convert cfg.Duration (int, milliseconds) to time.Duration — this is the safety margin.\nIf ctx has no deadline (ctx.Deadline() ok==false), return the margin directly.\nOtherwise compute time.Until(deadline) minus the margin: if the result is negative return 0, otherwise return it.\n";
@@ -252,13 +255,13 @@ inline Config MakeConfig() {
   }();
   cfg.streams.splitPipeline = [] {
     SplitStreamConfig value{};
-    value.id = 12;
+    value.id = 13;
     value.name = "Split Pipeline";
     value.pipeline = "order";
     value.idService = 2;
-    value.idSource = 8;
-    value.xPos = -416;
-    value.yPos = -472;
+    value.idSource = 9;
+    value.xPos = -620;
+    value.yPos = -554;
     return value;
   }();
   cfg.dataConnectors.inventoryServiceApi = [] {
@@ -307,10 +310,30 @@ inline Config MakeConfig() {
     value.functionInitializerGroup = "";
     return value;
   }();
+  cfg.pools.defaultPool = [] {
+    PoolConfig value{};
+    value.name = "Default Pool";
+    value.executorsCount = 2;
+    return value;
+  }();
+  cfg.links.processOrderToSplitPipeline = [] {
+    LinkConfig value{};
+    value.from = 9;
+    value.to = 13;
+    value.callSemantics = MakeCallSemanticsGroup(CallSemantics::kPriorityTaskPool, "Default Pool", 1);
+    return value;
+  }();
+  cfg.links.splitPipelineToProcessOrderItems = [] {
+    LinkConfig value{};
+    value.from = 13;
+    value.to = 11;
+    value.callSemantics = MakeCallSemanticsGroup(CallSemantics::kParallelCall, "", 0);
+    return value;
+  }();
   cfg.links.splitPipelineToSoftDeadline = [] {
     LinkConfig value{};
-    value.from = 12;
-    value.to = 11;
+    value.from = 13;
+    value.to = 12;
     value.callSemantics = MakeCallSemanticsGroup(CallSemantics::kParallelCall, "", 0);
     return value;
   }();
@@ -384,6 +407,12 @@ inline Config MakeConfig(userver::formats::parse::To<Config>) {
 inline void ApplyConfig(const userver::formats::yaml::Value& value,
                         Config& config) {
   {
+    const auto object = value["pools"]["defaultPool"];
+    if (const auto field = object["executorsCount"]; !field.IsMissing()) {
+      config.pools.defaultPool.executorsCount = field.As<int>();
+    }
+  }
+  {
     const auto object = value["dataConnectors"]["inventoryServiceApi"];
     if (const auto field = object["address"]; !field.IsMissing()) {
       config.dataConnectors.inventoryServiceApi.address = field.As<std::string>();
@@ -445,6 +474,10 @@ inline int ParseEnvironmentInt(const char* name, const char* value) {
 }
 
 inline void ApplyEnvironment(Config& config) {
+  if (const auto* value = std::getenv("DEFAULT_POOL_EXECUTORS_COUNT")) {
+    config.pools.defaultPool.executorsCount =
+        ParseEnvironmentInt("DEFAULT_POOL_EXECUTORS_COUNT", value);
+  }
   if (const auto* value = std::getenv("INVENTORY_SERVICE_API_ADDRESS")) {
     config.dataConnectors.inventoryServiceApi.address = value;
   }

@@ -71,10 +71,9 @@ modules:
         modulePath: github.com/gorundebug/cppexample-order-service-api
         name: order_service_api
 pools:
-    inventoryPriorityWorkers:
+    defaultPool:
         executorsCount: 2
-        name: Inventory Priority Workers
-        queueCapacity: 256
+        name: Default Pool
 services:
     inventoryService:
         color: '#D2E5FF'
@@ -87,10 +86,13 @@ services:
         httpPort: 9092
         links:
             link1:
-                callSemantics: PriorityTaskPool
+                callSemantics: ParallelCall
+                from: getInventoryItemData
+                to: mergeInventoryResult
+            link2:
+                callSemantics: TaskPool
                 from: processInventoryItem
-                poolName: Inventory Priority Workers
-                priority: 10
+                poolName: Default Pool
                 to: getInventoryItemData
         metricsHandler: metrics
         modulePath: github.com/gorundebug/cppexample-inventoryservice
@@ -114,8 +116,8 @@ services:
                     source: processInventoryItem
                     type: Process
                     valueType: orderItemResult
-                    xPos: 400
-                    yPos: -261
+                    xPos: 487
+                    yPos: -372
                 getInventoryItemError:
                     functionDescription: |
                         Convert an error from GetInventoryItemData into an OrderItemResult.
@@ -145,8 +147,8 @@ services:
                     source: mergeInventoryResult
                     type: Input
                     valueType: orderItem
-                    xPos: 131
-                    yPos: -165
+                    xPos: 203
+                    yPos: -465
         programmingLanguage: Cpp
         shutdownTimeout: 30000
         statusHandler: status
@@ -161,6 +163,16 @@ services:
         httpPort: 9091
         links:
             link1:
+                callSemantics: PriorityTaskPool
+                from: processOrder
+                poolName: Default Pool
+                priority: 1
+                to: splitPipeline
+            link2:
+                callSemantics: ParallelCall
+                from: splitPipeline
+                to: processOrderItems
+            link3:
                 callSemantics: ParallelCall
                 from: splitPipeline
                 to: softDeadline
@@ -168,6 +180,14 @@ services:
         modulePath: github.com/gorundebug/cppexample-orderservice
         name: Order Service
         pipelines:
+            default:
+                processOrderItemError:
+                    name: ProcessOrderItemError
+                    source: processOrderItem
+                    type: Error
+                    valueType: orderState
+                    xPos: -172
+                    yPos: -165
             order:
                 mapOrderItemResultToOrderState:
                     functionDescription: |
@@ -182,8 +202,8 @@ services:
                     source: processOrderItem
                     type: Map
                     valueType: orderState
-                    xPos: 0
-                    yPos: 0
+                    xPos: 103
+                    yPos: -52
                 mapToOrderState:
                     functionDescription: |
                         Convert an Order that reached the soft deadline into an OrderState.
@@ -196,32 +216,34 @@ services:
                     source: softDeadline
                     type: Map
                     valueType: orderState
-                    xPos: -459
-                    yPos: 76
+                    xPos: -453
+                    yPos: 73
                 mergeResults:
                     name: Merge Results
                     sources:
                         - mapToOrderState
                         - mapOrderItemResultToOrderState
+                        - processOrderItemError
                     type: Merge
-                    xPos: -178
-                    yPos: 24
+                    xPos: -228
+                    yPos: 130
                 processOrder:
                     endpoint: processOrder
                     name: Process Order
                     source: mergeResults
                     type: Input
                     valueType: order
-                    xPos: -343
-                    yPos: -229
+                    xPos: -382
+                    yPos: -315
                 processOrderItem:
                     endpoint: processOrderItem
+                    errorStream: processOrderItemError
                     name: Process Order Item
                     source: processOrderItems
                     type: Sink
                     valueType: orderItemResult
-                    xPos: -75
-                    yPos: -311
+                    xPos: -52
+                    yPos: -362
                 processOrderItems:
                     functionDescription: |
                         Expand an Order into individual OrderItem messages — one sc.Collect call per element of Order.Items.
@@ -234,10 +256,10 @@ services:
                     source: splitPipeline
                     type: FlatMap
                     valueType: orderItem
-                    xPos: -197
-                    yPos: -473
+                    xPos: -198
+                    yPos: -662
                 softDeadline:
-                    duration: 1000
+                    duration: 0
                     functionDescription: |
                         Cast stream.GetConfig() to *runtimecfg.DelayStreamConfig and convert cfg.Duration (int, milliseconds) to time.Duration — this is the safety margin.
                         If ctx has no deadline (ctx.Deadline() ok==false), return the margin directly.
@@ -249,14 +271,14 @@ services:
                     name: Soft Deadline
                     source: splitPipeline
                     type: Delay
-                    xPos: -706
-                    yPos: -33
+                    xPos: -745
+                    yPos: -235
                 splitPipeline:
                     name: Split Pipeline
                     source: processOrder
                     type: Split
-                    xPos: -416
-                    yPos: -472
+                    xPos: -620
+                    yPos: -554
         programmingLanguage: Cpp
         shutdownTimeout: 30000
         statusHandler: status
@@ -295,3 +317,8 @@ types:
         publicType: false
         transferByValue: false
         type: struct
+    unknownType:
+        name: UnknownType
+        publicType: false
+        type: int
+        useAlias: false

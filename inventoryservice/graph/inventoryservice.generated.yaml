@@ -23,10 +23,9 @@ dataConnectors:
         pythonImplementation: google/grpc
         type: gRPC
 pools:
-    inventoryPriorityWorkers:
+    defaultPool:
         executorsCount: 2
-        name: Inventory Priority Workers
-        queueCapacity: 256
+        name: Default Pool
 services:
     inventoryService:
         color: '#D2E5FF'
@@ -39,10 +38,13 @@ services:
         httpPort: 9092
         links:
             link1:
-                callSemantics: PriorityTaskPool
+                callSemantics: ParallelCall
+                from: getInventoryItemData
+                to: mergeInventoryResult
+            link2:
+                callSemantics: TaskPool
                 from: processInventoryItem
-                poolName: Inventory Priority Workers
-                priority: 10
+                poolName: Default Pool
                 to: getInventoryItemData
         metricsHandler: metrics
         modulePath: github.com/gorundebug/cppexample-inventoryservice
@@ -66,8 +68,8 @@ services:
                     source: processInventoryItem
                     type: Process
                     valueType: orderItemResult
-                    xPos: 400
-                    yPos: -261
+                    xPos: 487
+                    yPos: -372
                 getInventoryItemError:
                     functionDescription: |
                         Convert an error from GetInventoryItemData into an OrderItemResult.
@@ -97,8 +99,8 @@ services:
                     source: mergeInventoryResult
                     type: Input
                     valueType: orderItem
-                    xPos: 131
-                    yPos: -165
+                    xPos: 203
+                    yPos: -465
         programmingLanguage: Cpp
         shutdownTimeout: 30000
         statusHandler: status

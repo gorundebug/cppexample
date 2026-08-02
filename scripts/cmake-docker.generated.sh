@@ -8,4 +8,4 @@ if (($# == 0)); then
   set -- run --build --rm cpp-build
 fi
 
-exec docker compose -f docker-compose.cmake.yml "$@"
+exec docker compose -f docker-compose.cmake.generated.yml "$@"

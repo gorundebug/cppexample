@@ -45,7 +45,7 @@ cpp-format: cpp-tools ## Format C++ sources in Docker
 cpp-gen: cpp-build ## Generate C++ protobuf/OpenAPI code through CMake
 
 cpp-docker-build: cpp-build ## Build the C++ build/runtime Docker image
-	@docker compose -f docker-compose.cmake.yml build cpp-build
+	@docker compose -f docker-compose.cmake.generated.yml build cpp-build
 
 cpp-integration-test: cpp-tools ## Run C++ integration tests
 	@./scripts/integration-test.generated.sh
@@ -65,5 +65,5 @@ cpp-package-%: ## Package one C++ service (for example: make cpp-package-orderse
 	@./scripts/package-cpp-service.generated.sh "$*" "dist/$*"
 
 cpp-clean: ## Remove C++ build and ccache volumes
-	@docker compose -f docker-compose.cmake.yml down --volumes --remove-orphans
+	@docker compose -f docker-compose.cmake.generated.yml down --volumes --remove-orphans
 	@rm -rf build

@@ -45,10 +45,11 @@ class Config final : public servicelib::config::IConfig {
   } endpoints;
 
   struct Pools final {
-    servicelib::config::PoolConfig inventoryPriorityWorkers;
+    servicelib::config::PoolConfig defaultPool;
   } pools;
 
   struct Links final {
+    servicelib::config::LinkConfig getInventoryItemDataToMergeInventoryResult;
     servicelib::config::LinkConfig processInventoryItemToGetInventoryItemData;
   } links;
 
@@ -87,12 +88,12 @@ class Config final : public servicelib::config::IConfig {
 
   std::vector<const servicelib::config::PoolConfig*> GetPools()
       const override {
-    return { &pools.inventoryPriorityWorkers,  };
+    return { &pools.defaultPool,  };
   }
 
   std::vector<const servicelib::config::LinkConfig*> GetLinks()
       const override {
-    return { &links.processInventoryItemToGetInventoryItemData,  };
+    return { &links.getInventoryItemDataToMergeInventoryResult, &links.processInventoryItemToGetInventoryItemData,  };
   }
 
   std::vector<const servicelib::config::ModuleConfig*> GetModules()
@@ -137,8 +138,8 @@ inline Config MakeConfig() {
     value.pipeline = "inventoryItem";
     value.idService = 1;
     value.idSource = 4;
-    value.xPos = 400;
-    value.yPos = -261;
+    value.xPos = 487;
+    value.yPos = -372;
     value.functionPackage = "";
     value.functionName = "GetInventoryItemData";
     value.functionDescription = "Look up the inventory record by OrderItem.SKU; retrieve current stock and UnitPrice from the record.\nAlways copy OrderID, ItemID, SKU, RequestedQty (=OrderItem.Quantity), UnitPrice into the result.\nIf stock >= OrderItem.Quantity: reserve the stock atomically and emit\nOrderItemResult{OrderID, ItemID, SKU, RequestedQty, UnitPrice, Reserved: true, Status: CONFIRMED, AvailableQty: OrderItem.Quantity} via out.\nIf stock is insufficient: emit\nOrderItemResult{OrderID, ItemID, SKU, RequestedQty, UnitPrice, Reserved: false, Status: OUT_OF_STOCK, AvailableQty: actual available} via rout.\n";
@@ -164,8 +165,8 @@ inline Config MakeConfig() {
     value.pipeline = "inventoryItem";
     value.idService = 1;
     value.idSource = 3;
-    value.xPos = 131;
-    value.yPos = -165;
+    value.xPos = 203;
+    value.yPos = -465;
     value.valueType = "OrderItem";
     value.idEndpoint = 1;
     return value;
@@ -193,18 +194,24 @@ inline Config MakeConfig() {
     value.functionInitializerGroup = "";
     return value;
   }();
-  cfg.pools.inventoryPriorityWorkers = [] {
+  cfg.pools.defaultPool = [] {
     PoolConfig value{};
-    value.name = "Inventory Priority Workers";
+    value.name = "Default Pool";
     value.executorsCount = 2;
-    value.queueCapacity = 256;
+    return value;
+  }();
+  cfg.links.getInventoryItemDataToMergeInventoryResult = [] {
+    LinkConfig value{};
+    value.from = 1;
+    value.to = 3;
+    value.callSemantics = MakeCallSemanticsGroup(CallSemantics::kParallelCall, "", 0);
     return value;
   }();
   cfg.links.processInventoryItemToGetInventoryItemData = [] {
     LinkConfig value{};
     value.from = 4;
     value.to = 1;
-    value.callSemantics = MakeCallSemanticsGroup(CallSemantics::kPriorityTaskPool, "Inventory Priority Workers", 10);
+    value.callSemantics = MakeCallSemanticsGroup(CallSemantics::kTaskPool, "Default Pool", 0);
     return value;
   }();
   cfg.modules.inventoryServiceApi = [] {
@@ -257,9 +264,9 @@ inline Config MakeConfig(userver::formats::parse::To<Config>) {
 inline void ApplyConfig(const userver::formats::yaml::Value& value,
                         Config& config) {
   {
-    const auto object = value["pools"]["inventoryPriorityWorkers"];
+    const auto object = value["pools"]["defaultPool"];
     if (const auto field = object["executorsCount"]; !field.IsMissing()) {
-      config.pools.inventoryPriorityWorkers.executorsCount = field.As<int>();
+      config.pools.defaultPool.executorsCount = field.As<int>();
     }
   }
   {
@@ -324,9 +331,9 @@ inline int ParseEnvironmentInt(const char* name, const char* value) {
 }
 
 inline void ApplyEnvironment(Config& config) {
-  if (const auto* value = std::getenv("INVENTORY_PRIORITY_WORKERS_EXECUTORS_COUNT")) {
-    config.pools.inventoryPriorityWorkers.executorsCount =
-        ParseEnvironmentInt("INVENTORY_PRIORITY_WORKERS_EXECUTORS_COUNT", value);
+  if (const auto* value = std::getenv("DEFAULT_POOL_EXECUTORS_COUNT")) {
+    config.pools.defaultPool.executorsCount =
+        ParseEnvironmentInt("DEFAULT_POOL_EXECUTORS_COUNT", value);
   }
   if (const auto* value = std::getenv("INVENTORY_SERVICE_API_ADDRESS")) {
     config.dataConnectors.inventoryServiceApi.address = value;

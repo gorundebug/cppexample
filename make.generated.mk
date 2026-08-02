@@ -82,7 +82,7 @@ docker-restart: docker-down docker-up ## Restart all services
 
 docker-clean: docker-down ## Stop services and remove persistent volumes
 	@docker compose down --volumes --remove-orphans
-	@docker compose -f docker-compose.cmake.yml down --volumes --remove-orphans
+	@docker compose -f docker-compose.cmake.generated.yml down --volumes --remove-orphans
 
 act: $(ACT) ## Run GitHub Actions locally through act
 	@$(ACT) push -W .github/workflows --env "GITHUB_TOKEN=$$($(GH) auth token)"

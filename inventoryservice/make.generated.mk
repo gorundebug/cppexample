@@ -29,11 +29,11 @@ fmt: ## Format C++ sources in Docker
 	@./scripts/format.generated.sh
 
 clean: ## Remove CMake build and ccache volumes
-	@docker compose -f docker-compose.cmake.yml down --volumes --remove-orphans
+	@docker compose -f docker-compose.cmake.generated.yml down --volumes --remove-orphans
 	@rm -rf build
 
 docker-build: build ## Build the reusable C++ toolchain image and service
-	@docker compose -f docker-compose.cmake.yml build cpp-build
+	@docker compose -f docker-compose.cmake.generated.yml build cpp-build
 
 docker-up: docker-build ## Start this service through Docker Compose
 	@docker compose up -d

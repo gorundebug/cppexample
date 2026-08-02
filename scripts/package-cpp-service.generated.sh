@@ -29,7 +29,7 @@ fi
 mkdir -p "${output_dir}"
 cp -R "${service_dir}/." "${output_dir}/"
 
-cp CMakePresets.json Dockerfile.cmake docker-compose.cmake.yml \
+cp CMakePresets.json Dockerfile.cmake docker-compose.cmake.generated.yml \
   .clang-format .clang-tidy .dockerignore .gitignore "${output_dir}/"
 
 mkdir -p "${output_dir}/docker" "${output_dir}/scripts"
