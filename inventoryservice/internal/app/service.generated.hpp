@@ -15,6 +15,7 @@
 
 
 #include "inventoryservice/config/config.generated.hpp"
+#include "inventoryservice/internal/serdes/serde_registration.generated.hpp"
 #include <servicelib/runtime/config/component.hpp>
 #include <servicelib/runtime/serviceapp.hpp>
 #include <servicelib/runtime/telemetry/userver/log.hpp>
