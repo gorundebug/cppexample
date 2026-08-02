@@ -12,6 +12,10 @@
 
 namespace example::order_service::types::serde {
 
+// NOTE: generated but currently unused. servicegen's C++ codegen has no
+// equivalent of the Go port's Service.GetSerde() dispatch yet, so nothing
+// constructs or calls this class -- it is not on any request path and is
+// not exercised by benchmarks/profiling.
 class OrderSerde final : public servicelib::serde::Serde<example::order_service::types::Order> {
  public:
   bool IsStub() const noexcept override { return false; }
