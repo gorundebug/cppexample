@@ -54,12 +54,10 @@ void ServiceGenerated::initRuntime() {
 
 void ServiceGenerated::initStreams(const config::Config& cfg) {
   streams_.process_inventory_item = servicelib::makeInputStream<example::model::types::OrderItem, example::model::types::OrderItemResult, std::exception_ptr, ServiceGenerated>(cfg.streams.processInventoryItem, nullptr, *this);
-  streams_.get_inventory_item_error = servicelib::makeDetachedStream<example::model::types::OrderItemResult, ServiceGenerated>(2, "Get Inventory Item Error", nullptr, *this);
   auto& get_inventory_item_data = (*streams_.process_inventory_item).process(cfg.streams.getInventoryItemData, servicelib::StreamType<example::model::types::OrderItemResult>{}, servicelib::StreamType<example::model::types::OrderItemResult>{}, servicelib::StreamFunction(functions::GetInventoryItemData{}));
   streams_.get_inventory_item_data = std::addressof(get_inventory_item_data);
-  auto& merge_inventory_result = get_inventory_item_data.merge(cfg.streams.mergeInventoryResult, (*streams_.get_inventory_item_error));
+  auto& merge_inventory_result = get_inventory_item_data.merge(cfg.streams.mergeInventoryResult, get_inventory_item_data.getErrorStream());
   streams_.merge_inventory_result = std::addressof(merge_inventory_result);
-  get_inventory_item_data.setErrorConsumer(*streams_.get_inventory_item_error);
   streams_.process_inventory_item->setSource(merge_inventory_result);
 }
 
@@ -120,8 +118,6 @@ void ServiceGenerated::releaseRuntime() noexcept {
   endpoints_.process_inventory_item.reset();
 
 
-
-  streams_.get_inventory_item_error.reset();
 
 
   streams_.process_inventory_item.reset();

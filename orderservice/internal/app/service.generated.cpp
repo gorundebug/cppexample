@@ -60,10 +60,9 @@ void ServiceGenerated::initStreams(const config::Config& cfg) {
   auto& process_order_items = split_pipeline.template get<0>().flatMap(cfg.streams.processOrderItems, servicelib::StreamType<example::model::types::OrderItem>{}, servicelib::StreamFunction(functions::ProcessOrderItems{}));
   streams_.process_order_items = std::addressof(process_order_items);
   bindings_.process_order_item = std::make_shared<ProcessOrderItemSinkBinding>();
-  streams_.process_order_item_error = servicelib::makeDetachedStream<example::order_service::types::OrderState, ServiceGenerated>(5, "ProcessOrderItemError", nullptr, *this);
-  bindings_.process_order_item->consumeError = [root = streams_.process_order_item_error](servicelib::MessageContext context, servicelib::Payload<example::order_service::types::OrderState> payload) { root->consume(std::move(context), std::move(payload)); };
-  auto& process_order_item = process_order_items.sinkWithResult(cfg.streams.processOrderItem, servicelib::StreamType<example::model::types::OrderItemResult>{}, servicelib::StreamFunction(ProcessOrderItemSinkBinding::Function{bindings_.process_order_item}));
+  auto& process_order_item = process_order_items.sinkWithResult(cfg.streams.processOrderItem, servicelib::StreamType<example::model::types::OrderItemResult>{}, servicelib::StreamType<example::order_service::types::OrderState>{}, servicelib::StreamFunction(ProcessOrderItemSinkBinding::Function{bindings_.process_order_item}));
   bindings_.process_order_item->consumeResult = [&process_order_item](servicelib::MessageContext context, servicelib::Payload<example::model::types::OrderItemResult> payload) { process_order_item.consumeResult(std::move(context), std::move(payload)); };
+  bindings_.process_order_item->consumeError = [&process_order_item](servicelib::MessageContext context, servicelib::Payload<example::order_service::types::OrderState> payload) { process_order_item.produceError(std::move(context), std::move(payload)); };
   streams_.process_order_item = std::addressof(process_order_item);
   auto& map_order_item_result_to_order_state = process_order_item.map(cfg.streams.mapOrderItemResultToOrderState, servicelib::StreamType<example::order_service::types::OrderState>{}, servicelib::StreamFunction(functions::MapOrderItemResultToOrderState{}));
   streams_.map_order_item_result_to_order_state = std::addressof(map_order_item_result_to_order_state);
@@ -71,7 +70,7 @@ void ServiceGenerated::initStreams(const config::Config& cfg) {
   streams_.soft_deadline = std::addressof(soft_deadline);
   auto& map_to_order_state = soft_deadline.map(cfg.streams.mapToOrderState, servicelib::StreamType<example::order_service::types::OrderState>{}, servicelib::StreamFunction(functions::MapToOrderState{}));
   streams_.map_to_order_state = std::addressof(map_to_order_state);
-  auto& merge_results = map_to_order_state.merge(cfg.streams.mergeResults, map_order_item_result_to_order_state, (*streams_.process_order_item_error));
+  auto& merge_results = map_to_order_state.merge(cfg.streams.mergeResults, map_order_item_result_to_order_state, process_order_item.getErrorStream());
   streams_.merge_results = std::addressof(merge_results);
   streams_.process_order->setSource(merge_results);
 }
@@ -181,8 +180,6 @@ void ServiceGenerated::releaseRuntime() noexcept {
 
 
   bindings_.process_order_item.reset();
-
-  streams_.process_order_item_error.reset();
 
 
   streams_.process_order.reset();

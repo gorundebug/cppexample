@@ -85,13 +85,9 @@ class ServiceGenerated
       servicelib::InputStream<example::order_service::types::Order, example::order_service::types::OrderState, std::exception_ptr,
                               ServiceGenerated>;
 
-  using ProcessOrderItemErrorDetached =
-      servicelib::DetachedStream<example::order_service::types::OrderState, ServiceGenerated>;
-
 
   struct ServiceStreams final {
     std::shared_ptr<ProcessOrderInput> process_order;
-    std::shared_ptr<ProcessOrderItemErrorDetached> process_order_item_error;
     servicelib::StreamBase* split_pipeline{nullptr};
     servicelib::StreamBase* process_order_items{nullptr};
     servicelib::StreamBase* process_order_item{nullptr};

@@ -73,13 +73,9 @@ class ServiceGenerated
       servicelib::InputStream<example::model::types::OrderItem, example::model::types::OrderItemResult, std::exception_ptr,
                               ServiceGenerated>;
 
-  using GetInventoryItemErrorDetached =
-      servicelib::DetachedStream<example::model::types::OrderItemResult, ServiceGenerated>;
-
 
   struct ServiceStreams final {
     std::shared_ptr<ProcessInventoryItemInput> process_inventory_item;
-    std::shared_ptr<GetInventoryItemErrorDetached> get_inventory_item_error;
     servicelib::StreamBase* get_inventory_item_data{nullptr};
     servicelib::StreamBase* merge_inventory_result{nullptr};
   };
