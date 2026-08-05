@@ -1,5 +1,8 @@
+inventoryPriorityWorkersExecutorsCount: 2
 inventoryServiceApiAddress: dns:///localhost:9202
+inventoryServiceApiConnectionsCount: 1
 inventoryServiceConfigOverridePath: config/overrides.yaml
+inventoryServiceDefaultGrpcTimeout: 0
 inventoryServiceEnvironment: ""
 inventoryServiceGrpcHost: 0.0.0.0
 inventoryServiceGrpcPort: 9202

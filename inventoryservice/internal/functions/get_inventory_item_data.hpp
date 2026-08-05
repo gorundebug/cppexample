@@ -56,6 +56,7 @@ struct GetInventoryItemData final {
         reserved,
         reserved ? "CONFIRMED" : "OUT_OF_STOCK",
         value.unit_price,
+        {},
     };
     if (reserved) {
       out.out(std::move(context), std::move(result));

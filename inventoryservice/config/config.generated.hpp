@@ -180,6 +180,7 @@ inline Config MakeConfig() {
     value.implementation = DataConnectorImplementation::kUserverGRPC;
     value.module = "inventory_service_api";
     value.address = "dns:///localhost:9202";
+    value.connectionsCount = 1;
     return value;
   }();
   cfg.endpoints.processOrderItem = [] {
@@ -238,7 +239,6 @@ inline Config MakeConfig() {
     TypeConfig value{};
     value.name = "OrderItem";
     value.type = DataType::kStruct;
-    value.package = "";
     value.module = "model";
     value.definitionFormat = TypeDefinitionFormat::kNative;
     value.publicType = false;
@@ -249,7 +249,6 @@ inline Config MakeConfig() {
     TypeConfig value{};
     value.name = "OrderItemResult";
     value.type = DataType::kStruct;
-    value.package = "";
     value.module = "model";
     value.definitionFormat = TypeDefinitionFormat::kNative;
     value.publicType = false;
@@ -275,6 +274,12 @@ inline void ApplyConfig(const userver::formats::yaml::Value& value,
     const auto object = value["dataConnectors"]["inventoryServiceApi"];
     if (const auto field = object["address"]; !field.IsMissing()) {
       config.dataConnectors.inventoryServiceApi.address = field.As<std::string>();
+    }
+  }
+  {
+    const auto object = value["dataConnectors"]["inventoryServiceApi"];
+    if (const auto field = object["connectionsCount"]; !field.IsMissing()) {
+      config.dataConnectors.inventoryServiceApi.connectionsCount = field.As<int>();
     }
   }
   {
@@ -345,6 +350,10 @@ inline void ApplyEnvironment(Config& config) {
   }
   if (const auto* value = std::getenv("INVENTORY_SERVICE_API_ADDRESS")) {
     config.dataConnectors.inventoryServiceApi.address = value;
+  }
+  if (const auto* value = std::getenv("INVENTORY_SERVICE_API_CONNECTIONS_COUNT")) {
+    config.dataConnectors.inventoryServiceApi.connectionsCount =
+        ParseEnvironmentInt("INVENTORY_SERVICE_API_CONNECTIONS_COUNT", value);
   }
   if (const auto* value = std::getenv("INVENTORY_SERVICE_DEFAULT_GRPC_TIMEOUT")) {
     config.services.inventoryService.properties["defaultGrpcTimeout"] =

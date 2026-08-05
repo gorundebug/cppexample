@@ -59,4 +59,24 @@ UTEST(ProcessOrderItem, MapsRequestAndResponseWithoutLosingMetadata) {
   EXPECT_TRUE(stream.result->reserved);
 }
 
+UTEST(ProcessOrderItem, PublishesProcessingErrorFromFailedCall) {
+  ProcessOrderItem function;
+  ProcessOrderItem::State state{
+      "order-1", "item-1", "SKU-001", 3, 12.5};
+  StreamContext stream;
+
+  function.endRequest(
+      servicelib::MessageContext{}, stream,
+      std::make_exception_ptr(std::runtime_error{"inventory unavailable"}),
+      state);
+
+  ASSERT_TRUE(stream.result.has_value());
+  EXPECT_EQ(stream.result->order_id, "order-1");
+  EXPECT_EQ(stream.result->item_id, "item-1");
+  EXPECT_EQ(stream.result->status, "PROCESSING_ERROR");
+  EXPECT_EQ(stream.result->error, "inventory unavailable");
+  EXPECT_FALSE(stream.result->reserved);
+  EXPECT_EQ(stream.result->available_qty, 0);
+}
+
 }  // namespace example::order_service::functions

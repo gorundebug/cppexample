@@ -21,6 +21,7 @@ struct OrderItemResult final {
   bool reserved{false};
   std::string status;
   double unit_price{0.0};
+  std::string error;
 };
 
 inline OrderItemResult Parse(
@@ -35,6 +36,7 @@ inline OrderItemResult Parse(
       json["reserved"].As<bool>(),
       json["status"].As<std::string>(),
       json["unit_price"].As<double>(),
+      json["error"].As<std::string>(""),
   };
 }
 
@@ -50,6 +52,7 @@ inline userver::formats::json::Value Serialize(
   json["reserved"] = value.reserved;
   json["status"] = value.status;
   json["unit_price"] = value.unit_price;
+  json["error"] = value.error;
   return json.ExtractValue();
 }
 

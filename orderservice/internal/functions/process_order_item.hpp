@@ -65,11 +65,38 @@ struct ProcessOrderItem final {
             response.reserved(),
             response.status(),
             state.unit_price,
+            {},
         });
   }
 
-  void endRequest(servicelib::MessageContext, auto&, std::exception_ptr,
-                  State&) const noexcept {}
+  void endRequest(servicelib::MessageContext context, auto& stream_context,
+                  std::exception_ptr error, State& state) const noexcept {
+    if (!error) return;
+    try {
+      std::string message{"unknown processing error"};
+      try {
+        std::rethrow_exception(error);
+      } catch (const std::exception& exception) {
+        message = exception.what();
+      } catch (...) {
+      }
+      stream_context.collect(
+          std::move(context),
+          example::model::types::OrderItemResult{
+              state.order_id,
+              state.item_id,
+              state.sku,
+              state.requested_qty,
+              0,
+              false,
+              "PROCESSING_ERROR",
+              state.unit_price,
+              std::move(message),
+          });
+    } catch (...) {
+      // endRequest is noexcept by contract; downstream shutdown must continue.
+    }
+  }
 };
 
 }  // namespace example::order_service::functions

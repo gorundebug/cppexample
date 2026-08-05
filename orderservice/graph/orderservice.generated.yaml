@@ -1,6 +1,7 @@
 dataConnectors:
     inventoryServiceApi:
         address: dns:///localhost:9202
+        connectionsCount: 1
         cppImplementation: userver/grpc
         endpoints:
             processOrderItem:
@@ -9,7 +10,7 @@ dataConnectors:
                     [ConsumeMessage] map OrderItem → ProcessOrderItemRequest (OrderID, ItemID, SKU, Quantity); call sender.Send(req).
                     [HandleResponse] map ProcessOrderItemResponse → OrderItemResult:
                     copy OrderID, ItemID, AvailableQty, Reserved, Status, UnitPrice from response; push downstream via sc.Collect.
-                    [EndRequest] log the outcome.
+                    [EndRequest] if the call failed, publish an OrderItemResult with Reserved=false, Status=PROCESSING_ERROR and Error set to the failure text.
                 functionInitializerGroup: ""
                 functionName: ProcessOrderItem
                 functionPackage: ""
@@ -220,7 +221,7 @@ types:
         type: struct
     orderItemResult:
         definitionFormat: Native
-        description: 'Inventory reservation result for a single order item. Fields: OrderID string, ItemID string, SKU string, RequestedQty int, AvailableQty int, Reserved bool, Status string (CONFIRMED / OUT_OF_STOCK), UnitPrice float64.'
+        description: 'Inventory reservation result for a single order item. Fields: OrderID string, ItemID string, SKU string, RequestedQty int, AvailableQty int, Reserved bool, Status string (CONFIRMED / OUT_OF_STOCK / PROCESSING_ERROR), UnitPrice float64, Error string.'
         module: model
         name: OrderItemResult
         publicType: false

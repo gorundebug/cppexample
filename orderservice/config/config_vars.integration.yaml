@@ -1,8 +1,12 @@
+defaultPoolExecutorsCount: 2
 inventoryServiceApiAddress: dns:///inventoryservice:9202
+inventoryServiceApiConnectionsCount: 1
 orderServiceConfigOverridePath: config/overrides.integration.generated.yaml
+orderServiceDefaultGrpcTimeout: 5000
 orderServiceEnvironment: ""
 orderServiceGrpcHost: 0.0.0.0
 orderServiceGrpcPort: 9201
 orderServiceHttpHost: 0.0.0.0
 orderServiceHttpPort: 9091
 orderServiceOtlpEndpoint: jaeger:4317
+softDeadlineDuration: 1000

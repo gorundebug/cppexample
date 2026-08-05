@@ -252,6 +252,7 @@ struct ProcessOrder final {
       item["available_qty"] = result.available_qty;
       item["reserved"] = result.reserved;
       item["status"] = result.status;
+      if (!result.error.empty()) item["error"] = result.error;
       json["confirmed_items"].PushBack(std::move(item));
     }
     return userver::formats::json::ToString(json.ExtractValue());

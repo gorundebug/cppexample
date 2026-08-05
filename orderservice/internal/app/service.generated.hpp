@@ -13,6 +13,7 @@
 #include <userver/components/component_context.hpp>
 #include <userver/components/statistics_storage.hpp>
 #include <userver/ugrpc/client/client_factory_component.hpp>
+#include <userver/ugrpc/client/client_settings.hpp>
 
 
 #include "orderservice/config/config.generated.hpp"

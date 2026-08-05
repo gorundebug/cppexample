@@ -63,3 +63,5 @@ components:
           type: boolean
         status:
           type: string
+        error:
+          type: string

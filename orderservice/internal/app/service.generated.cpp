@@ -81,9 +81,23 @@ void ServiceGenerated::initDataSinks(const config::Config& cfg) {
       component_context_
           .FindComponent<userver::ugrpc::client::ClientFactoryComponent>()
           .GetFactory()
-          .MakeClient<inventoryserviceapi::InventoryServiceApiClient>(
-              "inventory-service-api",
-              cfg.dataConnectors.inventoryServiceApi.address));
+          .MakeClient<inventoryserviceapi::InventoryServiceApiClient>([&cfg] {
+            const auto& connector = cfg.dataConnectors.inventoryServiceApi;
+            userver::ugrpc::client::ClientSettings settings{
+                .client_name = "inventory-service-api",
+                .endpoint = connector.address,
+            };
+            if (connector.connectionsCount < 1) {
+              throw std::invalid_argument(
+                  "gRPC connector inventory-service-api connectionsCount "
+                  "must be at least 1");
+            }
+            if (connector.connectionsCount > 1) {
+              settings.dedicated_methods_config.emplace(
+                  "ProcessOrderItem", connector.connectionsCount);
+            }
+            return settings;
+          }()));
   connectors_.inventory_service_api_sink =
       std::make_shared<servicelib::datasink::grpc::UserverDataSink>(
           *this, cfg.dataConnectors.inventoryServiceApi.id);

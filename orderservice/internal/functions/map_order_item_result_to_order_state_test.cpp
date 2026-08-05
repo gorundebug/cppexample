@@ -23,7 +23,7 @@ UTEST(MapOrderItemResultToOrderState, MapsReservationResult) {
   function(
       servicelib::MessageContext{},
       example::model::types::OrderItemResult{
-          "order-1", "item-1", "SKU-001", 2, 2, true, "CONFIRMED", 7.0},
+          "order-1", "item-1", "SKU-001", 2, 2, true, "CONFIRMED", 7.0, {}},
       out);
 
   ASSERT_TRUE(out.value.has_value());
