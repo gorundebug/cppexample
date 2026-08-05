@@ -21,6 +21,7 @@ dataConnectors:
         module: inventory_service_api
         name: Inventory Service API
         pythonImplementation: google/grpc
+        rustImplementation: rust/tonic
         type: gRPC
     orderServiceApi:
         cppImplementation: userver/http
@@ -58,6 +59,7 @@ dataConnectors:
         module: order_service_api
         name: Order Service API
         pythonImplementation: aiohttp
+        rustImplementation: rust/axum
         type: HTTP
         useDedicatedListener: false
 modules:
@@ -90,9 +92,10 @@ services:
                 from: getInventoryItemData
                 to: mergeInventoryResult
             link2:
-                callSemantics: TaskPool
+                callSemantics: PriorityTaskPool
                 from: processInventoryItem
-                poolName: Default Pool
+                poolName: Inventory Priority Workers
+                priority: 10
                 to: getInventoryItemData
         metricsHandler: metrics
         modulePath: github.com/gorundebug/cppexample-inventoryservice
@@ -155,6 +158,7 @@ services:
     orderService:
         color: '#D2E5FF'
         defaultCallSemantics: FunctionCall
+        defaultGrpcTimeout: 5000
         environment: ""
         golangVersion: 1.25.4
         grpcHost: 0.0.0.0
@@ -259,7 +263,7 @@ services:
                     xPos: -198
                     yPos: -662
                 softDeadline:
-                    duration: 0
+                    duration: 1000
                     functionDescription: |
                         Cast stream.GetConfig() to *runtimecfg.DelayStreamConfig and convert cfg.Duration (int, milliseconds) to time.Duration — this is the safety margin.
                         If ctx has no deadline (ctx.Deadline() ok==false), return the margin directly.

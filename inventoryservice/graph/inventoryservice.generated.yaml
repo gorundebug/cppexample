@@ -21,11 +21,8 @@ dataConnectors:
         module: inventory_service_api
         name: Inventory Service API
         pythonImplementation: google/grpc
+        rustImplementation: rust/tonic
         type: gRPC
-pools:
-    defaultPool:
-        executorsCount: 2
-        name: Default Pool
 services:
     inventoryService:
         color: '#D2E5FF'
@@ -42,9 +39,10 @@ services:
                 from: getInventoryItemData
                 to: mergeInventoryResult
             link2:
-                callSemantics: TaskPool
+                callSemantics: PriorityTaskPool
                 from: processInventoryItem
-                poolName: Default Pool
+                poolName: Inventory Priority Workers
+                priority: 10
                 to: getInventoryItemData
         metricsHandler: metrics
         modulePath: github.com/gorundebug/cppexample-inventoryservice

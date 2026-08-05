@@ -63,6 +63,7 @@ SRC_ROOT="${SRC_ROOT%/}"
 ADDED=0
 UPDATED=0
 SKIPPED=0
+SELF_UPDATE=""
 
 echo ""
 while IFS= read -r src; do
@@ -75,7 +76,12 @@ while IFS= read -r src; do
         echo "  ADD  $rel"
         ADDED=$((ADDED + 1))
     elif [[ "$(basename "$rel")" == *generated* ]]; then
-        cp -p "$src" "$dst"
+        if [[ "$dst" == "$SCRIPT_DIR/merge.generated.sh" ]]; then
+            SELF_UPDATE="$SCRIPT_DIR/.merge.generated.sh.new"
+            cp -p "$src" "$SELF_UPDATE"
+        else
+            cp -p "$src" "$dst"
+        fi
         echo "  UPD  $rel"
         UPDATED=$((UPDATED + 1))
     else
@@ -89,3 +95,8 @@ echo "Merge complete: ${ADDED} added, ${UPDATED} updated, ${SKIPPED} skipped."
 echo "Removing tmp dir $TMP_DIR ..."
 rm -rf "$TMP_DIR"
 echo "Done."
+
+# Replace the running script only after Bash has read every other command.
+if [[ -n "$SELF_UPDATE" ]]; then
+    mv "$SELF_UPDATE" "$SCRIPT_DIR/merge.generated.sh"
+fi
