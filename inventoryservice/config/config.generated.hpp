@@ -279,6 +279,12 @@ inline void ApplyConfig(const userver::formats::yaml::Value& value,
   }
   {
     const auto object = value["services"]["inventoryService"];
+    if (const auto field = object["defaultGrpcTimeout"]; !field.IsMissing()) {
+      config.services.inventoryService.properties["defaultGrpcTimeout"] = field;
+    }
+  }
+  {
+    const auto object = value["services"]["inventoryService"];
     if (const auto field = object["environment"]; !field.IsMissing()) {
       config.services.inventoryService.environment = field.As<servicelib::api::Environment>();
     }
@@ -339,6 +345,10 @@ inline void ApplyEnvironment(Config& config) {
   }
   if (const auto* value = std::getenv("INVENTORY_SERVICE_API_ADDRESS")) {
     config.dataConnectors.inventoryServiceApi.address = value;
+  }
+  if (const auto* value = std::getenv("INVENTORY_SERVICE_DEFAULT_GRPC_TIMEOUT")) {
+    config.services.inventoryService.properties["defaultGrpcTimeout"] =
+        userver::formats::yaml::FromString(value);
   }
   if (const auto* value = std::getenv("INVENTORY_SERVICE_ENVIRONMENT")) {
     config.services.inventoryService.environment = ParseEnvironment(value);

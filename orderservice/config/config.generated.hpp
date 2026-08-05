@@ -422,6 +422,12 @@ inline void ApplyConfig(const userver::formats::yaml::Value& value,
   }
   {
     const auto object = value["services"]["orderService"];
+    if (const auto field = object["defaultGrpcTimeout"]; !field.IsMissing()) {
+      config.services.orderService.properties["defaultGrpcTimeout"] = field;
+    }
+  }
+  {
+    const auto object = value["services"]["orderService"];
     if (const auto field = object["environment"]; !field.IsMissing()) {
       config.services.orderService.environment = field.As<servicelib::api::Environment>();
     }
@@ -448,6 +454,12 @@ inline void ApplyConfig(const userver::formats::yaml::Value& value,
     const auto object = value["services"]["orderService"];
     if (const auto field = object["httpPort"]; !field.IsMissing()) {
       config.services.orderService.httpPort = field.As<int>();
+    }
+  }
+  {
+    const auto object = value["streams"]["softDeadline"];
+    if (const auto field = object["duration"]; !field.IsMissing()) {
+      config.streams.softDeadline.properties["duration"] = field;
     }
   }
   ApplyConfig(value, config.custom);
@@ -483,6 +495,10 @@ inline void ApplyEnvironment(Config& config) {
   if (const auto* value = std::getenv("INVENTORY_SERVICE_API_ADDRESS")) {
     config.dataConnectors.inventoryServiceApi.address = value;
   }
+  if (const auto* value = std::getenv("ORDER_SERVICE_DEFAULT_GRPC_TIMEOUT")) {
+    config.services.orderService.properties["defaultGrpcTimeout"] =
+        userver::formats::yaml::FromString(value);
+  }
   if (const auto* value = std::getenv("ORDER_SERVICE_ENVIRONMENT")) {
     config.services.orderService.environment = ParseEnvironment(value);
   }
@@ -499,6 +515,10 @@ inline void ApplyEnvironment(Config& config) {
   if (const auto* value = std::getenv("ORDER_SERVICE_HTTP_PORT")) {
     config.services.orderService.httpPort =
         ParseEnvironmentInt("ORDER_SERVICE_HTTP_PORT", value);
+  }
+  if (const auto* value = std::getenv("SOFT_DEADLINE_DURATION")) {
+    config.streams.softDeadline.properties["duration"] =
+        userver::formats::yaml::FromString(value);
   }
   ApplyEnvironment(config.custom);
 }
