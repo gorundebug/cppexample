@@ -23,6 +23,10 @@ dataConnectors:
         pythonImplementation: google/grpc
         rustImplementation: rust/tonic
         type: gRPC
+pools:
+    inventoryPriorityWorkers:
+        executorsCount: 2
+        name: Inventory Priority Workers
 services:
     inventoryService:
         color: '#D2E5FF'

@@ -47,6 +47,7 @@ class Config final : public servicelib::config::IConfig {
   } endpoints;
 
   struct Pools final {
+    servicelib::config::PoolConfig inventoryPriorityWorkers;
   } pools;
 
   struct Links final {
@@ -89,7 +90,7 @@ class Config final : public servicelib::config::IConfig {
 
   std::vector<const servicelib::config::PoolConfig*> GetPools()
       const override {
-    return {  };
+    return { &pools.inventoryPriorityWorkers,  };
   }
 
   std::vector<const servicelib::config::LinkConfig*> GetLinks()
@@ -195,6 +196,12 @@ inline Config MakeConfig() {
     value.functionInitializerGroup = "";
     return value;
   }();
+  cfg.pools.inventoryPriorityWorkers = [] {
+    PoolConfig value{};
+    value.name = "Inventory Priority Workers";
+    value.executorsCount = 2;
+    return value;
+  }();
   cfg.links.getInventoryItemDataToMergeInventoryResult = [] {
     LinkConfig value{};
     value.from = 1;
@@ -259,6 +266,12 @@ inline Config MakeConfig(userver::formats::parse::To<Config>) {
 inline void ApplyConfig(const userver::formats::yaml::Value& value,
                         Config& config) {
   {
+    const auto object = value["pools"]["inventoryPriorityWorkers"];
+    if (const auto field = object["executorsCount"]; !field.IsMissing()) {
+      config.pools.inventoryPriorityWorkers.executorsCount = field.As<int>();
+    }
+  }
+  {
     const auto object = value["dataConnectors"]["inventoryServiceApi"];
     if (const auto field = object["address"]; !field.IsMissing()) {
       config.dataConnectors.inventoryServiceApi.address = field.As<std::string>();
@@ -320,6 +333,10 @@ inline int ParseEnvironmentInt(const char* name, const char* value) {
 }
 
 inline void ApplyEnvironment(Config& config) {
+  if (const auto* value = std::getenv("INVENTORY_PRIORITY_WORKERS_EXECUTORS_COUNT")) {
+    config.pools.inventoryPriorityWorkers.executorsCount =
+        ParseEnvironmentInt("INVENTORY_PRIORITY_WORKERS_EXECUTORS_COUNT", value);
+  }
   if (const auto* value = std::getenv("INVENTORY_SERVICE_API_ADDRESS")) {
     config.dataConnectors.inventoryServiceApi.address = value;
   }

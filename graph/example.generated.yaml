@@ -76,6 +76,9 @@ pools:
     defaultPool:
         executorsCount: 2
         name: Default Pool
+    inventoryPriorityWorkers:
+        executorsCount: 2
+        name: Inventory Priority Workers
 services:
     inventoryService:
         color: '#D2E5FF'
