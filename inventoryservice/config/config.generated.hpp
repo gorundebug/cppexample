@@ -119,7 +119,7 @@ inline Config MakeConfig() {
     value.id = 1;
     value.name = "Inventory Service";
     value.color = "#D2E5FF";
-    value.defaultCallSemantics = MakeCallSemanticsGroup(CallSemantics::kFunctionCall, "", 0);
+    value.defaultCallSemantics = MakeCallSemanticsGroup(CallSemantics::kFunctionCall, "", 0, false);
     value.defaultGrpcTimeout = 0;
     value.environment = Environment::kUndefined;
     value.golangVersion = "1.25.4";
@@ -193,7 +193,7 @@ inline Config MakeConfig() {
     value.functionName = "ProcessOrderItem";
     value.functionPackage = "";
     value.publicFunction = false;
-    value.functionDescription = "Outgoing unary gRPC call to the Inventory Service.\n[ConsumeMessage] map OrderItem → ProcessOrderItemRequest (OrderID, ItemID, SKU, Quantity); call sender.Send(req).\n[HandleResponse] map ProcessOrderItemResponse → OrderItemResult:\ncopy OrderID, ItemID, AvailableQty, Reserved, Status, UnitPrice from response; push downstream via sc.Collect.\n[EndRequest] log the outcome.\n";
+    value.functionDescription = "Outgoing unary gRPC call to the Inventory Service.\n[ConsumeMessage] map OrderItem → ProcessOrderItemRequest (OrderID, ItemID, SKU, Quantity); call sender.Send(req).\n[HandleResponse] map ProcessOrderItemResponse → OrderItemResult:\ncopy OrderID, ItemID, AvailableQty, Reserved, Status, UnitPrice from response; push downstream via sc.Collect.\n[EndRequest] if the call failed, publish an OrderItemResult with Reserved=false, Status=PROCESSING_ERROR and Error set to the failure text.\n";
     value.functionInitializerGroup = "";
     return value;
   }();
@@ -207,14 +207,14 @@ inline Config MakeConfig() {
     LinkConfig value{};
     value.from = 1;
     value.to = 3;
-    value.callSemantics = MakeCallSemanticsGroup(CallSemantics::kParallelCall, "", 0);
+    value.callSemantics = MakeCallSemanticsGroup(CallSemantics::kParallelCall, "", 0, false);
     return value;
   }();
   cfg.links.processInventoryItemToGetInventoryItemData = [] {
     LinkConfig value{};
     value.from = 4;
     value.to = 1;
-    value.callSemantics = MakeCallSemanticsGroup(CallSemantics::kPriorityTaskPool, "Inventory Priority Workers", 10);
+    value.callSemantics = MakeCallSemanticsGroup(CallSemantics::kPriorityTaskPool, "Inventory Priority Workers", 10, false);
     return value;
   }();
   cfg.modules.inventoryServiceApi = [] {
@@ -239,6 +239,7 @@ inline Config MakeConfig() {
     TypeConfig value{};
     value.name = "OrderItem";
     value.type = DataType::kStruct;
+    value.package = "";
     value.module = "model";
     value.definitionFormat = TypeDefinitionFormat::kNative;
     value.publicType = false;
@@ -249,6 +250,7 @@ inline Config MakeConfig() {
     TypeConfig value{};
     value.name = "OrderItemResult";
     value.type = DataType::kStruct;
+    value.package = "";
     value.module = "model";
     value.definitionFormat = TypeDefinitionFormat::kNative;
     value.publicType = false;

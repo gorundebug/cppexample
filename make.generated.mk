@@ -137,21 +137,26 @@ define git-push-dir
 	fi; \
 	tmp=$$(mktemp -d); \
 	trap 'rm -rf "$$tmp"' EXIT INT TERM; \
+	stage="$$tmp/stage"; \
+	work="$$tmp/repository"; \
+	mkdir -p "$$stage"; \
 	if [ "$(5)" = "cpp-service" ]; then \
-	  ./scripts/package-cpp-service.generated.sh "./$(1)" "$$tmp"; \
+	  ./scripts/package-cpp-service.generated.sh "./$(1)" "$$stage"; \
 	elif [ "$(5)" = "python-service" ]; then \
-	  ./scripts/package-python-service.generated.sh "./$(1)" "$$tmp"; \
+	  ./scripts/package-python-service.generated.sh "./$(1)" "$$stage"; \
 	else \
-	  cp -r ./$(1)/. $$tmp/; \
+	  cp -r ./$(1)/. "$$stage/"; \
 	fi; \
-	rm -rf $$tmp/.git; \
-	cd $$tmp; \
-	git init -q; \
-	git -c user.email="local@dev" -c user.name="local" add .; \
-	git -c user.email="local@dev" -c user.name="local" commit -q -m "release $(2)"; \
-	git tag -f $(2); \
-	git push -qf git@$$host:$$repo.git HEAD:main; \
-	git push -qf git@$$host:$$repo.git refs/tags/$(2)
+	rm -rf "$$stage/.git"; \
+	git clone -q "git@$$host:$$repo.git" "$$work"; \
+	git -C "$$work" rm -rq --ignore-unmatch .; \
+	cp -r "$$stage/." "$$work/"; \
+	git -C "$$work" add -A; \
+	if ! git -C "$$work" diff --cached --quiet; then \
+	  git -C "$$work" -c user.email="local@dev" -c user.name="local" commit -q -m "release $(2)"; \
+	fi; \
+	git -C "$$work" tag $(2); \
+	git -C "$$work" push --atomic origin HEAD:main refs/tags/$(2)
 endef
 
 git-push-inventory_service_api: $(GH) ## Push module inventory_service_api to github.com/gorundebug/cppexample-inventory-service-api

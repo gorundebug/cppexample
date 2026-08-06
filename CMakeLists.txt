@@ -18,7 +18,7 @@ set(SERVICELIB_REPOSITORY
     "https://github.com/gorundebug/cppservicelib.git" CACHE STRING
     "Standalone cppservicelib repository")
 set(SERVICELIB_REVISION
-    "v3.0.9" CACHE STRING
+    "v3.0.10" CACHE STRING
     "Pinned cppservicelib revision")
 set(USERVER_REPOSITORY
     "https://github.com/userver-framework/userver.git" CACHE STRING
