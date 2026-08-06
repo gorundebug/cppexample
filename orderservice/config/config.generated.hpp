@@ -323,21 +323,21 @@ inline Config MakeConfig() {
     LinkConfig value{};
     value.from = 9;
     value.to = 13;
-    value.callSemantics = MakeCallSemanticsGroup(CallSemantics::kPriorityTaskPool, "Default Pool", 1, false);
+    value.callSemantics = MakeCallSemanticsGroup(CallSemantics::kFunctionCall, "Default Pool", 1, false);
     return value;
   }();
   cfg.links.splitPipelineToProcessOrderItems = [] {
     LinkConfig value{};
     value.from = 13;
     value.to = 11;
-    value.callSemantics = MakeCallSemanticsGroup(CallSemantics::kParallelCall, "", 0, false);
+    value.callSemantics = MakeCallSemanticsGroup(CallSemantics::kFunctionCall, "", 0, false);
     return value;
   }();
   cfg.links.splitPipelineToSoftDeadline = [] {
     LinkConfig value{};
     value.from = 13;
     value.to = 12;
-    value.callSemantics = MakeCallSemanticsGroup(CallSemantics::kParallelCall, "", 0, false);
+    value.callSemantics = MakeCallSemanticsGroup(CallSemantics::kFunctionCall, "", 0, true);
     return value;
   }();
   cfg.modules.inventoryServiceApi = [] {

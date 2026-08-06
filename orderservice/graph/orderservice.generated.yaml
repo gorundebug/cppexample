@@ -80,17 +80,17 @@ services:
         httpPort: 9091
         links:
             link1:
-                callSemantics: PriorityTaskPool
+                callSemantics: FunctionCall
                 from: processOrder
                 poolName: Default Pool
                 priority: 1
                 to: splitPipeline
             link2:
-                callSemantics: ParallelCall
+                callSemantics: FunctionCall
                 from: splitPipeline
                 to: processOrderItems
             link3:
-                callSemantics: ParallelCall
+                callSemantics: FunctionCall
                 from: splitPipeline
                 to: softDeadline
         metricsHandler: metrics
