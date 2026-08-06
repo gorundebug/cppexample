@@ -2,6 +2,7 @@
 #include "orderservice/internal/app/service.generated.hpp"
 
 #include <chrono>
+#include <cstdlib>
 #include <exception>
 #include <stdexcept>
 #include <string>
@@ -16,7 +17,9 @@ namespace example::order_service::app {
 ServiceGenerated::ServiceGenerated(
     userver::utils::statistics::Storage& statistics_storage,
     const userver::components::ComponentContext& component_context)
-    : component_context_(component_context), metrics_(statistics_storage) {}
+    : component_context_(component_context),
+      metrics_(statistics_storage),
+      use_noop_metrics_(std::getenv("SERVICELIB_NOOP_METRICS") != nullptr) {}
 
 ServiceGenerated::~ServiceGenerated() { stop(); }
 
@@ -221,7 +224,8 @@ servicelib::log::Logger& ServiceGenerated::getLogger() {
 }
 
 servicelib::metrics::Metrics& ServiceGenerated::getMetrics() {
-  return metrics_;
+  return use_noop_metrics_ ? servicelib::metrics::NoopMetrics::instance()
+                           : metrics_;
 }
 
 servicelib::tracing::Tracing* ServiceGenerated::getTracing() {

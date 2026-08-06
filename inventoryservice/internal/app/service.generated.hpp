@@ -123,6 +123,7 @@ class ServiceGenerated
 
   const userver::components::ComponentContext& component_context_;
   servicelib::telemetry::userver_adapter::UserverMetrics metrics_;
+  bool use_noop_metrics_{false};
   bool user_lifecycle_started_{false};
 };
 
