@@ -19,7 +19,7 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
          "Fetch missing pinned servicelib, userver, and contract modules" ON)
   set(SERVICELIB_REPOSITORY "https://github.com/gorundebug/cppservicelib.git" CACHE STRING
       "Standalone cppservicelib repository")
-  set(SERVICELIB_REVISION "v3.0.1" CACHE STRING
+  set(SERVICELIB_REVISION "v3.0.14" CACHE STRING
       "Pinned cppservicelib revision")
   set(USERVER_REPOSITORY "https://github.com/userver-framework/userver.git" CACHE STRING
       "Standalone userver repository")
