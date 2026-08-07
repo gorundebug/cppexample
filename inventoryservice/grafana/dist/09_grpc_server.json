@@ -1,0 +1,463 @@
+{
+   "panels": [
+      {
+         "collapsed": false,
+         "gridPos": {
+            "h": 1,
+            "w": 0,
+            "x": 0,
+            "y": 0
+         },
+         "id": 1,
+         "panels": [ ],
+         "title": "Traffic",
+         "type": "row"
+      },
+      {
+         "datasource": {
+            "type": "datasource",
+            "uid": "-- Mixed --"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "unit": "short"
+            }
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 0,
+            "y": 1
+         },
+         "id": 2,
+         "pluginVersion": "v11.0.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "grpc_server_by_destination_active{job=~\"$job\", grpc_destination=~\"$grpc_destination\"}",
+               "intervalFactor": 2,
+               "legendFormat": "{{grpc_destination}}"
+            }
+         ],
+         "title": "Active RPCs",
+         "type": "timeseries"
+      },
+      {
+         "datasource": {
+            "type": "datasource",
+            "uid": "-- Mixed --"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "unit": "ops"
+            }
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 16,
+            "x": 8,
+            "y": 1
+         },
+         "id": 3,
+         "pluginVersion": "v11.0.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "rate(grpc_server_by_destination_rps{job=~\"$job\", grpc_destination=~\"$grpc_destination\"}[$__rate_interval])",
+               "intervalFactor": 2,
+               "legendFormat": "{{grpc_destination}}"
+            }
+         ],
+         "title": "RPC Rate",
+         "type": "timeseries"
+      },
+      {
+         "collapsed": false,
+         "gridPos": {
+            "h": 1,
+            "w": 0,
+            "x": 24,
+            "y": 9
+         },
+         "id": 4,
+         "panels": [ ],
+         "title": "Status",
+         "type": "row"
+      },
+      {
+         "datasource": {
+            "type": "datasource",
+            "uid": "-- Mixed --"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "unit": "ops"
+            }
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 10
+         },
+         "id": 5,
+         "pluginVersion": "v11.0.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "rate(grpc_server_by_destination_status{job=~\"$job\", grpc_destination=~\"$grpc_destination\"}[$__rate_interval])",
+               "intervalFactor": 2,
+               "legendFormat": "{{grpc_code}} {{grpc_destination}}"
+            }
+         ],
+         "title": "Status Code Distribution",
+         "type": "timeseries"
+      },
+      {
+         "collapsed": false,
+         "gridPos": {
+            "h": 1,
+            "w": 0,
+            "x": 24,
+            "y": 18
+         },
+         "id": 6,
+         "panels": [ ],
+         "title": "Latency",
+         "type": "row"
+      },
+      {
+         "datasource": {
+            "type": "datasource",
+            "uid": "-- Mixed --"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "unit": "s"
+            }
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 0,
+            "y": 19
+         },
+         "id": 7,
+         "pluginVersion": "v11.0.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "grpc_server_by_destination_timings{job=~\"$job\", grpc_destination=~\"$grpc_destination\", percentile=\"p50\"} / 1000",
+               "intervalFactor": 2,
+               "legendFormat": "p50 {{grpc_destination}}"
+            }
+         ],
+         "title": "Duration p50",
+         "type": "timeseries"
+      },
+      {
+         "datasource": {
+            "type": "datasource",
+            "uid": "-- Mixed --"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "unit": "s"
+            }
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 8,
+            "y": 19
+         },
+         "id": 8,
+         "pluginVersion": "v11.0.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "grpc_server_by_destination_timings{job=~\"$job\", grpc_destination=~\"$grpc_destination\", percentile=\"p95\"} / 1000",
+               "intervalFactor": 2,
+               "legendFormat": "p95 {{grpc_destination}}"
+            }
+         ],
+         "title": "Duration p95",
+         "type": "timeseries"
+      },
+      {
+         "datasource": {
+            "type": "datasource",
+            "uid": "-- Mixed --"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "unit": "s"
+            }
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 16,
+            "y": 19
+         },
+         "id": 9,
+         "pluginVersion": "v11.0.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "grpc_server_by_destination_timings{job=~\"$job\", grpc_destination=~\"$grpc_destination\", percentile=\"p99\"} / 1000",
+               "intervalFactor": 2,
+               "legendFormat": "p99 {{grpc_destination}}"
+            }
+         ],
+         "title": "Duration p99",
+         "type": "timeseries"
+      },
+      {
+         "collapsed": false,
+         "gridPos": {
+            "h": 1,
+            "w": 0,
+            "x": 24,
+            "y": 27
+         },
+         "id": 10,
+         "panels": [ ],
+         "title": "Latency Distribution",
+         "type": "row"
+      },
+      {
+         "datasource": {
+            "type": "datasource",
+            "uid": "-- Mixed --"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "unit": "s"
+            }
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 28
+         },
+         "id": 11,
+         "pluginVersion": "v11.0.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "grpc_server_by_destination_timings{job=~\"$job\", grpc_destination=~\"$grpc_destination\", percentile=\"p50\"} / 1000",
+               "intervalFactor": 2,
+               "legendFormat": "p50 {{grpc_destination}}"
+            },
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "grpc_server_by_destination_timings{job=~\"$job\", grpc_destination=~\"$grpc_destination\", percentile=\"p90\"} / 1000",
+               "intervalFactor": 2,
+               "legendFormat": "p90 {{grpc_destination}}"
+            },
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "grpc_server_by_destination_timings{job=~\"$job\", grpc_destination=~\"$grpc_destination\", percentile=\"p95\"} / 1000",
+               "intervalFactor": 2,
+               "legendFormat": "p95 {{grpc_destination}}"
+            },
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "grpc_server_by_destination_timings{job=~\"$job\", grpc_destination=~\"$grpc_destination\", percentile=\"p99\"} / 1000",
+               "intervalFactor": 2,
+               "legendFormat": "p99 {{grpc_destination}}"
+            },
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "grpc_server_by_destination_timings{job=~\"$job\", grpc_destination=~\"$grpc_destination\", percentile=\"p100\"} / 1000",
+               "intervalFactor": 2,
+               "legendFormat": "max {{grpc_destination}}"
+            }
+         ],
+         "title": "Duration Percentile Bands",
+         "type": "timeseries"
+      },
+      {
+         "collapsed": false,
+         "gridPos": {
+            "h": 1,
+            "w": 0,
+            "x": 24,
+            "y": 36
+         },
+         "id": 12,
+         "panels": [ ],
+         "title": "Latency Heatmap",
+         "type": "row"
+      },
+      {
+         "datasource": {
+            "type": "datasource",
+            "uid": "-- Mixed --"
+         },
+         "gridPos": {
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 37
+         },
+         "id": 13,
+         "options": {
+            "calculate": false,
+            "color": {
+               "mode": "scheme",
+               "scheme": "Oranges",
+               "steps": 128
+            },
+            "yAxis": {
+               "unit": "s"
+            }
+         },
+         "pluginVersion": "v11.0.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "sum(rate(datasource_endpoint_request_duration_seconds_bucket{job=~\"$job\", transport=\"grpc\"}[$__rate_interval])) by (le)",
+               "format": "heatmap",
+               "intervalFactor": 2,
+               "legendFormat": "{{le}}"
+            }
+         ],
+         "title": "Call Duration Heatmap",
+         "type": "heatmap"
+      },
+      {
+         "collapsed": false,
+         "gridPos": {
+            "h": 1,
+            "w": 0,
+            "x": 24,
+            "y": 47
+         },
+         "id": 14,
+         "panels": [ ],
+         "title": "Errors",
+         "type": "row"
+      },
+      {
+         "datasource": {
+            "type": "datasource",
+            "uid": "-- Mixed --"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "unit": "ops"
+            }
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 48
+         },
+         "id": 15,
+         "pluginVersion": "v11.0.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "rate(grpc_server_by_destination_status{job=~\"$job\", grpc_destination=~\"$grpc_destination\", grpc_code!=\"OK\"}[$__rate_interval])",
+               "intervalFactor": 2,
+               "legendFormat": "{{grpc_code}} {{grpc_destination}}"
+            }
+         ],
+         "title": "Error Rate (non-OK)",
+         "type": "timeseries"
+      }
+   ],
+   "refresh": "30s",
+   "schemaVersion": 39,
+   "tags": [
+      "servicelib",
+      "grpc",
+      "server",
+      "userver"
+   ],
+   "templating": {
+      "list": [
+         {
+            "label": "Datasource",
+            "name": "datasource",
+            "query": "prometheus",
+            "type": "datasource"
+         },
+         {
+            "datasource": {
+               "type": "prometheus",
+               "uid": "$datasource"
+            },
+            "includeAll": false,
+            "label": "Job",
+            "multi": false,
+            "name": "job",
+            "query": "label_values(grpc_server_by_destination_rps, job)",
+            "regex": "inventoryservice",
+            "type": "query"
+         },
+         {
+            "datasource": {
+               "type": "prometheus",
+               "uid": "$datasource"
+            },
+            "includeAll": true,
+            "label": "Grpc_destination",
+            "multi": true,
+            "name": "grpc_destination",
+            "query": "label_values(grpc_server_by_destination_rps{job=~\"$job\"}, grpc_destination)",
+            "type": "query"
+         }
+      ]
+   },
+   "time": {
+      "from": "now-1h",
+      "to": "now"
+   },
+   "timezone": "browser",
+   "title": "inventoryservice / gRPC Server",
+   "uid": "inventoryservice-grpc-server"
+}

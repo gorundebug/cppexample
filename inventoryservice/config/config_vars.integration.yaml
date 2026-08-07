@@ -1,0 +1,11 @@
+inventoryPriorityWorkersExecutorsCount: 2
+inventoryServiceApiAddress: dns:///inventoryservice:9202
+inventoryServiceApiConnectionsCount: 1
+inventoryServiceConfigOverridePath: config/overrides.integration.generated.yaml
+inventoryServiceDefaultGrpcTimeout: 0
+inventoryServiceEnvironment: ""
+inventoryServiceGrpcHost: 0.0.0.0
+inventoryServiceGrpcPort: 9202
+inventoryServiceHttpHost: 0.0.0.0
+inventoryServiceHttpPort: 9092
+inventoryServiceOtlpEndpoint: jaeger:4317

@@ -1,0 +1,130 @@
+dataConnectors:
+    inventoryServiceApi:
+        address: dns:///localhost:9202
+        connectionsCount: 1
+        cppImplementation: userver/grpc
+        endpoints:
+            processOrderItem:
+                functionDescription: |
+                    Outgoing unary gRPC call to the Inventory Service.
+                    [ConsumeMessage] map OrderItem → ProcessOrderItemRequest (OrderID, ItemID, SKU, Quantity); call sender.Send(req).
+                    [HandleResponse] map ProcessOrderItemResponse → OrderItemResult:
+                    copy OrderID, ItemID, AvailableQty, Reserved, Status, UnitPrice from response; push downstream via sc.Collect.
+                    [EndRequest] if the call failed, publish an OrderItemResult with Reserved=false, Status=PROCESSING_ERROR and Error set to the failure text.
+                functionInitializerGroup: ""
+                functionName: ProcessOrderItem
+                functionPackage: ""
+                grpcMethodType: NoStreaming
+                methodName: ProcessOrderItem
+                name: Process Order Item
+                publicFunction: false
+        goImplementation: google/grpc
+        module: inventory_service_api
+        name: Inventory Service API
+        pythonImplementation: google/grpc
+        rustImplementation: rust/tonic
+        type: gRPC
+pools:
+    inventoryPriorityWorkers:
+        executorsCount: 2
+        name: Inventory Priority Workers
+services:
+    inventoryService:
+        color: '#D2E5FF'
+        defaultCallSemantics: FunctionCall
+        environment: ""
+        golangVersion: 1.25.4
+        grpcHost: 0.0.0.0
+        grpcPort: 9202
+        httpHost: 0.0.0.0
+        httpPort: 9092
+        links:
+            link1:
+                callSemantics: FunctionCall
+                from: getInventoryItemData
+                to: mergeInventoryResult
+            link2:
+                callSemantics: FunctionCall
+                from: processInventoryItem
+                poolName: Inventory Priority Workers
+                priority: 10
+                to: getInventoryItemData
+        metricsHandler: metrics
+        modulePath: github.com/gorundebug/cppexample-inventoryservice
+        name: Inventory Service
+        pipelines:
+            inventoryItem:
+                getInventoryItemData:
+                    errorStream: getInventoryItemError
+                    functionDescription: |
+                        Look up the inventory record by OrderItem.SKU; retrieve current stock and UnitPrice from the record.
+                        Always copy OrderID, ItemID, SKU, RequestedQty (=OrderItem.Quantity), UnitPrice into the result.
+                        If stock >= OrderItem.Quantity: reserve the stock atomically and emit
+                        OrderItemResult{OrderID, ItemID, SKU, RequestedQty, UnitPrice, Reserved: true, Status: CONFIRMED, AvailableQty: OrderItem.Quantity} via out.
+                        If stock is insufficient: emit
+                        OrderItemResult{OrderID, ItemID, SKU, RequestedQty, UnitPrice, Reserved: false, Status: OUT_OF_STOCK, AvailableQty: actual available} via rout.
+                    functionInitializerGroup: ""
+                    functionModule: ""
+                    functionName: GetInventoryItemData
+                    functionPackage: ""
+                    name: Get Inventory Item Data
+                    source: processInventoryItem
+                    type: Process
+                    valueType: orderItemResult
+                    xPos: 487
+                    yPos: -372
+                getInventoryItemError:
+                    functionDescription: |
+                        Convert an error from GetInventoryItemData into an OrderItemResult.
+                        Copy OrderID, ItemID, SKU from the input OrderItem; set RequestedQty=OrderItem.Quantity, AvailableQty=0, Reserved=false, Status=OUT_OF_STOCK.
+                        Log the error.
+                    functionInitializerGroup: ""
+                    functionModule: ""
+                    functionName: GetInventoryItemError
+                    functionPackage: ""
+                    name: Get Inventory Item Error
+                    source: getInventoryItemData
+                    type: Error
+                    valueType: orderItemResult
+                    xPos: 733
+                    yPos: -263
+                mergeInventoryResult:
+                    name: Merge Inventory Result
+                    sources:
+                        - getInventoryItemData
+                        - getInventoryItemError
+                    type: Merge
+                    xPos: 542
+                    yPos: 33
+                processInventoryItem:
+                    endpoint: processOrderItem
+                    name: 'Process Inventory Item '
+                    source: mergeInventoryResult
+                    type: Input
+                    valueType: orderItem
+                    xPos: 203
+                    yPos: -465
+        programmingLanguage: Cpp
+        shutdownTimeout: 30000
+        statusHandler: status
+settings:
+    moduleVersion: v0.0.1
+    name: Example
+    repoPath: github.com/gorundebug/cppexample
+types:
+    orderItem:
+        definitionFormat: Native
+        description: 'A single line item within an order. Fields: OrderID string, ItemID string, SKU string, Quantity int.'
+        module: model
+        name: OrderItem
+        publicType: false
+        transferByValue: false
+        type: struct
+    orderItemResult:
+        definitionFormat: Native
+        description: 'Inventory reservation result for a single order item. Fields: OrderID string, ItemID string, SKU string, RequestedQty int, AvailableQty int, Reserved bool, Status string (CONFIRMED / OUT_OF_STOCK / PROCESSING_ERROR), UnitPrice float64, Error string.'
+        module: model
+        name: OrderItemResult
+        publicType: false
+        transferByValue: false
+        type: struct
