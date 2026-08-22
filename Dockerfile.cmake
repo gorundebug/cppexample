@@ -5,10 +5,22 @@ FROM userver-source AS userver-source
 FROM --platform=$TARGETPLATFORM ubuntu:24.04 AS development
 
 ARG TARGETARCH
+ARG SERVICEGEN_GITHUB_RAW_URL=
+ARG SERVICEGEN_APT_UBUNTU_ARCHIVE_URL=
+ARG SERVICEGEN_APT_UBUNTU_SECURITY_URL=
+ARG SERVICEGEN_APT_UBUNTU_PORTS_URL=
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Etc/UTC
+ENV SERVICEGEN_GITHUB_RAW_URL=${SERVICEGEN_GITHUB_RAW_URL}
 
 COPY docker/userver-packages-ubuntu-24.04.txt /tmp/userver-packages.txt
+
+RUN if [ -n "$SERVICEGEN_APT_UBUNTU_ARCHIVE_URL$SERVICEGEN_APT_UBUNTU_SECURITY_URL$SERVICEGEN_APT_UBUNTU_PORTS_URL" ]; then \
+      find /etc/apt -type f \( -name '*.list' -o -name '*.sources' \) -exec sed -i \
+        -e "s|http://archive.ubuntu.com/ubuntu|$SERVICEGEN_APT_UBUNTU_ARCHIVE_URL|g" \
+        -e "s|http://security.ubuntu.com/ubuntu|$SERVICEGEN_APT_UBUNTU_SECURITY_URL|g" \
+        -e "s|http://ports.ubuntu.com/ubuntu-ports|$SERVICEGEN_APT_UBUNTU_PORTS_URL|g" {} +; \
+    fi
 
 RUN rm -f /etc/apt/apt.conf.d/docker-clean
 RUN --mount=type=cache,id=servicegen-apt-lists-${TARGETARCH},target=/var/lib/apt/lists,sharing=locked \
@@ -20,8 +32,35 @@ RUN --mount=type=cache,id=servicegen-apt-lists-${TARGETARCH},target=/var/lib/apt
     && locale-gen en_US.UTF-8 \
     && rm -f /tmp/userver-packages.txt
 
-COPY --from=servicelib-source / /opt/servicelib
-COPY --from=userver-source / /opt/userver
+COPY --from=servicelib-source / /tmp/servicelib-source
+RUN source_dir=/tmp/servicelib-source; \
+    if [ -f "$source_dir/context" ]; then \
+      mkdir -p /tmp/servicelib-archive; \
+      tar -xf "$source_dir/context" -C /tmp/servicelib-archive; \
+      source_dir=/tmp/servicelib-archive; \
+    fi; \
+    if [ ! -f "$source_dir/CMakeLists.txt" ]; then \
+      source_dir=$(find "$source_dir" -mindepth 1 -maxdepth 1 -type d | head -n 1); \
+    fi; \
+    test -n "$source_dir" && test -f "$source_dir/CMakeLists.txt"; \
+    mkdir -p /opt/servicelib; \
+    cp -a "$source_dir/." /opt/servicelib/; \
+    rm -rf /tmp/servicelib-source
+
+COPY --from=userver-source / /tmp/userver-source
+RUN source_dir=/tmp/userver-source; \
+    if [ -f "$source_dir/context" ]; then \
+      mkdir -p /tmp/userver-archive; \
+      tar -xf "$source_dir/context" -C /tmp/userver-archive; \
+      source_dir=/tmp/userver-archive; \
+    fi; \
+    if [ ! -f "$source_dir/CMakeLists.txt" ]; then \
+      source_dir=$(find "$source_dir" -mindepth 1 -maxdepth 1 -type d | head -n 1); \
+    fi; \
+    test -n "$source_dir" && test -f "$source_dir/CMakeLists.txt"; \
+    mkdir -p /opt/userver; \
+    cp -a "$source_dir/." /opt/userver/; \
+    rm -rf /tmp/userver-source
 
 WORKDIR /workspace
 
@@ -79,6 +118,15 @@ RUN --mount=type=cache,id=cppexample-runtime-build-v2-${TARGETARCH}-${SERVICEGEN
 FROM ubuntu:24.04 AS runtime-base
 
 ARG DEBIAN_FRONTEND=noninteractive
+ARG SERVICEGEN_APT_UBUNTU_ARCHIVE_URL=
+ARG SERVICEGEN_APT_UBUNTU_SECURITY_URL=
+ARG SERVICEGEN_APT_UBUNTU_PORTS_URL=
+RUN if [ -n "$SERVICEGEN_APT_UBUNTU_ARCHIVE_URL$SERVICEGEN_APT_UBUNTU_SECURITY_URL$SERVICEGEN_APT_UBUNTU_PORTS_URL" ]; then \
+      find /etc/apt -type f \( -name '*.list' -o -name '*.sources' \) -exec sed -i \
+        -e "s|http://archive.ubuntu.com/ubuntu|$SERVICEGEN_APT_UBUNTU_ARCHIVE_URL|g" \
+        -e "s|http://security.ubuntu.com/ubuntu|$SERVICEGEN_APT_UBUNTU_SECURITY_URL|g" \
+        -e "s|http://ports.ubuntu.com/ubuntu-ports|$SERVICEGEN_APT_UBUNTU_PORTS_URL|g" {} +; \
+    fi
 RUN apt-get update \
     && apt-get install --yes --no-install-recommends ca-certificates \
     && rm -rf /var/lib/apt/lists/*

@@ -52,10 +52,21 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
   if(SERVICEGEN_FETCH_CPP_DEPENDENCIES)
     include(FetchContent)
     if(NOT USERVER_SOURCE_DIR)
-      FetchContent_Declare(servicegen_userver
-          GIT_REPOSITORY "${USERVER_REPOSITORY}"
-          GIT_TAG "${USERVER_REVISION}"
-          GIT_SHALLOW FALSE)
+      if(DEFINED ENV{SERVICEGEN_GITHUB_RAW_URL} AND
+         USERVER_REPOSITORY MATCHES "^https://github.com/")
+        string(REGEX REPLACE "^https://github.com/" ""
+            _servicegen_userver_path "${USERVER_REPOSITORY}")
+        string(REGEX REPLACE "\\.git$" ""
+            _servicegen_userver_path "${_servicegen_userver_path}")
+        FetchContent_Declare(servicegen_userver
+            URL "$ENV{SERVICEGEN_GITHUB_RAW_URL}/${_servicegen_userver_path}/archive/${USERVER_REVISION}.tar.gz"
+            DOWNLOAD_EXTRACT_TIMESTAMP TRUE)
+      else()
+        FetchContent_Declare(servicegen_userver
+            GIT_REPOSITORY "${USERVER_REPOSITORY}"
+            GIT_TAG "${USERVER_REVISION}"
+            GIT_SHALLOW FALSE)
+      endif()
       FetchContent_GetProperties(servicegen_userver)
       if(NOT servicegen_userver_POPULATED)
         FetchContent_Populate(servicegen_userver)
@@ -63,10 +74,21 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
       set(USERVER_SOURCE_DIR "${servicegen_userver_SOURCE_DIR}")
     endif()
     if(NOT SERVICELIB_SOURCE_DIR)
-      FetchContent_Declare(servicegen_servicelib
-          GIT_REPOSITORY "${SERVICELIB_REPOSITORY}"
-          GIT_TAG "${SERVICELIB_REVISION}"
-          GIT_SHALLOW FALSE)
+      if(DEFINED ENV{SERVICEGEN_GITHUB_RAW_URL} AND
+         SERVICELIB_REPOSITORY MATCHES "^https://github.com/")
+        string(REGEX REPLACE "^https://github.com/" ""
+            _servicegen_servicelib_path "${SERVICELIB_REPOSITORY}")
+        string(REGEX REPLACE "\\.git$" ""
+            _servicegen_servicelib_path "${_servicegen_servicelib_path}")
+        FetchContent_Declare(servicegen_servicelib
+            URL "$ENV{SERVICEGEN_GITHUB_RAW_URL}/${_servicegen_servicelib_path}/archive/${SERVICELIB_REVISION}.tar.gz"
+            DOWNLOAD_EXTRACT_TIMESTAMP TRUE)
+      else()
+        FetchContent_Declare(servicegen_servicelib
+            GIT_REPOSITORY "${SERVICELIB_REPOSITORY}"
+            GIT_TAG "${SERVICELIB_REVISION}"
+            GIT_SHALLOW FALSE)
+      endif()
       FetchContent_GetProperties(servicegen_servicelib)
       if(NOT servicegen_servicelib_POPULATED)
         FetchContent_Populate(servicegen_servicelib)
@@ -78,11 +100,22 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
   if(USERVER_SOURCE_DIR)
     include(FetchContent)
     if(NOT FETCHCONTENT_SOURCE_DIR_RDKAFKA)
-      FetchContent_Declare(servicegen_librdkafka
-          GIT_REPOSITORY "${SERVICEGEN_RDKAFKA_REPOSITORY}"
-          GIT_TAG "${SERVICEGEN_RDKAFKA_REVISION}"
-          GIT_SHALLOW TRUE
-          GIT_PROGRESS TRUE)
+      if(DEFINED ENV{SERVICEGEN_GITHUB_RAW_URL} AND
+         SERVICEGEN_RDKAFKA_REPOSITORY MATCHES "^https://github.com/")
+        string(REGEX REPLACE "^https://github.com/" ""
+            _servicegen_rdkafka_path "${SERVICEGEN_RDKAFKA_REPOSITORY}")
+        string(REGEX REPLACE "\\.git$" ""
+            _servicegen_rdkafka_path "${_servicegen_rdkafka_path}")
+        FetchContent_Declare(servicegen_librdkafka
+            URL "$ENV{SERVICEGEN_GITHUB_RAW_URL}/${_servicegen_rdkafka_path}/archive/${SERVICEGEN_RDKAFKA_REVISION}.tar.gz"
+            DOWNLOAD_EXTRACT_TIMESTAMP TRUE)
+      else()
+        FetchContent_Declare(servicegen_librdkafka
+            GIT_REPOSITORY "${SERVICEGEN_RDKAFKA_REPOSITORY}"
+            GIT_TAG "${SERVICEGEN_RDKAFKA_REVISION}"
+            GIT_SHALLOW TRUE
+            GIT_PROGRESS TRUE)
+      endif()
       FetchContent_GetProperties(servicegen_librdkafka)
       if(NOT servicegen_librdkafka_POPULATED)
         FetchContent_Populate(servicegen_librdkafka)
