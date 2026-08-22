@@ -1,0 +1,250 @@
+{
+   "panels": [
+      {
+         "collapsed": false,
+         "gridPos": {
+            "h": 1,
+            "w": 0,
+            "x": 0,
+            "y": 0
+         },
+         "id": 1,
+         "panels": [ ],
+         "title": "Messages",
+         "type": "row"
+      },
+      {
+         "datasource": {
+            "type": "datasource",
+            "uid": "-- Mixed --"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "unit": "ops"
+            }
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 1
+         },
+         "id": 2,
+         "pluginVersion": "v11.0.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "rate(kafka_producer_messages_total{job=~\"$job\"}[$__rate_interval])",
+               "intervalFactor": 2,
+               "legendFormat": "{{topic}} total"
+            },
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "rate(kafka_producer_messages_success{job=~\"$job\"}[$__rate_interval])",
+               "intervalFactor": 2,
+               "legendFormat": "{{topic}} success"
+            },
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "rate(kafka_producer_messages_error{job=~\"$job\"}[$__rate_interval])",
+               "intervalFactor": 2,
+               "legendFormat": "{{topic}} errors"
+            }
+         ],
+         "title": "Produced Messages",
+         "type": "timeseries"
+      },
+      {
+         "datasource": {
+            "type": "datasource",
+            "uid": "-- Mixed --"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "unit": "ops"
+            }
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 1
+         },
+         "id": 3,
+         "pluginVersion": "v11.0.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "rate(kafka_consumer_messages_total{job=~\"$job\"}[$__rate_interval])",
+               "intervalFactor": 2,
+               "legendFormat": "{{topic}} total"
+            },
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "rate(kafka_consumer_messages_success{job=~\"$job\"}[$__rate_interval])",
+               "intervalFactor": 2,
+               "legendFormat": "{{topic}} success"
+            },
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "rate(kafka_consumer_messages_error{job=~\"$job\"}[$__rate_interval])",
+               "intervalFactor": 2,
+               "legendFormat": "{{topic}} errors"
+            }
+         ],
+         "title": "Consumed Messages",
+         "type": "timeseries"
+      },
+      {
+         "collapsed": false,
+         "gridPos": {
+            "h": 1,
+            "w": 0,
+            "x": 24,
+            "y": 9
+         },
+         "id": 4,
+         "panels": [ ],
+         "title": "Latency and connectivity",
+         "type": "row"
+      },
+      {
+         "datasource": {
+            "type": "datasource",
+            "uid": "-- Mixed --"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "unit": "ms"
+            }
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 10
+         },
+         "id": 5,
+         "pluginVersion": "v11.0.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "kafka_producer_avg_ms_spent_time{job=~\"$job\"}",
+               "intervalFactor": 2,
+               "legendFormat": "produce {{topic}}"
+            },
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "kafka_consumer_avg_ms_spent_time{job=~\"$job\"}",
+               "intervalFactor": 2,
+               "legendFormat": "consume {{topic}}"
+            }
+         ],
+         "title": "Average Message Latency",
+         "type": "timeseries"
+      },
+      {
+         "datasource": {
+            "type": "datasource",
+            "uid": "-- Mixed --"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "unit": "short"
+            }
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 10
+         },
+         "id": 6,
+         "pluginVersion": "v11.0.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "kafka_producer_connections_error{job=~\"$job\"}",
+               "intervalFactor": 2,
+               "legendFormat": "producer {{component_name}}"
+            },
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "kafka_consumer_connections_error{job=~\"$job\"}",
+               "intervalFactor": 2,
+               "legendFormat": "consumer {{component_name}}"
+            }
+         ],
+         "title": "Broker Connection Errors",
+         "type": "timeseries"
+      }
+   ],
+   "refresh": "30s",
+   "schemaVersion": 39,
+   "tags": [
+      "servicelib",
+      "kafka",
+      "cpp",
+      "userver"
+   ],
+   "templating": {
+      "list": [
+         {
+            "label": "Datasource",
+            "name": "datasource",
+            "query": "prometheus",
+            "type": "datasource"
+         },
+         {
+            "datasource": {
+               "type": "prometheus",
+               "uid": "$datasource"
+            },
+            "includeAll": false,
+            "label": "Job",
+            "multi": false,
+            "name": "job",
+            "query": "label_values(service_info, job)",
+            "regex": "(?i)^analytics[ _-]*service$",
+            "type": "query"
+         }
+      ]
+   },
+   "time": {
+      "from": "now-1h",
+      "to": "now"
+   },
+   "timezone": "browser",
+   "title": "analyticsservice / Kafka Client (userver)",
+   "uid": "analyticsservice-kafka-client"
+}

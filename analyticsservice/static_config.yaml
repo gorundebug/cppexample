@@ -1,0 +1,91 @@
+components_manager:
+  task_processors:
+    main-task-processor:
+      worker_threads: 4
+    fs-task-processor:
+      worker_threads: 4
+    consumer-task-processor:
+      worker_threads: 1
+      thread_name: kafka-consumer
+    consumer-blocking-task-processor:
+      worker_threads: 1
+      thread_name: kafka-consumer-blocking
+
+  default_task_processor: main-task-processor
+  components:
+    servicelib-disabled-server-middlewares:
+    logging:
+      fs-task-processor: fs-task-processor
+      loggers:
+        default:
+          file_path: '@stderr'
+          level: info
+          overflow_behavior: discard
+    testsuite-support:
+    server:
+      listener:
+        port: 9093
+        task_processor: main-task-processor
+    servicelib-metrics-handler:
+      path: /metrics
+      method: GET
+      task_processor: main-task-processor
+
+    servicelib-status-handler:
+      path: /status
+      method: GET
+      task_processor: main-task-processor
+    servicelib-status-data-handler:
+      path: /status/data
+      method: GET
+      task_processor: main-task-processor
+    servicelib-status-graph-handler:
+      path: /status/graph
+      method: GET
+      task_processor: main-task-processor
+    servicelib-status-js-handler:
+      path: /status/vis.min.js
+      method: GET
+      task_processor: main-task-processor
+    servicelib-status-css-handler:
+      path: /status/vis.min.css
+      method: GET
+      task_processor: main-task-processor
+
+    servicelib-startup-handler:
+      path: /health/startup
+      method: GET
+      task_processor: main-task-processor
+
+    servicelib-readiness-handler:
+      path: /health/ready
+      method: GET
+      task_processor: main-task-processor
+
+    servicelib-liveness-handler:
+      path: /health/live
+      method: GET
+      task_processor: main-task-processor
+
+    secdist: {}
+    default-secdist-provider:
+      missing-ok: true
+      environment-secrets-key: SECDIST_CONFIG
+
+    kafka-consumer-order-events:
+      group_id: analytics-service
+      topics:
+        - order-processed
+      auto_offset_reset: smallest
+      max_batch_size: 100
+      poll_timeout: 500ms
+      security_protocol#env: ORDER_EVENTS_SECURITY_PROTOCOL
+      security_protocol#fallback: PLAINTEXT
+      sasl_mechanisms#env: ORDER_EVENTS_SASL_MECHANISM
+      sasl_mechanisms#fallback: SCRAM-SHA-512
+
+    servicelib-runtime:
+      config-path: config/config.yaml
+      override-path: $analyticsServiceConfigOverridePath
+      fs-task-processor: fs-task-processor
+    analytics-service: {}

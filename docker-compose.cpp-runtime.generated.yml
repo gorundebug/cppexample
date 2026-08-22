@@ -1,0 +1,43 @@
+services:
+  analyticsservice:
+    image: cppexample-analyticsservice
+    working_dir: /app
+    command:
+      - --config
+      - /app/static_config.yaml
+      - --config_vars
+      - /app/config/config_vars.integration.yaml
+    volumes: !reset []
+    security_opt: !reset []
+    cap_add: !reset []
+    ports: !override
+      - "9093:9093"
+      - "9203:9203"
+  inventoryservice:
+    image: cppexample-inventoryservice
+    working_dir: /app
+    command:
+      - --config
+      - /app/static_config.yaml
+      - --config_vars
+      - /app/config/config_vars.integration.yaml
+    volumes: !reset []
+    security_opt: !reset []
+    cap_add: !reset []
+    ports: !override
+      - "9092:9092"
+      - "9202:9202"
+  orderservice:
+    image: cppexample-orderservice
+    working_dir: /app
+    command:
+      - --config
+      - /app/static_config.yaml
+      - --config_vars
+      - /app/config/config_vars.integration.yaml
+    volumes: !reset []
+    security_opt: !reset []
+    cap_add: !reset []
+    ports: !override
+      - "9091:9091"
+      - "9201:9201"

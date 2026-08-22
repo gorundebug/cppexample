@@ -1,0 +1,14 @@
+__integrationKafkaBrokers_orderEvents: redpanda:9092
+analyticsServiceConfigOverridePath: config/overrides.integration.generated.yaml
+analyticsServiceDefaultGrpcTimeout: 0
+analyticsServiceEnvironment: ""
+analyticsServiceGrpcHost: 0.0.0.0
+analyticsServiceGrpcPort: 9203
+analyticsServiceHttpHost: 0.0.0.0
+analyticsServiceHttpPort: 9093
+orderEventsBrokers: redpanda:9092
+orderEventsPassword: ""
+orderEventsSaslMechanism: SCRAM-SHA-512
+orderEventsSecurityProtocol: PLAINTEXT
+orderEventsUsername: ""
+orderProcessedEnabled: true

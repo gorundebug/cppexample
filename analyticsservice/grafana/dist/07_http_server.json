@@ -1,0 +1,418 @@
+{
+   "panels": [
+      {
+         "collapsed": false,
+         "gridPos": {
+            "h": 1,
+            "w": 0,
+            "x": 0,
+            "y": 0
+         },
+         "id": 1,
+         "panels": [ ],
+         "title": "Traffic",
+         "type": "row"
+      },
+      {
+         "datasource": {
+            "type": "datasource",
+            "uid": "-- Mixed --"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "unit": "short"
+            }
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 0,
+            "y": 1
+         },
+         "id": 2,
+         "pluginVersion": "v11.0.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "http_handler_in_flight{job=~\"$job\", http_handler=~\"$http_handler\"}",
+               "intervalFactor": 2,
+               "legendFormat": "{{http_handler}} {{http_path}}"
+            }
+         ],
+         "title": "Active Requests",
+         "type": "timeseries"
+      },
+      {
+         "datasource": {
+            "type": "datasource",
+            "uid": "-- Mixed --"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "unit": "ops"
+            }
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 16,
+            "x": 8,
+            "y": 1
+         },
+         "id": 3,
+         "pluginVersion": "v11.0.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "rate(http_handler_rps{job=~\"$job\", http_handler=~\"$http_handler\"}[$__rate_interval])",
+               "intervalFactor": 2,
+               "legendFormat": "{{http_handler}} {{http_path}}"
+            }
+         ],
+         "title": "Request Rate",
+         "type": "timeseries"
+      },
+      {
+         "collapsed": false,
+         "gridPos": {
+            "h": 1,
+            "w": 0,
+            "x": 24,
+            "y": 9
+         },
+         "id": 4,
+         "panels": [ ],
+         "title": "Latency",
+         "type": "row"
+      },
+      {
+         "datasource": {
+            "type": "datasource",
+            "uid": "-- Mixed --"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "unit": "s"
+            }
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 0,
+            "y": 10
+         },
+         "id": 5,
+         "pluginVersion": "v11.0.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "http_handler_timings{job=~\"$job\", http_handler=~\"$http_handler\", percentile=\"p50\"} / 1000",
+               "intervalFactor": 2,
+               "legendFormat": "p50 {{http_handler}} {{http_path}}"
+            }
+         ],
+         "title": "Request Duration p50",
+         "type": "timeseries"
+      },
+      {
+         "datasource": {
+            "type": "datasource",
+            "uid": "-- Mixed --"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "unit": "s"
+            }
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 8,
+            "y": 10
+         },
+         "id": 6,
+         "pluginVersion": "v11.0.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "http_handler_timings{job=~\"$job\", http_handler=~\"$http_handler\", percentile=\"p95\"} / 1000",
+               "intervalFactor": 2,
+               "legendFormat": "p95 {{http_handler}} {{http_path}}"
+            }
+         ],
+         "title": "Request Duration p95",
+         "type": "timeseries"
+      },
+      {
+         "datasource": {
+            "type": "datasource",
+            "uid": "-- Mixed --"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "unit": "s"
+            }
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 16,
+            "y": 10
+         },
+         "id": 7,
+         "pluginVersion": "v11.0.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "http_handler_timings{job=~\"$job\", http_handler=~\"$http_handler\", percentile=\"p99\"} / 1000",
+               "intervalFactor": 2,
+               "legendFormat": "p99 {{http_handler}} {{http_path}}"
+            }
+         ],
+         "title": "Request Duration p99",
+         "type": "timeseries"
+      },
+      {
+         "collapsed": false,
+         "gridPos": {
+            "h": 1,
+            "w": 0,
+            "x": 24,
+            "y": 18
+         },
+         "id": 8,
+         "panels": [ ],
+         "title": "Latency Distribution",
+         "type": "row"
+      },
+      {
+         "datasource": {
+            "type": "datasource",
+            "uid": "-- Mixed --"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "unit": "s"
+            }
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 19
+         },
+         "id": 9,
+         "pluginVersion": "v11.0.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "http_handler_timings{job=~\"$job\", http_handler=~\"$http_handler\", percentile=\"p50\"} / 1000",
+               "intervalFactor": 2,
+               "legendFormat": "p50 {{http_handler}} {{http_path}}"
+            },
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "http_handler_timings{job=~\"$job\", http_handler=~\"$http_handler\", percentile=\"p90\"} / 1000",
+               "intervalFactor": 2,
+               "legendFormat": "p90 {{http_handler}} {{http_path}}"
+            },
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "http_handler_timings{job=~\"$job\", http_handler=~\"$http_handler\", percentile=\"p95\"} / 1000",
+               "intervalFactor": 2,
+               "legendFormat": "p95 {{http_handler}} {{http_path}}"
+            },
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "http_handler_timings{job=~\"$job\", http_handler=~\"$http_handler\", percentile=\"p99\"} / 1000",
+               "intervalFactor": 2,
+               "legendFormat": "p99 {{http_handler}} {{http_path}}"
+            },
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "http_handler_timings{job=~\"$job\", http_handler=~\"$http_handler\", percentile=\"p100\"} / 1000",
+               "intervalFactor": 2,
+               "legendFormat": "max {{http_handler}} {{http_path}}"
+            }
+         ],
+         "title": "Request Duration Percentile Bands",
+         "type": "timeseries"
+      },
+      {
+         "collapsed": false,
+         "gridPos": {
+            "h": 1,
+            "w": 0,
+            "x": 24,
+            "y": 27
+         },
+         "id": 10,
+         "panels": [ ],
+         "title": "Latency Heatmap",
+         "type": "row"
+      },
+      {
+         "datasource": {
+            "type": "datasource",
+            "uid": "-- Mixed --"
+         },
+         "gridPos": {
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 28
+         },
+         "id": 11,
+         "options": {
+            "calculate": false,
+            "color": {
+               "mode": "scheme",
+               "scheme": "Oranges",
+               "steps": 128
+            },
+            "yAxis": {
+               "unit": "s"
+            }
+         },
+         "pluginVersion": "v11.0.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "sum(rate(datasource_endpoint_request_duration_seconds_bucket{job=~\"$job\", transport=\"http\"}[$__rate_interval])) by (le)",
+               "format": "heatmap",
+               "intervalFactor": 2,
+               "legendFormat": "{{le}}"
+            }
+         ],
+         "title": "Request Duration Heatmap",
+         "type": "heatmap"
+      },
+      {
+         "collapsed": false,
+         "gridPos": {
+            "h": 1,
+            "w": 0,
+            "x": 24,
+            "y": 38
+         },
+         "id": 12,
+         "panels": [ ],
+         "title": "Errors",
+         "type": "row"
+      },
+      {
+         "datasource": {
+            "type": "datasource",
+            "uid": "-- Mixed --"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "unit": "ops"
+            }
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 39
+         },
+         "id": 13,
+         "pluginVersion": "v11.0.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "rate(http_handler_reply_codes{job=~\"$job\", http_handler=~\"$http_handler\", http_code=~\"4..|5..\"}[$__rate_interval])",
+               "intervalFactor": 2,
+               "legendFormat": "{{http_code}} {{http_handler}} {{http_path}}"
+            }
+         ],
+         "title": "Error Rate (4xx + 5xx)",
+         "type": "timeseries"
+      }
+   ],
+   "refresh": "30s",
+   "schemaVersion": 39,
+   "tags": [
+      "servicelib",
+      "http",
+      "server",
+      "servicelib"
+   ],
+   "templating": {
+      "list": [
+         {
+            "label": "Datasource",
+            "name": "datasource",
+            "query": "prometheus",
+            "type": "datasource"
+         },
+         {
+            "datasource": {
+               "type": "prometheus",
+               "uid": "$datasource"
+            },
+            "includeAll": false,
+            "label": "Job",
+            "multi": false,
+            "name": "job",
+            "query": "label_values(http_handler_rps, job)",
+            "regex": "(?i)^analytics[ _-]*service$",
+            "type": "query"
+         },
+         {
+            "datasource": {
+               "type": "prometheus",
+               "uid": "$datasource"
+            },
+            "includeAll": true,
+            "label": "Http_handler",
+            "multi": true,
+            "name": "http_handler",
+            "query": "label_values(http_handler_rps{job=~\"$job\"}, http_handler)",
+            "type": "query"
+         }
+      ]
+   },
+   "time": {
+      "from": "now-1h",
+      "to": "now"
+   },
+   "timezone": "browser",
+   "title": "analyticsservice / HTTP Server",
+   "uid": "analyticsservice-http-server"
+}

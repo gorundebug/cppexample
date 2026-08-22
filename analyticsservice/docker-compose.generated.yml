@@ -1,0 +1,29 @@
+services:
+  analyticsservice:
+    image: analyticsservice-cpp-build
+    working_dir: /workspace
+    command:
+      - /workspace/build/example_analytics_service
+      - --config
+      - /workspace/static_config.yaml
+      - --config_vars
+      - /workspace/config/config_vars.integration.yaml
+    volumes:
+      - .:/workspace
+      - cpp-cmake-build:/workspace/build
+    stop_grace_period: 30000ms
+    restart: unless-stopped
+    environment:
+      - DEBUG=${ANALYTICS_SERVICE_DEBUG:-0}
+      - 'SECDIST_CONFIG=${SECDIST_CONFIG:-{"kafka_settings":{"kafka-consumer-order-events":{"brokers":"redpanda:9092"}}}}'
+    ports:
+      - "9093:9093"
+      - "9203:9203"
+      - "2345:2345"
+    security_opt:
+      - seccomp:unconfined
+    cap_add:
+      - SYS_PTRACE
+
+volumes:
+  cpp-cmake-build:

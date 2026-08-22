@@ -1,0 +1,238 @@
+cmake_minimum_required(VERSION 3.24)
+
+# This file is both a standalone service project and a workspace subdirectory.
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+  project(example_inventory_service LANGUAGES CXX)
+
+  set(FETCHCONTENT_UPDATES_DISCONNECTED ON CACHE BOOL "" FORCE)
+
+  include(CTest)
+  set(CMAKE_CXX_STANDARD 20)
+  set(CMAKE_CXX_STANDARD_REQUIRED ON)
+  set(CMAKE_CXX_EXTENSIONS OFF)
+
+  option(SERVICEGEN_USE_CCACHE "Use ccache when it is available" ON)
+  option(SERVICEGEN_ENABLE_OTLP_TRACING
+         "Register userver OTLP tracing components" OFF)
+  if(SERVICEGEN_USE_CCACHE AND NOT CMAKE_CXX_COMPILER_LAUNCHER)
+    find_program(SERVICEGEN_CCACHE_PROGRAM ccache)
+    if(SERVICEGEN_CCACHE_PROGRAM)
+      set(CMAKE_CXX_COMPILER_LAUNCHER "${SERVICEGEN_CCACHE_PROGRAM}")
+      message(STATUS "C++ compiler cache: ${SERVICEGEN_CCACHE_PROGRAM}")
+    endif()
+  endif()
+
+  set(SERVICELIB_SOURCE_DIR "" CACHE PATH
+      "Path to a servicelib source checkout")
+  set(USERVER_SOURCE_DIR "" CACHE PATH
+      "Path to a userver source checkout")
+  set(_servicegen_modules_root_default "${CMAKE_CURRENT_SOURCE_DIR}/..")
+  if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/modules")
+    set(_servicegen_modules_root_default "${CMAKE_CURRENT_SOURCE_DIR}/modules")
+  endif()
+  set(SERVICEGEN_MODULES_ROOT "${_servicegen_modules_root_default}" CACHE PATH
+      "Path containing local generated contract modules")
+  option(SERVICEGEN_FETCH_CPP_DEPENDENCIES
+         "Fetch missing pinned servicelib, userver, and contract modules" ON)
+  set(SERVICELIB_REPOSITORY "https://github.com/gorundebug/cppservicelib.git" CACHE STRING
+      "Standalone cppservicelib repository")
+  set(SERVICELIB_REVISION "v0.2.5" CACHE STRING
+      "Pinned cppservicelib revision")
+  set(USERVER_REPOSITORY "https://github.com/userver-framework/userver.git" CACHE STRING
+      "Standalone userver repository")
+  set(USERVER_REVISION "c9f77729c0edce7e423def2d4a4450aa7fc9d259" CACHE STRING
+      "Pinned userver revision")
+
+
+  if(SERVICEGEN_FETCH_CPP_DEPENDENCIES)
+    include(FetchContent)
+    if(NOT USERVER_SOURCE_DIR)
+      FetchContent_Declare(servicegen_userver
+          GIT_REPOSITORY "${USERVER_REPOSITORY}"
+          GIT_TAG "${USERVER_REVISION}"
+          GIT_SHALLOW FALSE)
+      FetchContent_GetProperties(servicegen_userver)
+      if(NOT servicegen_userver_POPULATED)
+        FetchContent_Populate(servicegen_userver)
+      endif()
+      set(USERVER_SOURCE_DIR "${servicegen_userver_SOURCE_DIR}")
+    endif()
+    if(NOT SERVICELIB_SOURCE_DIR)
+      FetchContent_Declare(servicegen_servicelib
+          GIT_REPOSITORY "${SERVICELIB_REPOSITORY}"
+          GIT_TAG "${SERVICELIB_REVISION}"
+          GIT_SHALLOW FALSE)
+      FetchContent_GetProperties(servicegen_servicelib)
+      if(NOT servicegen_servicelib_POPULATED)
+        FetchContent_Populate(servicegen_servicelib)
+      endif()
+      set(SERVICELIB_SOURCE_DIR "${servicegen_servicelib_SOURCE_DIR}")
+    endif()
+  endif()
+
+
+  set(_servicegen_cpm_directory "")
+  if(CPM_SOURCE_CACHE AND NOT CPM_SOURCE_CACHE STREQUAL "OFF")
+    set(_servicegen_cpm_directory "${CPM_SOURCE_CACHE}/cpm")
+  elseif(DEFINED ENV{CPM_SOURCE_CACHE} AND
+         NOT "$ENV{CPM_SOURCE_CACHE}" STREQUAL "")
+    set(_servicegen_cpm_directory "$ENV{CPM_SOURCE_CACHE}/cpm")
+  endif()
+  if(_servicegen_cpm_directory)
+    file(MAKE_DIRECTORY "${_servicegen_cpm_directory}")
+    if(DEFINED CPM_DIRECTORY AND
+       NOT CPM_DIRECTORY STREQUAL _servicegen_cpm_directory)
+      get_cmake_property(_servicegen_cache_variables CACHE_VARIABLES)
+      foreach(_servicegen_cache_variable IN LISTS _servicegen_cache_variables)
+        if(_servicegen_cache_variable MATCHES
+           "^CPM_(DIRECTORY|FILE|VERSION|PACKAGES|PACKAGE_.+)$")
+          unset("${_servicegen_cache_variable}" CACHE)
+        endif()
+      endforeach()
+    endif()
+  endif()
+
+  if(USERVER_SOURCE_DIR)
+    set(USERVER_FEATURE_GRPC ON CACHE BOOL "" FORCE)
+    set(USERVER_FORCE_DOWNLOAD_GRPC ON CACHE BOOL "" FORCE)
+    set(USERVER_FORCE_DOWNLOAD_PROTOBUF ON CACHE BOOL "" FORCE)
+    if(SERVICEGEN_ENABLE_OTLP_TRACING)
+      set(USERVER_FEATURE_OTLP ON CACHE BOOL "" FORCE)
+    endif()
+    set(USERVER_FEATURE_CHAOTIC_EXPERIMENTAL ON CACHE BOOL "" FORCE)
+    add_subdirectory(
+        "${USERVER_SOURCE_DIR}"
+        "${CMAKE_BINARY_DIR}/_deps/userver-build"
+        EXCLUDE_FROM_ALL)
+
+    userver_setup_environment()
+    list(APPEND CMAKE_MODULE_PATH "${USERVER_SOURCE_DIR}/cmake")
+  else()
+    set(_servicegen_userver_components core grpc)
+    if(SERVICEGEN_ENABLE_OTLP_TRACING)
+      list(APPEND _servicegen_userver_components otlp)
+    endif()
+    find_package(userver QUIET COMPONENTS ${_servicegen_userver_components})
+  endif()
+
+  if(SERVICELIB_SOURCE_DIR)
+    add_subdirectory(
+        "${SERVICELIB_SOURCE_DIR}"
+        "${CMAKE_BINARY_DIR}/_deps/servicelib-build"
+        EXCLUDE_FROM_ALL)
+  else()
+    find_package(servicelib CONFIG QUIET)
+  endif()
+
+  if(NOT TARGET userver-core)
+    message(FATAL_ERROR
+        "Standalone service requires userver. Set USERVER_SOURCE_DIR, install "
+        "userver, or enable SERVICEGEN_FETCH_CPP_DEPENDENCIES.")
+  endif()
+  if(NOT TARGET servicelib::servicelib)
+    message(FATAL_ERROR
+        "Standalone service requires servicelib. Set SERVICELIB_SOURCE_DIR, "
+        "install servicelib, or enable SERVICEGEN_FETCH_CPP_DEPENDENCIES.")
+  endif()
+
+  if(NOT TARGET example_inventory_service_api)
+    set(_servicegen_module_source "${SERVICEGEN_MODULES_ROOT}/inventory_service_api")
+    if(EXISTS "${_servicegen_module_source}/CMakeLists.txt")
+      add_subdirectory(
+          "${_servicegen_module_source}"
+          "${CMAKE_BINARY_DIR}/_modules/inventory_service_api")
+    elseif(SERVICEGEN_FETCH_CPP_DEPENDENCIES)
+      include(FetchContent)
+      FetchContent_Declare(servicegen_module_inventory_service_api
+          GIT_REPOSITORY "https://github.com/gorundebug/cppexample-inventory-service-api.git"
+          GIT_TAG "v0.2.5"
+          GIT_SHALLOW FALSE)
+      FetchContent_MakeAvailable(servicegen_module_inventory_service_api)
+    else()
+      message(FATAL_ERROR
+          "Contract module inventory_service_api was not found under "
+          "SERVICEGEN_MODULES_ROOT=${SERVICEGEN_MODULES_ROOT}.")
+    endif()
+  endif()
+  if(NOT TARGET example_model)
+    set(_servicegen_module_source "${SERVICEGEN_MODULES_ROOT}/model")
+    if(EXISTS "${_servicegen_module_source}/CMakeLists.txt")
+      add_subdirectory(
+          "${_servicegen_module_source}"
+          "${CMAKE_BINARY_DIR}/_modules/model")
+    elseif(SERVICEGEN_FETCH_CPP_DEPENDENCIES)
+      include(FetchContent)
+      FetchContent_Declare(servicegen_module_model
+          GIT_REPOSITORY "https://github.com/gorundebug/cppexample-model.git"
+          GIT_TAG "v0.2.5"
+          GIT_SHALLOW FALSE)
+      FetchContent_MakeAvailable(servicegen_module_model)
+    else()
+      message(FATAL_ERROR
+          "Contract module model was not found under "
+          "SERVICEGEN_MODULES_ROOT=${SERVICEGEN_MODULES_ROOT}.")
+    endif()
+  endif()
+endif()
+
+# Generated includes keep a stable service prefix independent of the checkout
+# directory name (workspace directory, Git repository name, or FetchContent).
+set(_servicegen_include_root
+    "${CMAKE_CURRENT_BINARY_DIR}/servicegen-include")
+file(MAKE_DIRECTORY "${_servicegen_include_root}")
+if(NOT EXISTS
+    "${_servicegen_include_root}/inventoryservice")
+  file(CREATE_LINK "${CMAKE_CURRENT_SOURCE_DIR}"
+      "${_servicegen_include_root}/inventoryservice"
+      SYMBOLIC COPY_ON_ERROR)
+endif()
+
+add_executable(example_inventory_service
+    cmd/service/main.cpp
+    internal/app/service.generated.cpp
+    internal/app/grpc_service.generated.cpp
+    internal/app/service.cpp
+    internal/functions/get_inventory_item_data.cpp
+)
+
+target_compile_features(example_inventory_service PRIVATE cxx_std_20)
+target_include_directories(example_inventory_service PRIVATE
+    "${_servicegen_include_root}")
+target_link_libraries(example_inventory_service PRIVATE
+    servicelib::servicelib userver-core userver-grpc
+      example_inventory_service_api
+      example_model
+
+      example_inventory_service_api
+)
+if(SERVICEGEN_ENABLE_OTLP_TRACING)
+  target_compile_definitions(example_inventory_service
+      PRIVATE SERVICEGEN_ENABLE_OTLP_TRACING=1)
+  target_link_libraries(example_inventory_service PRIVATE userver::otlp userver-grpc)
+endif()
+
+add_executable(example_inventory_service_typed_config
+    config/config.generated.cpp)
+target_compile_features(example_inventory_service_typed_config PRIVATE cxx_std_20)
+target_include_directories(example_inventory_service_typed_config PRIVATE
+    "${_servicegen_include_root}")
+target_link_libraries(example_inventory_service_typed_config
+    PRIVATE servicelib::servicelib userver-core)
+add_test(NAME example_inventory_service_typed_config
+    COMMAND example_inventory_service_typed_config)
+
+add_executable(example_inventory_service_unit_tests
+    internal/functions/get_inventory_item_data_test.cpp
+    internal/functions/process_order_item_test.cpp
+)
+target_compile_features(example_inventory_service_unit_tests PRIVATE cxx_std_20)
+target_include_directories(example_inventory_service_unit_tests PRIVATE
+    "${_servicegen_include_root}")
+target_link_libraries(example_inventory_service_unit_tests PRIVATE
+    servicelib::servicelib userver-core userver::utest userver-grpc
+    example_inventory_service_api
+    example_model
+
+    example_inventory_service_api
+)
+add_google_tests(example_inventory_service_unit_tests)

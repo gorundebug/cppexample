@@ -1,0 +1,38 @@
+services:
+  cpp-build:
+    image: analyticsservice-cpp-build
+    build:
+      context: .
+      dockerfile: Dockerfile.cmake
+      additional_contexts:
+        servicelib-source: ${SERVICELIB_SOURCE_CONTEXT:-https://github.com/gorundebug/cppservicelib.git#v0.2.5}
+        userver-source: ${USERVER_SOURCE_CONTEXT:-https://github.com/userver-framework/userver.git#c9f77729c0edce7e423def2d4a4450aa7fc9d259}
+    working_dir: /workspace
+    environment:
+      SERVICELIB_SOURCE_DIR: ${SERVICELIB_CONTAINER_SOURCE_DIR:-/opt/servicelib}
+      USERVER_SOURCE_DIR: ${USERVER_CONTAINER_SOURCE_DIR:-/opt/userver}
+      CPM_SOURCE_CACHE: /var/cache/cpm
+      CCACHE_DIR: /ccache
+      CCACHE_BASEDIR: /workspace
+      CCACHE_COMPILERCHECK: content
+      CCACHE_MAXSIZE: ${CCACHE_MAXSIZE:-20G}
+      GITHUB_TOKEN: ${GITHUB_TOKEN:-}
+      GITLAB_TOKEN: ${GITLAB_TOKEN:-}
+      SERVICEGEN_FETCH_CPP_DEPENDENCIES: ${SERVICEGEN_FETCH_CPP_DEPENDENCIES:-ON}
+      USERVER_LTO: ${USERVER_LTO:-OFF}
+    volumes:
+      - .:/workspace
+      - cpp-cmake-build:/workspace/build
+      - cpp-fetchcontent:/workspace/build/_deps
+      - cpp-cpm-source:/var/cache/cpm
+      - cpp-ccache:/ccache
+    command:
+      - /bin/bash
+      - -lc
+      - source scripts/configure-git-auth.generated.sh && ./scripts/run_with_progress.generated.sh "Debug configure" cmake --preset docker-debug -DSERVICEGEN_FETCH_CPP_DEPENDENCIES="${SERVICEGEN_FETCH_CPP_DEPENDENCIES:-ON}" && ./scripts/run_with_progress.generated.sh "Debug build" cmake --build --preset docker-debug && ./scripts/run_with_progress.generated.sh "Test suite" ctest --preset docker-debug
+
+volumes:
+  cpp-cmake-build:
+  cpp-fetchcontent:
+  cpp-cpm-source:
+  cpp-ccache:

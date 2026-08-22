@@ -1,0 +1,310 @@
+{
+   "panels": [
+      {
+         "collapsed": false,
+         "gridPos": {
+            "h": 1,
+            "w": 0,
+            "x": 0,
+            "y": 0
+         },
+         "id": 1,
+         "panels": [ ],
+         "title": "Task Processors",
+         "type": "row"
+      },
+      {
+         "datasource": {
+            "type": "datasource",
+            "uid": "-- Mixed --"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "unit": "short"
+            }
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 0,
+            "y": 1
+         },
+         "id": 2,
+         "pluginVersion": "v11.0.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "engine_task_processors_worker_threads{job=~\"$job\", task_processor=~\"$task_processor\"}",
+               "intervalFactor": 2,
+               "legendFormat": "{{task_processor}}"
+            }
+         ],
+         "title": "Worker Threads",
+         "type": "timeseries"
+      },
+      {
+         "datasource": {
+            "type": "datasource",
+            "uid": "-- Mixed --"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "unit": "short"
+            }
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 8,
+            "y": 1
+         },
+         "id": 3,
+         "pluginVersion": "v11.0.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "engine_task_processors_tasks_running{job=~\"$job\", task_processor=~\"$task_processor\"}",
+               "intervalFactor": 2,
+               "legendFormat": "running {{task_processor}}"
+            },
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "engine_task_processors_tasks_alive{job=~\"$job\", task_processor=~\"$task_processor\"}",
+               "intervalFactor": 2,
+               "legendFormat": "alive {{task_processor}}"
+            }
+         ],
+         "title": "Tasks Running and Alive",
+         "type": "timeseries"
+      },
+      {
+         "datasource": {
+            "type": "datasource",
+            "uid": "-- Mixed --"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "unit": "short"
+            }
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 16,
+            "y": 1
+         },
+         "id": 4,
+         "pluginVersion": "v11.0.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "engine_task_processors_tasks_queued{job=~\"$job\", task_processor=~\"$task_processor\"}",
+               "intervalFactor": 2,
+               "legendFormat": "{{task_processor}}"
+            }
+         ],
+         "title": "Queued Tasks",
+         "type": "timeseries"
+      },
+      {
+         "collapsed": false,
+         "gridPos": {
+            "h": 1,
+            "w": 0,
+            "x": 24,
+            "y": 9
+         },
+         "id": 5,
+         "panels": [ ],
+         "title": "Event Loop and Coroutines",
+         "type": "row"
+      },
+      {
+         "datasource": {
+            "type": "datasource",
+            "uid": "-- Mixed --"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "unit": "percent"
+            }
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 10
+         },
+         "id": 6,
+         "pluginVersion": "v11.0.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "engine_ev_threads_cpu_load_percent{job=~\"$job\"}",
+               "intervalFactor": 2,
+               "legendFormat": "{{ev_thread_name}}"
+            }
+         ],
+         "title": "Event Thread CPU Load",
+         "type": "timeseries"
+      },
+      {
+         "datasource": {
+            "type": "datasource",
+            "uid": "-- Mixed --"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "unit": "short"
+            }
+         },
+         "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 10
+         },
+         "id": 7,
+         "pluginVersion": "v11.0.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "engine_coro_pool_coroutines_active{job=~\"$job\"}",
+               "intervalFactor": 2,
+               "legendFormat": "active {{job}}"
+            },
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "engine_coro_pool_coroutines_total{job=~\"$job\"}",
+               "intervalFactor": 2,
+               "legendFormat": "total {{job}}"
+            }
+         ],
+         "title": "Coroutine Pool",
+         "type": "timeseries"
+      },
+      {
+         "collapsed": false,
+         "gridPos": {
+            "h": 1,
+            "w": 0,
+            "x": 24,
+            "y": 18
+         },
+         "id": 8,
+         "panels": [ ],
+         "title": "Process",
+         "type": "row"
+      },
+      {
+         "datasource": {
+            "type": "datasource",
+            "uid": "-- Mixed --"
+         },
+         "fieldConfig": {
+            "defaults": {
+               "unit": "s"
+            }
+         },
+         "gridPos": {
+            "h": 4,
+            "w": 24,
+            "x": 0,
+            "y": 19
+         },
+         "id": 9,
+         "options": {
+            "reduceOptions": {
+               "calcs": [
+                  "lastNotNull"
+               ]
+            }
+         },
+         "pluginVersion": "v11.0.0",
+         "targets": [
+            {
+               "datasource": {
+                  "type": "prometheus",
+                  "uid": "$datasource"
+               },
+               "expr": "engine_uptime_seconds{job=~\"$job\"}",
+               "intervalFactor": 2,
+               "legendFormat": "{{job}}"
+            }
+         ],
+         "title": "Uptime",
+         "type": "stat"
+      }
+   ],
+   "refresh": "30s",
+   "schemaVersion": 39,
+   "tags": [
+      "servicelib",
+      "runtime",
+      "cpp",
+      "userver"
+   ],
+   "templating": {
+      "list": [
+         {
+            "label": "Datasource",
+            "name": "datasource",
+            "query": "prometheus",
+            "type": "datasource"
+         },
+         {
+            "datasource": {
+               "type": "prometheus",
+               "uid": "$datasource"
+            },
+            "includeAll": false,
+            "label": "Job",
+            "multi": false,
+            "name": "job",
+            "query": "label_values(engine_task_processors_worker_threads, job)",
+            "regex": "(?i)^analytics[ _-]*service$",
+            "type": "query"
+         },
+         {
+            "datasource": {
+               "type": "prometheus",
+               "uid": "$datasource"
+            },
+            "includeAll": true,
+            "label": "Task_processor",
+            "multi": true,
+            "name": "task_processor",
+            "query": "label_values(engine_task_processors_worker_threads{job=~\"$job\"}, task_processor)",
+            "type": "query"
+         }
+      ]
+   },
+   "time": {
+      "from": "now-1h",
+      "to": "now"
+   },
+   "timezone": "browser",
+   "title": "analyticsservice / userver Runtime",
+   "uid": "analyticsservice-runtime"
+}

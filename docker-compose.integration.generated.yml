@@ -1,0 +1,70 @@
+services:
+  analyticsservice:
+    image: cppexample-cpp-build
+    working_dir: /workspace/analyticsservice
+    command:
+      - /workspace/build/analyticsservice/example_analytics_service
+      - --config
+      - /workspace/analyticsservice/static_config.yaml
+      - --config_vars
+      - /workspace/analyticsservice/config/config_vars.integration.yaml
+    volumes:
+      - .:/workspace
+      - cpp-cmake-build:/workspace/build
+    environment:
+      - 'SECDIST_CONFIG={"kafka_settings":{"kafka-consumer-order-events":{"brokers":"redpanda:9092"}}}'
+
+    depends_on:
+      redpanda:
+        condition: service_healthy
+
+    stop_grace_period: 30000ms
+  inventoryservice:
+    image: cppexample-cpp-build
+    working_dir: /workspace/inventoryservice
+    command:
+      - /workspace/build/inventoryservice/example_inventory_service
+      - --config
+      - /workspace/inventoryservice/static_config.yaml
+      - --config_vars
+      - /workspace/inventoryservice/config/config_vars.integration.yaml
+    volumes:
+      - .:/workspace
+      - cpp-cmake-build:/workspace/build
+
+    depends_on:
+      redpanda:
+        condition: service_healthy
+
+    stop_grace_period: 30000ms
+  orderservice:
+    image: cppexample-cpp-build
+    working_dir: /workspace/orderservice
+    command:
+      - /workspace/build/orderservice/example_order_service
+      - --config
+      - /workspace/orderservice/static_config.yaml
+      - --config_vars
+      - /workspace/orderservice/config/config_vars.integration.yaml
+    volumes:
+      - .:/workspace
+      - cpp-cmake-build:/workspace/build
+
+    depends_on:
+      redpanda:
+        condition: service_healthy
+
+    stop_grace_period: 30000ms
+
+  redpanda:
+    image: redpandadata/redpanda:v24.2.5
+    command: ["redpanda", "start", "--overprovisioned", "--smp=1", "--memory=512M", "--reserve-memory=0M", "--node-id=0", "--check=false", "--kafka-addr=internal://0.0.0.0:9092", "--advertise-kafka-addr=internal://redpanda:9092"]
+    healthcheck:
+      test: ["CMD", "rpk", "cluster", "health", "--exit-when-healthy"]
+      interval: 1s
+      timeout: 5s
+      retries: 30
+
+volumes:
+  cpp-cmake-build:
+    name: cppexample_cpp-cmake-build

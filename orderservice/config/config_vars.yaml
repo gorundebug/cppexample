@@ -1,0 +1,17 @@
+defaultPoolExecutorsCount: 2
+inventoryServiceApiAddress: dns:///localhost:9202
+inventoryServiceApiConnectionsCount: 1
+orderEventsBrokers: redpanda:9092
+orderEventsPassword: ""
+orderEventsSaslMechanism: SCRAM-SHA-512
+orderEventsSecurityProtocol: PLAINTEXT
+orderEventsUsername: ""
+orderProcessedEnabled: true
+orderServiceConfigOverridePath: config/overrides.yaml
+orderServiceDefaultGrpcTimeout: 5000
+orderServiceEnvironment: ""
+orderServiceGrpcHost: 0.0.0.0
+orderServiceGrpcPort: 9201
+orderServiceHttpHost: 0.0.0.0
+orderServiceHttpPort: 9091
+softDeadlineDuration: 1000
