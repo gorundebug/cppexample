@@ -6,7 +6,7 @@ PROJECT_DIR := $(abspath .)
 BIN_DIR := $(PROJECT_DIR)/bin
 TOOLS_DIR := $(PROJECT_DIR)/tools
 GOPRIVATE := github.com
-MODULE_VERSION := v0.2.11
+MODULE_VERSION := v0.2.12
 OS := $(shell uname -s)
 ARCH := $(shell uname -m)
 RUNTIME_IMAGE ?= 0
@@ -40,7 +40,7 @@ export SERVICEGEN_APT_UBUNTU_SECURITY_URL := $(SERVICEGEN_DEPENDENCY_PROXY_BASE)
 export SERVICEGEN_APT_UBUNTU_PORTS_URL := $(SERVICEGEN_DEPENDENCY_PROXY_BASE)/apt-ubuntu-ports
 export SERVICEGEN_APT_DEBIAN_URL := $(SERVICEGEN_DEPENDENCY_PROXY_BASE)/apt-debian
 export SERVICEGEN_APT_DEBIAN_SECURITY_URL := $(SERVICEGEN_DEPENDENCY_PROXY_BASE)/apt-debian-security
-export SERVICELIB_SOURCE_CONTEXT ?= $(SERVICEGEN_DEPENDENCY_PROXY_DOCKER_BASE)/github-raw/gorundebug/cppservicelib/archive/refs/tags/v0.2.11.tar.gz
+export SERVICELIB_SOURCE_CONTEXT ?= $(SERVICEGEN_DEPENDENCY_PROXY_DOCKER_BASE)/github-raw/gorundebug/cppservicelib/archive/refs/tags/v0.2.12.tar.gz
 export USERVER_SOURCE_CONTEXT ?= $(SERVICEGEN_DEPENDENCY_PROXY_DOCKER_BASE)/github-raw/userver-framework/userver/archive/c9f77729c0edce7e423def2d4a4450aa7fc9d259.tar.gz
 export SERVICEGEN_HELM_PROMETHEUS_URL := $(SERVICEGEN_DEPENDENCY_PROXY_BASE)/helm-prometheus
 export SERVICEGEN_HELM_GRAFANA_URL := $(SERVICEGEN_DEPENDENCY_PROXY_BASE)/helm-grafana
@@ -87,7 +87,7 @@ else
 DOCKER_COMPOSE := docker compose
 endif
 
-ACT_VERSION := v0.2.114
+ACT_VERSION := v0.2.124
 ACT := $(TOOLS_DIR)/act
 GH_VERSION := v2.67.0
 GH := $(TOOLS_DIR)/gh
