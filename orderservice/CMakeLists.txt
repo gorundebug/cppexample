@@ -36,7 +36,7 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
          "Fetch missing pinned servicelib, userver, and contract modules" ON)
   set(SERVICELIB_REPOSITORY "https://github.com/gorundebug/cppservicelib.git" CACHE STRING
       "Standalone cppservicelib repository")
-  set(SERVICELIB_REVISION "v0.2.9" CACHE STRING
+  set(SERVICELIB_REVISION "v0.2.10" CACHE STRING
       "Pinned cppservicelib revision")
   set(USERVER_REPOSITORY "https://github.com/userver-framework/userver.git" CACHE STRING
       "Standalone userver repository")
@@ -207,7 +207,7 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
       include(FetchContent)
       FetchContent_Declare(servicegen_module_inventory_service_api
           GIT_REPOSITORY "https://github.com/gorundebug/cppexample-inventory-service-api.git"
-          GIT_TAG "v0.2.9"
+          GIT_TAG "v0.2.10"
           GIT_SHALLOW FALSE)
       FetchContent_MakeAvailable(servicegen_module_inventory_service_api)
     else()
@@ -226,7 +226,7 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
       include(FetchContent)
       FetchContent_Declare(servicegen_module_model
           GIT_REPOSITORY "https://github.com/gorundebug/cppexample-model.git"
-          GIT_TAG "v0.2.9"
+          GIT_TAG "v0.2.10"
           GIT_SHALLOW FALSE)
       FetchContent_MakeAvailable(servicegen_module_model)
     else()
@@ -245,7 +245,7 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
       include(FetchContent)
       FetchContent_Declare(servicegen_module_order_service_api
           GIT_REPOSITORY "https://github.com/gorundebug/cppexample-order-service-api.git"
-          GIT_TAG "v0.2.9"
+          GIT_TAG "v0.2.10"
           GIT_SHALLOW FALSE)
       FetchContent_MakeAvailable(servicegen_module_order_service_api)
     else()
