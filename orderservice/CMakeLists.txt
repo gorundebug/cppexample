@@ -53,6 +53,7 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     include(FetchContent)
     if(NOT USERVER_SOURCE_DIR)
       if(DEFINED ENV{SERVICEGEN_GITHUB_RAW_URL} AND
+         NOT "$ENV{SERVICEGEN_GITHUB_RAW_URL}" STREQUAL "" AND
          USERVER_REPOSITORY MATCHES "^https://github.com/")
         string(REGEX REPLACE "^https://github.com/" ""
             _servicegen_userver_path "${USERVER_REPOSITORY}")
@@ -75,6 +76,7 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     endif()
     if(NOT SERVICELIB_SOURCE_DIR)
       if(DEFINED ENV{SERVICEGEN_GITHUB_RAW_URL} AND
+         NOT "$ENV{SERVICEGEN_GITHUB_RAW_URL}" STREQUAL "" AND
          SERVICELIB_REPOSITORY MATCHES "^https://github.com/")
         string(REGEX REPLACE "^https://github.com/" ""
             _servicegen_servicelib_path "${SERVICELIB_REPOSITORY}")
@@ -101,6 +103,7 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     include(FetchContent)
     if(NOT FETCHCONTENT_SOURCE_DIR_RDKAFKA)
       if(DEFINED ENV{SERVICEGEN_GITHUB_RAW_URL} AND
+         NOT "$ENV{SERVICEGEN_GITHUB_RAW_URL}" STREQUAL "" AND
          SERVICEGEN_RDKAFKA_REPOSITORY MATCHES "^https://github.com/")
         string(REGEX REPLACE "^https://github.com/" ""
             _servicegen_rdkafka_path "${SERVICEGEN_RDKAFKA_REPOSITORY}")
