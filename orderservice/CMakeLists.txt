@@ -42,13 +42,6 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
       "Standalone userver repository")
   set(USERVER_REVISION "c9f77729c0edce7e423def2d4a4450aa7fc9d259" CACHE STRING
       "Pinned userver revision")
-  set(SERVICEGEN_RDKAFKA_REPOSITORY
-      "https://github.com/confluentinc/librdkafka" CACHE STRING
-      "Pinned librdkafka repository")
-  set(SERVICEGEN_RDKAFKA_REVISION "v2.8.0" CACHE STRING
-      "Pinned librdkafka revision")
-
-
   if(SERVICEGEN_FETCH_CPP_DEPENDENCIES)
     include(FetchContent)
     if(NOT USERVER_SOURCE_DIR)
@@ -100,65 +93,10 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
   endif()
 
   if(USERVER_SOURCE_DIR)
-    include(FetchContent)
-    if(NOT FETCHCONTENT_SOURCE_DIR_RDKAFKA)
-      if(DEFINED ENV{SERVICEGEN_GITHUB_RAW_URL} AND
-         NOT "$ENV{SERVICEGEN_GITHUB_RAW_URL}" STREQUAL "" AND
-         SERVICEGEN_RDKAFKA_REPOSITORY MATCHES "^https://github.com/")
-        string(REGEX REPLACE "^https://github.com/" ""
-            _servicegen_rdkafka_path "${SERVICEGEN_RDKAFKA_REPOSITORY}")
-        string(REGEX REPLACE "\\.git$" ""
-            _servicegen_rdkafka_path "${_servicegen_rdkafka_path}")
-        FetchContent_Declare(servicegen_librdkafka
-            URL "$ENV{SERVICEGEN_GITHUB_RAW_URL}/${_servicegen_rdkafka_path}/archive/${SERVICEGEN_RDKAFKA_REVISION}.tar.gz"
-            DOWNLOAD_EXTRACT_TIMESTAMP TRUE)
-      else()
-        FetchContent_Declare(servicegen_librdkafka
-            GIT_REPOSITORY "${SERVICEGEN_RDKAFKA_REPOSITORY}"
-            GIT_TAG "${SERVICEGEN_RDKAFKA_REVISION}"
-            GIT_SHALLOW TRUE
-            GIT_PROGRESS TRUE)
-      endif()
-      FetchContent_GetProperties(servicegen_librdkafka)
-      if(NOT servicegen_librdkafka_POPULATED)
-        FetchContent_Populate(servicegen_librdkafka)
-      endif()
-      set(FETCHCONTENT_SOURCE_DIR_RDKAFKA
-          "${servicegen_librdkafka_SOURCE_DIR}" CACHE PATH
-          "Pinned librdkafka source used by userver" FORCE)
-    endif()
-    set(USERVER_DOWNLOAD_PACKAGE_KAFKA ON CACHE BOOL "" FORCE)
-    set(CMAKE_DISABLE_FIND_PACKAGE_RdKafka ON CACHE BOOL "" FORCE)
-    message(STATUS
-        "Using pinned librdkafka source ${SERVICEGEN_RDKAFKA_REVISION}")
-  endif()
-
-
-  set(_servicegen_cpm_directory "")
-  if(CPM_SOURCE_CACHE AND NOT CPM_SOURCE_CACHE STREQUAL "OFF")
-    set(_servicegen_cpm_directory "${CPM_SOURCE_CACHE}/cpm")
-  elseif(DEFINED ENV{CPM_SOURCE_CACHE} AND
-         NOT "$ENV{CPM_SOURCE_CACHE}" STREQUAL "")
-    set(_servicegen_cpm_directory "$ENV{CPM_SOURCE_CACHE}/cpm")
-  endif()
-  if(_servicegen_cpm_directory)
-    file(MAKE_DIRECTORY "${_servicegen_cpm_directory}")
-    if(DEFINED CPM_DIRECTORY AND
-       NOT CPM_DIRECTORY STREQUAL _servicegen_cpm_directory)
-      get_cmake_property(_servicegen_cache_variables CACHE_VARIABLES)
-      foreach(_servicegen_cache_variable IN LISTS _servicegen_cache_variables)
-        if(_servicegen_cache_variable MATCHES
-           "^CPM_(DIRECTORY|FILE|VERSION|PACKAGES|PACKAGE_.+)$")
-          unset("${_servicegen_cache_variable}" CACHE)
-        endif()
-      endforeach()
-    endif()
-  endif()
-
-  if(USERVER_SOURCE_DIR)
+    set(USERVER_CONAN ON CACHE BOOL "" FORCE)
     set(USERVER_FEATURE_GRPC ON CACHE BOOL "" FORCE)
-    set(USERVER_FORCE_DOWNLOAD_GRPC ON CACHE BOOL "" FORCE)
-    set(USERVER_FORCE_DOWNLOAD_PROTOBUF ON CACHE BOOL "" FORCE)
+    set(USERVER_FORCE_DOWNLOAD_GRPC OFF CACHE BOOL "" FORCE)
+    set(USERVER_FORCE_DOWNLOAD_PROTOBUF OFF CACHE BOOL "" FORCE)
     if(SERVICEGEN_ENABLE_OTLP_TRACING)
       set(USERVER_FEATURE_OTLP ON CACHE BOOL "" FORCE)
     endif()
@@ -168,8 +106,6 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
         "${USERVER_SOURCE_DIR}"
         "${CMAKE_BINARY_DIR}/_deps/userver-build"
         EXCLUDE_FROM_ALL)
-    unset(CMAKE_DISABLE_FIND_PACKAGE_RdKafka CACHE)
-
     userver_setup_environment()
     list(APPEND CMAKE_MODULE_PATH "${USERVER_SOURCE_DIR}/cmake")
   else()

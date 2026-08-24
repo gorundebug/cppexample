@@ -1,10 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
+source "$(dirname "$0")/dependency-proxy-env.generated.sh"
 
 exec docker compose -f docker-compose.cmake.generated.yml run --build --rm cpp-build \
   /bin/bash -lc '
     source scripts/configure-git-auth.generated.sh
-    cmake --preset docker-debug \
+    ./scripts/conan-install.generated.sh Debug /workspace/build/conan-debug
+    conan_toolchain="$(cat /workspace/build/conan-debug/toolchain.path)"
+    cmake --fresh --preset docker-debug \
+      -DCMAKE_TOOLCHAIN_FILE="$conan_toolchain" \
       -DSERVICEGEN_FETCH_CPP_DEPENDENCIES="${SERVICEGEN_FETCH_CPP_DEPENDENCIES:-OFF}" \
       -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 

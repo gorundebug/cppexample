@@ -12,6 +12,9 @@ services:
         SERVICEGEN_APT_UBUNTU_ARCHIVE_URL: ${SERVICEGEN_APT_UBUNTU_ARCHIVE_URL:-}
         SERVICEGEN_APT_UBUNTU_SECURITY_URL: ${SERVICEGEN_APT_UBUNTU_SECURITY_URL:-}
         SERVICEGEN_APT_UBUNTU_PORTS_URL: ${SERVICEGEN_APT_UBUNTU_PORTS_URL:-}
+        SERVICEGEN_CONAN_REMOTE_URL: ${SERVICEGEN_CONAN_REMOTE_URL:-}
+        PIP_INDEX_URL: ${PIP_INDEX_URL:-https://pypi.org/simple}
+        PIP_TRUSTED_HOST: ${PIP_TRUSTED_HOST:-}
       additional_contexts:
         servicelib-source: ${SERVICELIB_SOURCE_CONTEXT:-https://github.com/gorundebug/cppservicelib.git#v0.2.12}
         userver-source: ${USERVER_SOURCE_CONTEXT:-https://github.com/userver-framework/userver.git#c9f77729c0edce7e423def2d4a4450aa7fc9d259}
@@ -20,8 +23,11 @@ services:
     working_dir: /workspace
     environment:
       SERVICELIB_SOURCE_DIR: ${SERVICELIB_CONTAINER_SOURCE_DIR:-/opt/servicelib}
+      CPPSERVICELIB_SOURCE_DIR: ${SERVICELIB_CONTAINER_SOURCE_DIR:-/opt/servicelib}
       USERVER_SOURCE_DIR: ${USERVER_CONTAINER_SOURCE_DIR:-/opt/userver}
-      CPM_SOURCE_CACHE: /var/cache/cpm
+      SERVICEGEN_CONAN_REMOTE_URL: ${SERVICEGEN_CONAN_REMOTE_URL:-}
+      PIP_INDEX_URL: ${PIP_INDEX_URL:-https://pypi.org/simple}
+      PIP_TRUSTED_HOST: ${PIP_TRUSTED_HOST:-}
       CCACHE_DIR: /ccache
       CCACHE_BASEDIR: /workspace
       CCACHE_COMPILERCHECK: content
@@ -39,13 +45,12 @@ services:
     volumes:
       - .:/workspace
       - cpp-cmake-build:/workspace/build
-      - cpp-fetchcontent:/workspace/build/_deps
-      - cpp-cpm-source:/var/cache/cpm
       - cpp-ccache:/ccache
+      - ${SERVICEGEN_CONAN_HOME:-cpp-conan2}:/conan
     command:
       - /bin/bash
       - -lc
-      - source scripts/configure-git-auth.generated.sh && ./scripts/run_with_progress.generated.sh "Debug configure" cmake --preset docker-debug -DSERVICEGEN_FETCH_CPP_DEPENDENCIES="${SERVICEGEN_FETCH_CPP_DEPENDENCIES:-OFF}" && ./scripts/run_with_progress.generated.sh "Debug build" cmake --build --preset docker-debug && ./scripts/run_with_progress.generated.sh "Test suite" ctest --preset docker-debug
+      - source scripts/configure-git-auth.generated.sh && ./scripts/conan-install.generated.sh Debug /workspace/build/conan-debug && conan_toolchain="$(cat /workspace/build/conan-debug/toolchain.path)" && ./scripts/run_with_progress.generated.sh "Debug configure" cmake --fresh --preset docker-debug -DCMAKE_TOOLCHAIN_FILE="$${conan_toolchain}" -DSERVICEGEN_FETCH_CPP_DEPENDENCIES="${SERVICEGEN_FETCH_CPP_DEPENDENCIES:-OFF}" && ./scripts/run_with_progress.generated.sh "Debug build" cmake --build --preset docker-debug && ./scripts/run_with_progress.generated.sh "Test suite" ctest --preset docker-debug
   analyticsservice-runtime:
     image: cppexample-analyticsservice
     build:
@@ -59,6 +64,9 @@ services:
         SERVICEGEN_APT_UBUNTU_ARCHIVE_URL: ${SERVICEGEN_APT_UBUNTU_ARCHIVE_URL:-}
         SERVICEGEN_APT_UBUNTU_SECURITY_URL: ${SERVICEGEN_APT_UBUNTU_SECURITY_URL:-}
         SERVICEGEN_APT_UBUNTU_PORTS_URL: ${SERVICEGEN_APT_UBUNTU_PORTS_URL:-}
+        SERVICEGEN_CONAN_REMOTE_URL: ${SERVICEGEN_CONAN_REMOTE_URL:-}
+        PIP_INDEX_URL: ${PIP_INDEX_URL:-https://pypi.org/simple}
+        PIP_TRUSTED_HOST: ${PIP_TRUSTED_HOST:-}
         USERVER_LTO: ${USERVER_LTO:-ON}
         SERVICEGEN_RUNTIME_STRIP: ${SERVICEGEN_RUNTIME_STRIP:-ON}
         SERVICEGEN_EXAMPLE_PROFILE: ${SERVICEGEN_EXAMPLE_PROFILE:-function-call}
@@ -78,6 +86,9 @@ services:
         SERVICEGEN_APT_UBUNTU_ARCHIVE_URL: ${SERVICEGEN_APT_UBUNTU_ARCHIVE_URL:-}
         SERVICEGEN_APT_UBUNTU_SECURITY_URL: ${SERVICEGEN_APT_UBUNTU_SECURITY_URL:-}
         SERVICEGEN_APT_UBUNTU_PORTS_URL: ${SERVICEGEN_APT_UBUNTU_PORTS_URL:-}
+        SERVICEGEN_CONAN_REMOTE_URL: ${SERVICEGEN_CONAN_REMOTE_URL:-}
+        PIP_INDEX_URL: ${PIP_INDEX_URL:-https://pypi.org/simple}
+        PIP_TRUSTED_HOST: ${PIP_TRUSTED_HOST:-}
         USERVER_LTO: ${USERVER_LTO:-ON}
         SERVICEGEN_RUNTIME_STRIP: ${SERVICEGEN_RUNTIME_STRIP:-ON}
         SERVICEGEN_EXAMPLE_PROFILE: ${SERVICEGEN_EXAMPLE_PROFILE:-function-call}
@@ -97,6 +108,9 @@ services:
         SERVICEGEN_APT_UBUNTU_ARCHIVE_URL: ${SERVICEGEN_APT_UBUNTU_ARCHIVE_URL:-}
         SERVICEGEN_APT_UBUNTU_SECURITY_URL: ${SERVICEGEN_APT_UBUNTU_SECURITY_URL:-}
         SERVICEGEN_APT_UBUNTU_PORTS_URL: ${SERVICEGEN_APT_UBUNTU_PORTS_URL:-}
+        SERVICEGEN_CONAN_REMOTE_URL: ${SERVICEGEN_CONAN_REMOTE_URL:-}
+        PIP_INDEX_URL: ${PIP_INDEX_URL:-https://pypi.org/simple}
+        PIP_TRUSTED_HOST: ${PIP_TRUSTED_HOST:-}
         USERVER_LTO: ${USERVER_LTO:-ON}
         SERVICEGEN_RUNTIME_STRIP: ${SERVICEGEN_RUNTIME_STRIP:-ON}
         SERVICEGEN_EXAMPLE_PROFILE: ${SERVICEGEN_EXAMPLE_PROFILE:-function-call}
@@ -107,9 +121,7 @@ services:
 volumes:
   cpp-cmake-build:
     name: cppexample_cpp-cmake-build
-  cpp-fetchcontent:
-    name: cppexample_cpp-fetchcontent
-  cpp-cpm-source:
-    name: cppexample_cpp-cpm-source
   cpp-ccache:
     name: cppexample_cpp-ccache
+  cpp-conan2:
+    name: cppexample_cpp-conan2

@@ -9,9 +9,13 @@ ARG SERVICEGEN_GITHUB_RAW_URL=
 ARG SERVICEGEN_APT_UBUNTU_ARCHIVE_URL=
 ARG SERVICEGEN_APT_UBUNTU_SECURITY_URL=
 ARG SERVICEGEN_APT_UBUNTU_PORTS_URL=
+ARG SERVICEGEN_CONAN_REMOTE_URL=
+ARG PIP_INDEX_URL=https://pypi.org/simple
+ARG PIP_TRUSTED_HOST=
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Etc/UTC
 ENV SERVICEGEN_GITHUB_RAW_URL=${SERVICEGEN_GITHUB_RAW_URL}
+ENV SERVICEGEN_CONAN_REMOTE_URL=${SERVICEGEN_CONAN_REMOTE_URL}
 
 COPY docker/userver-packages-ubuntu-24.04.txt /tmp/userver-packages.txt
 
@@ -31,6 +35,15 @@ RUN --mount=type=cache,id=servicegen-apt-lists-${TARGETARCH},target=/var/lib/apt
        < /tmp/userver-packages.txt \
     && locale-gen en_US.UTF-8 \
     && rm -f /tmp/userver-packages.txt
+
+RUN python3 -m venv /opt/conan \
+    && PIP_TRUSTED_HOST="$PIP_TRUSTED_HOST" \
+       /opt/conan/bin/pip install --no-cache-dir --index-url "$PIP_INDEX_URL" \
+       conan==2.31.1
+ENV PATH=/opt/conan/bin:$PATH
+ENV CONAN_HOME=/conan
+ENV PIP_INDEX_URL=${PIP_INDEX_URL}
+ENV PIP_TRUSTED_HOST=${PIP_TRUSTED_HOST}
 
 COPY --from=servicelib-source / /tmp/servicelib-source
 RUN set -eu; \
@@ -73,8 +86,8 @@ WORKDIR /workspace
 ENV LANG=en_US.UTF-8
 ENV LC_ALL=en_US.UTF-8
 ENV SERVICELIB_SOURCE_DIR=/opt/servicelib
+ENV CPPSERVICELIB_SOURCE_DIR=/opt/servicelib
 ENV USERVER_SOURCE_DIR=/opt/userver
-ENV CPM_SOURCE_CACHE=/var/cache/cpm
 
 FROM development AS runtime-builder
 
@@ -83,13 +96,19 @@ ARG SERVICEGEN_RUNTIME_STRIP=ON
 ARG SERVICEGEN_EXAMPLE_PROFILE=function-call
 COPY . /workspace
 RUN --mount=type=cache,id=cppexample-runtime-build-v2-${TARGETARCH}-${SERVICEGEN_EXAMPLE_PROFILE},target=/workspace/build,sharing=locked \
-    --mount=type=cache,id=servicegen-userver-cpm-v1-${TARGETARCH},target=/var/cache/cpm,sharing=locked \
     --mount=type=cache,id=cppexample-runtime-ccache-${TARGETARCH},target=/ccache \
-    CCACHE_DIR=/ccache ./scripts/run_with_progress.generated.sh "Release configure" cmake --preset docker-release \
+    --mount=type=cache,id=servicegen-conan2-${TARGETARCH},target=/conan,sharing=locked \
+    CPPSERVICELIB_BUILD_TESTS=False \
+      ./scripts/run_with_progress.generated.sh "Conan Release install" \
+        ./scripts/conan-install.generated.sh Release /workspace/build/conan-release \
+    && conan_toolchain="$(cat /workspace/build/conan-release/toolchain.path)" \
+    && CCACHE_DIR=/ccache ./scripts/run_with_progress.generated.sh "Release configure" cmake --preset docker-release \
+      --fresh \
+      -DCMAKE_TOOLCHAIN_FILE="${conan_toolchain}" \
       -DSERVICEGEN_FETCH_CPP_DEPENDENCIES=OFF \
       -DBUILD_TESTING=OFF \
       -DUSERVER_BUILD_TESTS=OFF \
-      -DUSERVER_FEATURE_UTEST=ON \
+      -DUSERVER_FEATURE_UTEST=OFF \
       -DUSERVER_FEATURE_TESTSUITE=OFF \
       -DUSERVER_LTO="${USERVER_LTO}" \
     && ./scripts/run_with_progress.generated.sh "Release build" cmake --build --preset docker-release \

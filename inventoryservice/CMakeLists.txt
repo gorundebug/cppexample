@@ -42,8 +42,6 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
       "Standalone userver repository")
   set(USERVER_REVISION "c9f77729c0edce7e423def2d4a4450aa7fc9d259" CACHE STRING
       "Pinned userver revision")
-
-
   if(SERVICEGEN_FETCH_CPP_DEPENDENCIES)
     include(FetchContent)
     if(NOT USERVER_SOURCE_DIR)
@@ -94,32 +92,11 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     endif()
   endif()
 
-
-  set(_servicegen_cpm_directory "")
-  if(CPM_SOURCE_CACHE AND NOT CPM_SOURCE_CACHE STREQUAL "OFF")
-    set(_servicegen_cpm_directory "${CPM_SOURCE_CACHE}/cpm")
-  elseif(DEFINED ENV{CPM_SOURCE_CACHE} AND
-         NOT "$ENV{CPM_SOURCE_CACHE}" STREQUAL "")
-    set(_servicegen_cpm_directory "$ENV{CPM_SOURCE_CACHE}/cpm")
-  endif()
-  if(_servicegen_cpm_directory)
-    file(MAKE_DIRECTORY "${_servicegen_cpm_directory}")
-    if(DEFINED CPM_DIRECTORY AND
-       NOT CPM_DIRECTORY STREQUAL _servicegen_cpm_directory)
-      get_cmake_property(_servicegen_cache_variables CACHE_VARIABLES)
-      foreach(_servicegen_cache_variable IN LISTS _servicegen_cache_variables)
-        if(_servicegen_cache_variable MATCHES
-           "^CPM_(DIRECTORY|FILE|VERSION|PACKAGES|PACKAGE_.+)$")
-          unset("${_servicegen_cache_variable}" CACHE)
-        endif()
-      endforeach()
-    endif()
-  endif()
-
   if(USERVER_SOURCE_DIR)
+    set(USERVER_CONAN ON CACHE BOOL "" FORCE)
     set(USERVER_FEATURE_GRPC ON CACHE BOOL "" FORCE)
-    set(USERVER_FORCE_DOWNLOAD_GRPC ON CACHE BOOL "" FORCE)
-    set(USERVER_FORCE_DOWNLOAD_PROTOBUF ON CACHE BOOL "" FORCE)
+    set(USERVER_FORCE_DOWNLOAD_GRPC OFF CACHE BOOL "" FORCE)
+    set(USERVER_FORCE_DOWNLOAD_PROTOBUF OFF CACHE BOOL "" FORCE)
     if(SERVICEGEN_ENABLE_OTLP_TRACING)
       set(USERVER_FEATURE_OTLP ON CACHE BOOL "" FORCE)
     endif()
@@ -128,7 +105,6 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
         "${USERVER_SOURCE_DIR}"
         "${CMAKE_BINARY_DIR}/_deps/userver-build"
         EXCLUDE_FROM_ALL)
-
     userver_setup_environment()
     list(APPEND CMAKE_MODULE_PATH "${USERVER_SOURCE_DIR}/cmake")
   else()

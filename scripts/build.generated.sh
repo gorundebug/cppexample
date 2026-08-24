@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
+source "$(dirname "$0")/dependency-proxy-env.generated.sh"
 
 # Docker is the canonical C++ build environment. The compose file deliberately
 # leaves the platform unset so Docker selects the runner's native architecture.
@@ -16,7 +17,11 @@ exec docker compose -f docker-compose.cmake.generated.yml run --build --rm \
   -e SERVICEGEN_CPP_CMAKE_PRESET="$preset" cpp-build \
   /bin/bash -lc \
   'source scripts/configure-git-auth.generated.sh &&
-   ./scripts/run_with_progress.generated.sh "Configure $SERVICEGEN_CPP_CMAKE_PRESET" cmake --preset "$SERVICEGEN_CPP_CMAKE_PRESET" \
+   build_type=Debug; if [[ "$SERVICEGEN_CPP_CMAKE_PRESET" == docker-release ]]; then build_type=Release; fi &&
+   ./scripts/run_with_progress.generated.sh "Conan $build_type install" ./scripts/conan-install.generated.sh "$build_type" "/workspace/build/conan-${build_type,,}" &&
+   conan_toolchain="$(cat "/workspace/build/conan-${build_type,,}/toolchain.path")" &&
+   ./scripts/run_with_progress.generated.sh "Configure $SERVICEGEN_CPP_CMAKE_PRESET" cmake --fresh --preset "$SERVICEGEN_CPP_CMAKE_PRESET" \
+     -DCMAKE_TOOLCHAIN_FILE="$conan_toolchain" \
      -DSERVICEGEN_FETCH_CPP_DEPENDENCIES="${SERVICEGEN_FETCH_CPP_DEPENDENCIES:-OFF}" \
      -DSERVICEGEN_ENABLE_OTLP_TRACING="${SERVICEGEN_ENABLE_OTLP_TRACING:-OFF}" \
      -DUSERVER_LTO="${USERVER_LTO:-OFF}" &&
