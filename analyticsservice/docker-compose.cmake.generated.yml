@@ -14,6 +14,8 @@ services:
       additional_contexts:
         servicelib-source: ${SERVICELIB_SOURCE_CONTEXT:-https://github.com/gorundebug/cppservicelib.git#v0.2.12}
         userver-source: ${USERVER_SOURCE_CONTEXT:-https://github.com/userver-framework/userver.git#c9f77729c0edce7e423def2d4a4450aa7fc9d259}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     working_dir: /workspace
     environment:
       SERVICELIB_SOURCE_DIR: ${SERVICELIB_CONTAINER_SOURCE_DIR:-/opt/servicelib}
