@@ -9,3 +9,5 @@ grafana/
 go.work.sum
 build/
 .cppservicelib/
+.pyservicelib/
+.tsservicelib/
