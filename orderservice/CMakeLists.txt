@@ -116,6 +116,8 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     find_package(userver QUIET COMPONENTS ${_servicegen_userver_components})
   endif()
 
+  find_package(RdKafka CONFIG REQUIRED)
+
   if(SERVICELIB_SOURCE_DIR)
     add_subdirectory(
         "${SERVICELIB_SOURCE_DIR}"
