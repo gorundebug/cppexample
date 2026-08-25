@@ -27,12 +27,12 @@ exec docker compose -f docker-compose.cmake.generated.yml run --build --rm \
   'set -euo pipefail
    source scripts/configure-git-auth.generated.sh
    build_dir="build/sanitizers/$SERVICEGEN_CPP_SANITIZER"
-   conan_dir="build/conan-relwithdebinfo"
-   ./scripts/conan-install.generated.sh RelWithDebInfo "$conan_dir"
+   conan_dir="build/conan-debug"
+   ./scripts/conan-install.generated.sh Debug "$conan_dir"
    conan_toolchain="$(cat "$conan_dir/toolchain.path")"
    cmake -S . -B "$build_dir" -G Ninja \
      --fresh \
-     -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+     -DCMAKE_BUILD_TYPE=Debug \
      -DCMAKE_TOOLCHAIN_FILE="$conan_toolchain" \
      -DSERVICEGEN_FETCH_CPP_DEPENDENCIES=OFF \
      $SERVICEGEN_CPP_SANITIZER_OPTIONS
