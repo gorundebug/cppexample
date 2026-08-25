@@ -38,6 +38,7 @@ exec docker compose -f docker-compose.cmake.generated.yml run --build --rm \
      ./scripts/conan-install.generated.sh Debug "$conan_dir" \
        -s:h compiler=clang \
        -s:h compiler.version=18 \
+       -s:h compiler.cppstd=20 \
        -s:h compiler.libcxx=libstdc++11
    else
      conan_dir="build/conan-debug"
