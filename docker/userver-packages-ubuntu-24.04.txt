@@ -3,6 +3,7 @@ ccache
 clang-format
 clang-tidy
 clang
+libclang-rt-18-dev
 cmake
 cmake-format
 gdb
