@@ -33,6 +33,10 @@ exec docker compose -f docker-compose.cmake.generated.yml run --build --rm \
    build_dir="build/sanitizers/$SERVICEGEN_CPP_SANITIZER"
    conan_dir="build/conan-debug"
    ./scripts/conan-install.generated.sh Debug "$conan_dir"
+   if [[ "$SERVICEGEN_CPP_SANITIZER" == "tsan" ]]; then
+     export CC=clang
+     export CXX=clang++
+   fi
    conan_toolchain="$(cat "$conan_dir/toolchain.path")"
    cmake -S . -B "$build_dir" -G Ninja \
      --fresh \

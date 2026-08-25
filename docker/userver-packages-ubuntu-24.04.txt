@@ -2,6 +2,7 @@ build-essential
 ccache
 clang-format
 clang-tidy
+clang
 cmake
 cmake-format
 gdb
