@@ -9,15 +9,9 @@ case "$sanitizer" in
       -DSERVICEGEN_ASAN=ON
       -DSERVICEGEN_UBSAN=ON
     )
-    conan_sanitizer="Address"
-    conan_compile_flags='["-fsanitize=address,undefined","-fno-omit-frame-pointer"]'
-    conan_link_flags='["-fsanitize=address,undefined"]'
     ;;
   tsan)
     cmake_options=(-DSERVICEGEN_TSAN=ON)
-    conan_sanitizer="Thread"
-    conan_compile_flags='["-fsanitize=thread","-fno-omit-frame-pointer"]'
-    conan_link_flags='["-fsanitize=thread"]'
     ;;
   *)
     echo "unsupported sanitizer: $sanitizer" >&2
@@ -28,21 +22,13 @@ esac
 options="${cmake_options[*]}"
 exec docker compose -f docker-compose.cmake.generated.yml run --build --rm \
   -e SERVICEGEN_CPP_SANITIZER="$sanitizer" \
-  -e SERVICEGEN_CPP_SANITIZER_OPTIONS="$options" \
-  -e SERVICEGEN_CPP_CONAN_SANITIZER="$conan_sanitizer" \
-  -e SERVICEGEN_CPP_CONAN_COMPILE_FLAGS="$conan_compile_flags" \
-  -e SERVICEGEN_CPP_CONAN_LINK_FLAGS="$conan_link_flags" cpp-build \
+  -e SERVICEGEN_CPP_SANITIZER_OPTIONS="$options" cpp-build \
   /bin/bash -lc \
   'set -euo pipefail
    source scripts/configure-git-auth.generated.sh
    build_dir="build/sanitizers/$SERVICEGEN_CPP_SANITIZER"
-   conan_dir="build/conan-sanitizers/$SERVICEGEN_CPP_SANITIZER"
-   ./scripts/conan-install.generated.sh RelWithDebInfo "$conan_dir" \
-     -s:h "compiler.sanitizer=$SERVICEGEN_CPP_CONAN_SANITIZER" \
-     -c:h "tools.build:cflags=$SERVICEGEN_CPP_CONAN_COMPILE_FLAGS" \
-     -c:h "tools.build:cxxflags=$SERVICEGEN_CPP_CONAN_COMPILE_FLAGS" \
-     -c:h "tools.build:sharedlinkflags=$SERVICEGEN_CPP_CONAN_LINK_FLAGS" \
-     -c:h "tools.build:exelinkflags=$SERVICEGEN_CPP_CONAN_LINK_FLAGS"
+   conan_dir="build/conan-relwithdebinfo"
+   ./scripts/conan-install.generated.sh RelWithDebInfo "$conan_dir"
    conan_toolchain="$(cat "$conan_dir/toolchain.path")"
    cmake -S . -B "$build_dir" -G Ninja \
      --fresh \
