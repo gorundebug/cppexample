@@ -238,6 +238,7 @@ if(SERVICEGEN_ENABLE_OTLP_TRACING)
   target_link_libraries(example_order_service PRIVATE userver::otlp userver-grpc)
 endif()
 
+if(BUILD_TESTING)
 add_executable(example_order_service_typed_config
     config/config.generated.cpp)
 target_compile_features(example_order_service_typed_config PRIVATE cxx_std_20)
@@ -271,3 +272,5 @@ target_link_libraries(example_order_service_unit_tests PRIVATE
     example_order_service_api
 )
 add_google_tests(example_order_service_unit_tests)
+
+endif()

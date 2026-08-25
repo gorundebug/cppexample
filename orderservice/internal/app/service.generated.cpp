@@ -203,6 +203,7 @@ void ServiceGenerated::initStreams(const config::Config& cfg) {
 }
 
 void ServiceGenerated::initDataSinks(const config::Config& cfg) {
+  (void)cfg;
 
   connectors_.inventory_service_api_client.emplace(
       component_context_
