@@ -19,7 +19,7 @@ docker-build docker-up: export SERVICEGEN_APT_UBUNTU_SECURITY_URL := http://$(SE
 docker-build docker-up: export SERVICEGEN_APT_UBUNTU_PORTS_URL := http://$(SERVICEGEN_DEPENDENCY_PROXY_DOCKER_HOST):$(SERVICEGEN_DEPENDENCY_PROXY_PORT)/repository/apt-ubuntu-ports
 endif
 
-.PHONY: build test release-build release-test release-up lint fmt clean \
+.PHONY: build test release-build release-test asan-test tsan-test release-up lint fmt clean \
 	docker-build docker-up docker-down docker-clean help
 
 build: ## Build the standalone service with CMake
@@ -39,6 +39,12 @@ release-build: ## Build the optimized standalone service with CMake
 release-test: ## Build and test the optimized standalone service
 	@$(MAKE) release-build
 	@ctest --test-dir "$(BUILD_DIR)-release" --output-on-failure
+
+asan-test: ## Run standalone service tests with ASan and UBSan in Docker
+	@SERVICEGEN_SANITIZER_INTEGRATION=0 ./scripts/sanitizer-test.generated.sh asan
+
+tsan-test: ## Run standalone service tests with TSan in Docker
+	@SERVICEGEN_SANITIZER_INTEGRATION=0 ./scripts/sanitizer-test.generated.sh tsan
 
 release-up: release-build ## Build the optimized service
 
