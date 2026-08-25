@@ -34,6 +34,8 @@ exec docker compose -f docker-compose.cmake.generated.yml run --build --rm \
      --fresh \
      -DCMAKE_BUILD_TYPE=Debug \
      -DCMAKE_TOOLCHAIN_FILE="$conan_toolchain" \
+     -DUSERVER_SOURCE_DIR="$USERVER_SOURCE_DIR" \
+     -DSERVICELIB_SOURCE_DIR="$CPPSERVICELIB_SOURCE_DIR" \
      -DSERVICEGEN_FETCH_CPP_DEPENDENCIES=OFF \
      $SERVICEGEN_CPP_SANITIZER_OPTIONS
    cmake --build "$build_dir" --parallel
