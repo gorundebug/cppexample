@@ -8,10 +8,14 @@ case "$sanitizer" in
     cmake_options=(
       -DSERVICEGEN_ASAN=ON
       -DSERVICEGEN_UBSAN=ON
+      '-DUSERVER_SANITIZE=addr;ub'
     )
     ;;
   tsan)
-    cmake_options=(-DSERVICEGEN_TSAN=ON)
+    cmake_options=(
+      -DSERVICEGEN_TSAN=ON
+      -DUSERVER_SANITIZE=thread
+    )
     ;;
   *)
     echo "unsupported sanitizer: $sanitizer" >&2
