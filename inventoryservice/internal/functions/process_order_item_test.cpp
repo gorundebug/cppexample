@@ -1,4 +1,4 @@
-#include <userver/utest/utest.hpp>
+#include <gtest/gtest.h>
 
 #include "inventoryservice/internal/functions/process_order_item.hpp"
 
@@ -8,7 +8,7 @@ namespace {
 struct StreamContext final {};
 }  // namespace
 
-UTEST(ProcessOrderItem, CorrelatesResultsByItemId) {
+TEST(ProcessOrderItem, CorrelatesResultsByItemId) {
   ProcessOrderItem function;
   StreamContext stream;
   ProcessOrderItem::State state;

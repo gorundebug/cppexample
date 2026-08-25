@@ -1,7 +1,7 @@
 #include <optional>
 #include <utility>
 
-#include <userver/utest/utest.hpp>
+#include <gtest/gtest.h>
 
 #include "inventoryservice/internal/functions/get_inventory_item_data.hpp"
 #include "inventoryservice/internal/functions/test_stream.hpp"
@@ -21,7 +21,7 @@ struct ResultCollector final {
 
 }  // namespace
 
-UTEST(GetInventoryItemData, ReservesAvailableStockAndPreservesPrice) {
+TEST(GetInventoryItemData, ReservesAvailableStockAndPreservesPrice) {
   GetInventoryItemData function;
   ResultCollector success;
   ResultCollector failure;
@@ -40,7 +40,7 @@ UTEST(GetInventoryItemData, ReservesAvailableStockAndPreservesPrice) {
   EXPECT_DOUBLE_EQ(success.value->unit_price, 12.5);
 }
 
-UTEST(GetInventoryItemData, RoutesInsufficientStockToErrorOutput) {
+TEST(GetInventoryItemData, RoutesInsufficientStockToErrorOutput) {
   GetInventoryItemData function;
   ResultCollector success;
   ResultCollector failure;

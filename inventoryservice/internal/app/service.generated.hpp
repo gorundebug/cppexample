@@ -141,7 +141,7 @@ class ServiceGenerated
   };
   ServiceConnectors connectors_;
 
-  const userver::components::ComponentContext& component_context_;
+  [[maybe_unused]] const userver::components::ComponentContext& component_context_;
   servicelib::telemetry::userver_adapter::UserverMetrics metrics_;
   bool use_noop_metrics_{false};
   bool use_noop_tracing_{false};

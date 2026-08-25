@@ -1,7 +1,7 @@
 #include <optional>
 #include <utility>
 
-#include <userver/utest/utest.hpp>
+#include <gtest/gtest.h>
 
 #include "orderservice/internal/functions/process_order_item.hpp"
 
@@ -26,7 +26,7 @@ struct StreamContext final {
 
 }  // namespace
 
-UTEST(ProcessOrderItem, MapsRequestAndResponseWithoutLosingMetadata) {
+TEST(ProcessOrderItem, MapsRequestAndResponseWithoutLosingMetadata) {
   ProcessOrderItem function;
   ProcessOrderItem::State state;
   StreamContext stream;
@@ -59,7 +59,7 @@ UTEST(ProcessOrderItem, MapsRequestAndResponseWithoutLosingMetadata) {
   EXPECT_TRUE(stream.result->reserved);
 }
 
-UTEST(ProcessOrderItem, PublishesProcessingErrorFromFailedCall) {
+TEST(ProcessOrderItem, PublishesProcessingErrorFromFailedCall) {
   ProcessOrderItem function;
   ProcessOrderItem::State state{
       "order-1", "item-1", "SKU-001", 3, 12.5};

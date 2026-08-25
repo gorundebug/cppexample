@@ -1,7 +1,7 @@
 #include <optional>
 #include <utility>
 
-#include <userver/utest/utest.hpp>
+#include <gtest/gtest.h>
 
 #include "orderservice/internal/functions/map_to_order_state.hpp"
 #include "orderservice/internal/functions/test_stream.hpp"
@@ -18,7 +18,7 @@ struct StateCollector final {
 };
 }  // namespace
 
-UTEST(MapToOrderState, ProducesTimeoutState) {
+TEST(MapToOrderState, ProducesTimeoutState) {
   MapToOrderState function;
   StateCollector out;
   test::Stream stream;

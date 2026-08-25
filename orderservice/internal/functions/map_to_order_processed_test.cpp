@@ -1,7 +1,7 @@
 #include <optional>
 #include <utility>
 
-#include <userver/utest/utest.hpp>
+#include <gtest/gtest.h>
 
 #include "orderservice/internal/functions/map_to_order_processed.hpp"
 #include "orderservice/internal/functions/test_stream.hpp"
@@ -18,7 +18,7 @@ struct EventCollector final {
 };
 }  // namespace
 
-UTEST(MapToOrderProcessed, ProducesEvent) {
+TEST(MapToOrderProcessed, ProducesEvent) {
   MapToOrderProcessed function;
   EventCollector out;
   test::Stream stream;

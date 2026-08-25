@@ -1,7 +1,7 @@
 #include <utility>
 #include <vector>
 
-#include <userver/utest/utest.hpp>
+#include <gtest/gtest.h>
 
 #include "orderservice/internal/functions/process_order_items.hpp"
 #include "orderservice/internal/functions/test_stream.hpp"
@@ -18,7 +18,7 @@ struct ItemCollector final {
 };
 }  // namespace
 
-UTEST(ProcessOrderItems, EmitsEveryItemWithParentOrderId) {
+TEST(ProcessOrderItems, EmitsEveryItemWithParentOrderId) {
   ProcessOrderItems function;
   ItemCollector out;
   test::Stream stream;

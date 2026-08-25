@@ -1,7 +1,7 @@
 #include <optional>
 #include <utility>
 
-#include <userver/utest/utest.hpp>
+#include <gtest/gtest.h>
 
 #include "orderservice/internal/functions/map_order_item_result_to_order_state.hpp"
 #include "orderservice/internal/functions/test_stream.hpp"
@@ -18,7 +18,7 @@ struct StateCollector final {
 };
 }  // namespace
 
-UTEST(MapOrderItemResultToOrderState, MapsReservationResult) {
+TEST(MapOrderItemResultToOrderState, MapsReservationResult) {
   MapOrderItemResultToOrderState function;
   StateCollector out;
   test::Stream stream;

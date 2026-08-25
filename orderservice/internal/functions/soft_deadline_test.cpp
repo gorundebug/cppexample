@@ -1,13 +1,13 @@
 #include <chrono>
 
-#include <userver/utest/utest.hpp>
+#include <gtest/gtest.h>
 
 #include "orderservice/internal/functions/soft_deadline.hpp"
 #include "orderservice/internal/functions/test_stream.hpp"
 
 namespace example::order_service::functions {
 
-UTEST(SoftDeadline, UsesConfiguredMarginWithoutRequestDeadline) {
+TEST(SoftDeadline, UsesConfiguredMarginWithoutRequestDeadline) {
   using namespace std::chrono_literals;
   SoftDeadline function{125ms};
   test::Stream stream;
@@ -18,7 +18,7 @@ UTEST(SoftDeadline, UsesConfiguredMarginWithoutRequestDeadline) {
   EXPECT_EQ(delay, 125ms);
 }
 
-UTEST(SoftDeadline, FiresBeforeRequestDeadline) {
+TEST(SoftDeadline, FiresBeforeRequestDeadline) {
   using namespace std::chrono_literals;
   SoftDeadline function{100ms};
   test::Stream stream;
