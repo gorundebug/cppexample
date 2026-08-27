@@ -30,18 +30,18 @@ exec docker compose -f docker-compose.cmake.generated.yml run --build --rm \
   /bin/bash -lc \
   'set -euo pipefail
    source scripts/configure-git-auth.generated.sh
-   build_dir="build/sanitizers/$CPP_SANITIZER"
+   build_dir="/workspace/build/sanitizers/$CPP_SANITIZER"
    if [[ "$CPP_SANITIZER" == "tsan" ]]; then
      export CC=clang
      export CXX=clang++
-     conan_dir="build/conan-tsan"
+     conan_dir="/workspace/build/conan-tsan"
      ./scripts/conan-install.generated.sh Debug "$conan_dir" \
        -s:h compiler=clang \
        -s:h compiler.version=18 \
        -s:h compiler.cppstd=20 \
        -s:h compiler.libcxx=libstdc++11
    else
-     conan_dir="build/conan-debug"
+     conan_dir="/workspace/build/conan-debug"
      ./scripts/conan-install.generated.sh Debug "$conan_dir"
    fi
    conan_toolchain="$(cat "$conan_dir/toolchain.path")"
