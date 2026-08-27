@@ -21,3 +21,4 @@ services:
 volumes:
   cpp-dev-cmake-build:
     name: cppexample_orderservice_cpp-cmake-build
+    external: true

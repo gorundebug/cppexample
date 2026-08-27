@@ -119,8 +119,11 @@ volumes:
   rust-dev-cargo-git:
   cpp-dev-cmake-build-analyticsservice:
     name: cppexample_analyticsservice_cpp-cmake-build
+    external: true
   go-dev-worktree-automationservice:
   cpp-dev-cmake-build-inventoryservice:
     name: cppexample_inventoryservice_cpp-cmake-build
+    external: true
   cpp-dev-cmake-build-orderservice:
     name: cppexample_orderservice_cpp-cmake-build
+    external: true

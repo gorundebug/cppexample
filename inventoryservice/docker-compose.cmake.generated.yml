@@ -80,5 +80,6 @@ services:
 
 volumes:
   cpp-cmake-build:
+    name: cppexample_inventoryservice_cpp-cmake-build
   cpp-ccache:
   cpp-conan2:
