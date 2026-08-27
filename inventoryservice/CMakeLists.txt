@@ -45,9 +45,9 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
   set(USERVER_SOURCE_DIR "" CACHE PATH
       "Path to a userver source checkout")
   set(_servicegen_modules_root_default "${CMAKE_CURRENT_SOURCE_DIR}/modules")
-  set(SERVICEGEN_MODULES_ROOT "${_servicegen_modules_root_default}" CACHE PATH
+  set(MODULES_ROOT "${_servicegen_modules_root_default}" CACHE PATH
       "Path containing local generated contract modules")
-  option(SERVICEGEN_FETCH_CPP_DEPENDENCIES
+  option(FETCH_CPP_DEPENDENCIES
          "Fetch missing pinned servicelib, userver, and contract modules" ON)
   set(SERVICELIB_REPOSITORY "https://github.com/gorundebug/cppservicelib.git" CACHE STRING
       "Standalone cppservicelib repository")
@@ -57,7 +57,7 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
       "Standalone userver repository")
   set(USERVER_REVISION "c9f77729c0edce7e423def2d4a4450aa7fc9d259" CACHE STRING
       "Pinned userver revision")
-  if(SERVICEGEN_FETCH_CPP_DEPENDENCIES)
+  if(FETCH_CPP_DEPENDENCIES)
     include(FetchContent)
     if(NOT USERVER_SOURCE_DIR)
       if(DEFINED ENV{DEPENDENCY_GITHUB_RAW_URL} AND
@@ -142,21 +142,21 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
   if(NOT TARGET userver-core)
     message(FATAL_ERROR
         "Standalone service requires userver. Set USERVER_SOURCE_DIR, install "
-        "userver, or enable SERVICEGEN_FETCH_CPP_DEPENDENCIES.")
+        "userver, or enable FETCH_CPP_DEPENDENCIES.")
   endif()
   if(NOT TARGET servicelib::servicelib)
     message(FATAL_ERROR
         "Standalone service requires servicelib. Set SERVICELIB_SOURCE_DIR, "
-        "install servicelib, or enable SERVICEGEN_FETCH_CPP_DEPENDENCIES.")
+        "install servicelib, or enable FETCH_CPP_DEPENDENCIES.")
   endif()
 
   if(NOT TARGET example_inventory_service_api)
-    set(_servicegen_module_source "${SERVICEGEN_MODULES_ROOT}/inventory_service_api")
+    set(_servicegen_module_source "${MODULES_ROOT}/inventory_service_api")
     if(EXISTS "${_servicegen_module_source}/CMakeLists.txt")
       add_subdirectory(
           "${_servicegen_module_source}"
           "${CMAKE_BINARY_DIR}/_modules/inventory_service_api")
-    elseif(SERVICEGEN_FETCH_CPP_DEPENDENCIES)
+    elseif(FETCH_CPP_DEPENDENCIES)
       include(FetchContent)
       FetchContent_Declare(servicegen_module_inventory_service_api
           GIT_REPOSITORY "https://github.com/gorundebug/cppexample-inventory-service-api.git"
@@ -166,16 +166,16 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     else()
       message(FATAL_ERROR
           "Contract module inventory_service_api was not found under "
-          "SERVICEGEN_MODULES_ROOT=${SERVICEGEN_MODULES_ROOT}.")
+          "MODULES_ROOT=${MODULES_ROOT}.")
     endif()
   endif()
   if(NOT TARGET example_model)
-    set(_servicegen_module_source "${SERVICEGEN_MODULES_ROOT}/model")
+    set(_servicegen_module_source "${MODULES_ROOT}/model")
     if(EXISTS "${_servicegen_module_source}/CMakeLists.txt")
       add_subdirectory(
           "${_servicegen_module_source}"
           "${CMAKE_BINARY_DIR}/_modules/model")
-    elseif(SERVICEGEN_FETCH_CPP_DEPENDENCIES)
+    elseif(FETCH_CPP_DEPENDENCIES)
       include(FetchContent)
       FetchContent_Declare(servicegen_module_model
           GIT_REPOSITORY "https://github.com/gorundebug/cppexample-model.git"
@@ -185,7 +185,7 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     else()
       message(FATAL_ERROR
           "Contract module model was not found under "
-          "SERVICEGEN_MODULES_ROOT=${SERVICEGEN_MODULES_ROOT}.")
+          "MODULES_ROOT=${MODULES_ROOT}.")
     endif()
   endif()
 endif()

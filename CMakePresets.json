@@ -13,7 +13,7 @@
       "binaryDir": "${sourceDir}/build/host",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "SERVICEGEN_FETCH_CPP_DEPENDENCIES": "ON",
+        "FETCH_CPP_DEPENDENCIES": "ON",
         "SERVICELIB_SOURCE_DIR": "$env{SERVICELIB_SOURCE_DIR}",
         "USERVER_SOURCE_DIR": "$env{USERVER_SOURCE_DIR}"
       }
@@ -25,7 +25,7 @@
       "binaryDir": "${sourceDir}/build/host",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
-        "SERVICEGEN_FETCH_CPP_DEPENDENCIES": "ON",
+        "FETCH_CPP_DEPENDENCIES": "ON",
         "SERVICELIB_SOURCE_DIR": "$env{SERVICELIB_SOURCE_DIR}",
         "USERVER_SOURCE_DIR": "$env{USERVER_SOURCE_DIR}"
       }
@@ -37,7 +37,7 @@
       "binaryDir": "/workspace/build",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "SERVICEGEN_FETCH_CPP_DEPENDENCIES": "OFF",
+        "FETCH_CPP_DEPENDENCIES": "OFF",
         "SERVICELIB_SOURCE_DIR": "$env{SERVICELIB_SOURCE_DIR}",
         "USERVER_SOURCE_DIR": "$env{USERVER_SOURCE_DIR}"
       }
@@ -49,7 +49,7 @@
       "binaryDir": "/workspace/build",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
-        "SERVICEGEN_FETCH_CPP_DEPENDENCIES": "OFF",
+        "FETCH_CPP_DEPENDENCIES": "OFF",
         "SERVICELIB_SOURCE_DIR": "$env{SERVICELIB_SOURCE_DIR}",
         "USERVER_SOURCE_DIR": "$env{USERVER_SOURCE_DIR}"
       }

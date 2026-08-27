@@ -43,7 +43,7 @@ set(SERVICELIB_SOURCE_DIR "" CACHE PATH
     "Path to a servicelib source checkout")
 set(USERVER_SOURCE_DIR "" CACHE PATH
     "Path to a userver source checkout")
-option(SERVICEGEN_FETCH_CPP_DEPENDENCIES
+option(FETCH_CPP_DEPENDENCIES
        "Fetch missing pinned servicelib and userver source trees" OFF)
 set(SERVICELIB_REPOSITORY
     "https://github.com/gorundebug/cppservicelib.git" CACHE STRING
@@ -57,7 +57,7 @@ set(USERVER_REPOSITORY
 set(USERVER_REVISION
     "c9f77729c0edce7e423def2d4a4450aa7fc9d259" CACHE STRING
     "Pinned userver revision")
-if(SERVICEGEN_FETCH_CPP_DEPENDENCIES)
+if(FETCH_CPP_DEPENDENCIES)
   include(FetchContent)
   if(NOT USERVER_SOURCE_DIR)
     FetchContent_Declare(servicegen_userver

@@ -22,7 +22,7 @@ exec docker compose -f docker-compose.cmake.generated.yml run --build --rm \
    conan_toolchain="$(cat "/workspace/build/conan-${build_type,,}/toolchain.path")" &&
    ./scripts/run_with_progress.generated.sh "Configure $SERVICEGEN_CPP_CMAKE_PRESET" cmake --fresh --preset "$SERVICEGEN_CPP_CMAKE_PRESET" \
      -DCMAKE_TOOLCHAIN_FILE="$conan_toolchain" \
-     -DSERVICEGEN_FETCH_CPP_DEPENDENCIES="${SERVICEGEN_FETCH_CPP_DEPENDENCIES:-OFF}" \
+     -DFETCH_CPP_DEPENDENCIES="${FETCH_CPP_DEPENDENCIES:-OFF}" \
      -DUSERVER_LTO="${USERVER_LTO:-OFF}" &&
    ./scripts/run_with_progress.generated.sh "Build $SERVICEGEN_CPP_CMAKE_PRESET" cmake --build --preset "$SERVICEGEN_CPP_CMAKE_PRESET" &&
    ./scripts/run_with_progress.generated.sh "Test $SERVICEGEN_CPP_CMAKE_PRESET" ctest --preset "$SERVICEGEN_CPP_CMAKE_PRESET"'

@@ -114,7 +114,7 @@ RUN --mount=type=cache,id=cppexample-runtime-build-v2-${TARGETARCH}-${SERVICEGEN
     && CCACHE_DIR=/ccache ./scripts/run_with_progress.generated.sh "Release configure" cmake --preset docker-release \
       --fresh \
       -DCMAKE_TOOLCHAIN_FILE="${conan_toolchain}" \
-      -DSERVICEGEN_FETCH_CPP_DEPENDENCIES=OFF \
+      -DFETCH_CPP_DEPENDENCIES=OFF \
       -DBUILD_TESTING=OFF \
       -DUSERVER_BUILD_TESTS=OFF \
       -DUSERVER_FEATURE_UTEST=OFF \

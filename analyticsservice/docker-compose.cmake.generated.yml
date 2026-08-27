@@ -40,7 +40,7 @@ services:
       GIT_CONFIG_VALUE_0: ${GIT_CONFIG_VALUE_0:-}
       GIT_CONFIG_KEY_1: ${GIT_CONFIG_KEY_1:-}
       GIT_CONFIG_VALUE_1: ${GIT_CONFIG_VALUE_1:-}
-      SERVICEGEN_FETCH_CPP_DEPENDENCIES: ${SERVICEGEN_FETCH_CPP_DEPENDENCIES:-ON}
+      FETCH_CPP_DEPENDENCIES: ${FETCH_CPP_DEPENDENCIES:-ON}
       USERVER_LTO: ${USERVER_LTO:-OFF}
     volumes:
       - .:/workspace
@@ -50,7 +50,7 @@ services:
     command:
       - /bin/bash
       - -lc
-      - source scripts/configure-git-auth.generated.sh && ./scripts/conan-install.generated.sh Debug /workspace/build/conan-debug && conan_toolchain="$(cat /workspace/build/conan-debug/toolchain.path)" && ./scripts/run_with_progress.generated.sh "Debug configure" cmake --fresh --preset docker-debug -DCMAKE_TOOLCHAIN_FILE="$${conan_toolchain}" -DSERVICEGEN_FETCH_CPP_DEPENDENCIES="${SERVICEGEN_FETCH_CPP_DEPENDENCIES:-ON}" && ./scripts/run_with_progress.generated.sh "Debug build" cmake --build --preset docker-debug && ./scripts/run_with_progress.generated.sh "Test suite" ctest --preset docker-debug
+      - source scripts/configure-git-auth.generated.sh && ./scripts/conan-install.generated.sh Debug /workspace/build/conan-debug && conan_toolchain="$(cat /workspace/build/conan-debug/toolchain.path)" && ./scripts/run_with_progress.generated.sh "Debug configure" cmake --fresh --preset docker-debug -DCMAKE_TOOLCHAIN_FILE="$${conan_toolchain}" -DFETCH_CPP_DEPENDENCIES="${FETCH_CPP_DEPENDENCIES:-ON}" && ./scripts/run_with_progress.generated.sh "Debug build" cmake --build --preset docker-debug && ./scripts/run_with_progress.generated.sh "Test suite" ctest --preset docker-debug
 
   analyticsservice-runtime:
     image: cppexample-analyticsservice

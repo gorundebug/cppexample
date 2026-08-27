@@ -2,7 +2,7 @@
 
 .DEFAULT_GOAL := build
 
-export SERVICEGEN_FETCH_CPP_DEPENDENCIES := ON
+export FETCH_CPP_DEPENDENCIES := ON
 BUILD_DIR ?= build
 STANDALONE_COMPOSE := $(if $(wildcard docker-compose.yml),docker-compose.yml,docker-compose.generated.yml)
 STANDALONE_DEV_COMPOSE := $(if $(wildcard docker-compose.dev.yml),docker-compose.dev.yml,docker-compose.dev.generated.yml)
@@ -10,7 +10,8 @@ DEPENDENCY_DOCKER_TARGETS := docker-build docker-up docker-build-dev docker-up-d
 include dependency-proxy.generated.mk
 LOCAL_MODULE_CMAKE_ARG :=
 ifeq ($(strip $(USE_LOCAL_MODULES)),1)
-LOCAL_MODULE_CMAKE_ARG := -DSERVICEGEN_MODULES_ROOT="$(abspath ..)"
+export FETCH_CPP_DEPENDENCIES := OFF
+LOCAL_MODULE_CMAKE_ARG := -DMODULES_ROOT="$(abspath ..)"
 export MODULE_MODEL_SOURCE_CONTEXT := ../model
 endif
 
@@ -25,7 +26,7 @@ endif
 build: ## Build the standalone service with CMake
 	@cmake -S . -B "$(BUILD_DIR)" -G Ninja -DCMAKE_BUILD_TYPE=Debug \
 		$(LOCAL_MODULE_CMAKE_ARG) \
-		-DSERVICEGEN_FETCH_CPP_DEPENDENCIES="$(SERVICEGEN_FETCH_CPP_DEPENDENCIES)"
+		-DFETCH_CPP_DEPENDENCIES="$(FETCH_CPP_DEPENDENCIES)"
 	@cmake --build "$(BUILD_DIR)" --parallel
 
 test: ## Build and run all service tests
@@ -35,7 +36,7 @@ test: ## Build and run all service tests
 release-build: ## Build the optimized standalone service with CMake
 	@cmake -S . -B "$(BUILD_DIR)-release" -G Ninja -DCMAKE_BUILD_TYPE=Release \
 		$(LOCAL_MODULE_CMAKE_ARG) \
-		-DSERVICEGEN_FETCH_CPP_DEPENDENCIES="$(SERVICEGEN_FETCH_CPP_DEPENDENCIES)"
+		-DFETCH_CPP_DEPENDENCIES="$(FETCH_CPP_DEPENDENCIES)"
 	@cmake --build "$(BUILD_DIR)-release" --parallel
 
 release-test: ## Build and test the optimized standalone service
