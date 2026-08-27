@@ -4,7 +4,7 @@ services:
     working_dir: /workspace
     command:
       - /bin/sh
-      - -lc
+      - -c
       - |
         if [ "$${DEBUG:-0}" = "1" ]; then
           exec gdbserver :2345 /workspace/build/example_order_service --config /workspace/static_config.yaml --config_vars /workspace/config/config_vars.integration.yaml
