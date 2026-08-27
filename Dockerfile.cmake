@@ -102,9 +102,8 @@ COPY . /workspace
 RUN --mount=type=cache,id=cppexample-runtime-build-v2-${TARGETARCH}-${SERVICEGEN_EXAMPLE_PROFILE},target=/workspace/build,sharing=locked \
     --mount=type=cache,id=cppexample-runtime-ccache-${TARGETARCH},target=/ccache \
     --mount=type=cache,id=servicegen-conan2-${TARGETARCH},target=/conan,sharing=locked \
-    CPPSERVICELIB_BUILD_TESTS=False \
-      ./scripts/run_with_progress.generated.sh "Conan Release install" \
-        ./scripts/conan-install.generated.sh Release /workspace/build/conan-release \
+    ./scripts/run_with_progress.generated.sh "Conan Release install" \
+      ./scripts/conan-install.generated.sh Release /workspace/build/conan-release \
     && conan_toolchain="$(cat /workspace/build/conan-release/toolchain.path)" \
     && CCACHE_DIR=/ccache ./scripts/run_with_progress.generated.sh "Release configure" cmake --preset docker-release \
       --fresh \
