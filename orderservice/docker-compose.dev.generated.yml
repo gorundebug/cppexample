@@ -1,17 +1,17 @@
 services:
   orderservice:
     image: orderservice-cpp-build
-    working_dir: /workspace
+    working_dir: /workspace/source
     command:
       - /bin/sh
       - -c
       - |
         if [ "$${DEBUG:-0}" = "1" ]; then
-          exec gdbserver :2345 /workspace/build/example_order_service --config /workspace/static_config.yaml --config_vars /workspace/config/config_vars.integration.yaml
+          exec gdbserver :2345 /workspace/build/example_order_service --config /workspace/source/static_config.yaml --config_vars /workspace/source/config/config_vars.integration.yaml
         fi
-        exec /workspace/build/example_order_service --config /workspace/static_config.yaml --config_vars /workspace/config/config_vars.integration.yaml
+        exec /workspace/build/example_order_service --config /workspace/source/static_config.yaml --config_vars /workspace/source/config/config_vars.integration.yaml
     volumes:
-      - .:/workspace:ro
+      - .:/workspace/source:ro
       - cpp-dev-cmake-build:/workspace/build
     security_opt:
       - seccomp:unconfined

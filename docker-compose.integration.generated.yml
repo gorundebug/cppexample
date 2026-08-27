@@ -1,15 +1,15 @@
 services:
   analyticsservice:
     image: cppexample-cpp-build
-    working_dir: /workspace/analyticsservice
+    working_dir: /workspace/source/analyticsservice
     command:
       - /workspace/build/analyticsservice/example_analytics_service
       - --config
-      - /workspace/analyticsservice/static_config.yaml
+      - /workspace/source/analyticsservice/static_config.yaml
       - --config_vars
-      - /workspace/analyticsservice/config/config_vars.integration.yaml
+      - /workspace/source/analyticsservice/config/config_vars.integration.yaml
     volumes:
-      - .:/workspace:ro
+      - .:/workspace/source:ro
       - cpp-cmake-build:/workspace/build
     environment:
       - 'SECDIST_CONFIG={"kafka_settings":{"kafka-consumer-order-events":{"brokers":"redpanda:9092"}}}'
@@ -21,15 +21,15 @@ services:
     stop_grace_period: 30000ms
   inventoryservice:
     image: cppexample-cpp-build
-    working_dir: /workspace/inventoryservice
+    working_dir: /workspace/source/inventoryservice
     command:
       - /workspace/build/inventoryservice/example_inventory_service
       - --config
-      - /workspace/inventoryservice/static_config.yaml
+      - /workspace/source/inventoryservice/static_config.yaml
       - --config_vars
-      - /workspace/inventoryservice/config/config_vars.integration.yaml
+      - /workspace/source/inventoryservice/config/config_vars.integration.yaml
     volumes:
-      - .:/workspace:ro
+      - .:/workspace/source:ro
       - cpp-cmake-build:/workspace/build
 
     depends_on:
@@ -39,15 +39,15 @@ services:
     stop_grace_period: 30000ms
   orderservice:
     image: cppexample-cpp-build
-    working_dir: /workspace/orderservice
+    working_dir: /workspace/source/orderservice
     command:
       - /workspace/build/orderservice/example_order_service
       - --config
-      - /workspace/orderservice/static_config.yaml
+      - /workspace/source/orderservice/static_config.yaml
       - --config_vars
-      - /workspace/orderservice/config/config_vars.integration.yaml
+      - /workspace/source/orderservice/config/config_vars.integration.yaml
     volumes:
-      - .:/workspace:ro
+      - .:/workspace/source:ro
       - cpp-cmake-build:/workspace/build
 
     depends_on:
