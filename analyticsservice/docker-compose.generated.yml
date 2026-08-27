@@ -10,7 +10,7 @@ services:
     stop_grace_period: 30000ms
     restart: unless-stopped
     environment:
-      - DEBUG=${ANALYTICS_SERVICE_DEBUG:-0}
+      - DEBUG=${DEBUG:-0}
       - 'SECDIST_CONFIG=${SECDIST_CONFIG:-{"kafka_settings":{"kafka-consumer-order-events":{"brokers":"redpanda:9092"}}}}'
     ports:
       - "9093:9093"
