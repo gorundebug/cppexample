@@ -1,13 +1,14 @@
 #pragma once
 
-#include <cstdint>
-#include <exception>
 #include <memory>
-#include <optional>
+
+#include <exception>
 #include <stdexcept>
 #include <string>
 #include <utility>
 #include <variant>
+
+#include <userver/formats/json/serialize.hpp>
 
 #include <servicelib/runtime/common.hpp>
 #include <servicelib/runtime/config/endpoint_types.hpp>
@@ -29,15 +30,28 @@ struct OrderProcessedEndpointSource final {
   }
 
   void consumeMessage(
-      servicelib::MessageContext, auto&, State&,
-      const servicelib::datasource::kafka::ConsumerMessage&, auto) const {
-    throw std::logic_error("OrderProcessedEndpointSource is not implemented");
+      servicelib::MessageContext context, auto& stream, State&,
+      const servicelib::datasource::kafka::ConsumerMessage& message,
+      auto result) const {
+    auto value = userver::formats::json::FromString(message.value())
+                     .template As<
+                         example::model::types::OrderProcessed>();
+    const auto message_id = value.order_id;
+    result.setResultCallback(
+        message_id,
+        [message, result](servicelib::MessageContext, auto&, State&,
+                          const auto&) mutable {
+          message.commit();
+          result.done();
+          return true;
+        });
+    stream.collect(std::move(context), std::move(value));
   }
 
   std::string getMessageId(
       servicelib::MessageContext, auto&, State&,
-      const example::model::types::OrderProcessed&) const {
-    return {};
+      const example::model::types::OrderProcessed& value) const {
+    return value.order_id;
   }
 
   void endRequest(
@@ -48,9 +62,7 @@ struct OrderProcessedEndpointSource final {
 inline std::unique_ptr<OrderProcessedEndpointSource> MakeOrderProcessedEndpointSource(
     servicelib::Context context, servicelib::IServiceEnvironment& environment,
     const servicelib::config::KafkaEndpointConfig& config) {
-  (void)context;
-  (void)config;
-  (void)environment;
+  (void)context; (void)environment; (void)config;
   return std::make_unique<OrderProcessedEndpointSource>();
 }
 
