@@ -25,8 +25,8 @@
 #include <servicelib/datasource/kafka/userver.hpp>
 #include <userver/kafka/consumer_component.hpp>
 
-#include <analyticsservice/internal/functions/count_order_processed.hpp>
-#include <analyticsservice/internal/functions/order_processed_endpoint.hpp>
+#include <analyticsservice/internal/functions/analytics/count_order_processed.hpp>
+#include <analyticsservice/internal/functions/endpoint/order_processed_endpoint_source.hpp>
 #include <model/include/example/model/types/order_processed.hpp>
 
 
@@ -60,13 +60,13 @@ class ServiceGenerated
     std::function<std::unique_ptr<functions::CountOrderProcessed>(
         servicelib::Context, servicelib::IServiceEnvironment&,
         const servicelib::config::ProcessStreamConfig&)> count_order_processed;
-    std::function<std::unique_ptr<functions::OrderProcessedEndpoint>(
+    std::function<std::unique_ptr<functions::OrderProcessedEndpointSource>(
         servicelib::Context, servicelib::IServiceEnvironment&,
-        const servicelib::config::KafkaEndpointConfig&)> order_processed_endpoint;
+        const servicelib::config::KafkaEndpointConfig&)> order_processed_endpoint_source;
   };
   struct ServiceFunctions final {
     std::unique_ptr<functions::CountOrderProcessed> count_order_processed;
-    std::unique_ptr<functions::OrderProcessedEndpoint> order_processed_endpoint;
+    std::unique_ptr<functions::OrderProcessedEndpointSource> order_processed_endpoint_source;
   };
 
   ServiceMakers makers_;
@@ -111,7 +111,7 @@ class ServiceGenerated
 
   using ConsumeOrderProcessedKafkaSourceEndpoint =
       servicelib::datasource::kafka::Endpoint<
-          example::model::types::OrderProcessed, example::model::types::OrderProcessed, functions::OrderProcessedEndpoint, std::exception_ptr>;
+          example::model::types::OrderProcessed, example::model::types::OrderProcessed, functions::OrderProcessedEndpointSource, std::exception_ptr>;
   struct ConsumeOrderProcessedKafkaConsumerOwner final {
     ConsumeOrderProcessedKafkaConsumerOwner(
         userver::kafka::ConsumerComponent& component, std::string topic)

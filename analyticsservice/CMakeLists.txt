@@ -193,7 +193,7 @@ add_executable(example_analytics_service
     cmd/service/main.cpp
     internal/app/service.generated.cpp
     internal/app/service.cpp
-    internal/functions/count_order_processed.cpp
+    internal/functions/analytics/count_order_processed.cpp
 )
 
 target_compile_features(example_analytics_service PRIVATE cxx_std_20)
@@ -222,8 +222,8 @@ add_test(NAME example_analytics_service_typed_config
     COMMAND example_analytics_service_typed_config)
 
 add_executable(example_analytics_service_unit_tests
-    internal/functions/count_order_processed_test.cpp
-    internal/functions/order_processed_endpoint_test.cpp
+    internal/functions/analytics/count_order_processed_test.cpp
+    internal/functions/endpoint/order_processed_endpoint_source_test.cpp
 )
 target_compile_features(example_analytics_service_unit_tests PRIVATE cxx_std_20)
 target_include_directories(example_analytics_service_unit_tests PRIVATE
