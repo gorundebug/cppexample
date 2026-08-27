@@ -9,7 +9,7 @@ services:
       - --config_vars
       - /workspace/analyticsservice/config/config_vars.integration.yaml
     volumes:
-      - .:/workspace
+      - .:/workspace:ro
       - cpp-cmake-build:/workspace/build
     environment:
       - 'SECDIST_CONFIG={"kafka_settings":{"kafka-consumer-order-events":{"brokers":"redpanda:9092"}}}'
@@ -29,7 +29,7 @@ services:
       - --config_vars
       - /workspace/inventoryservice/config/config_vars.integration.yaml
     volumes:
-      - .:/workspace
+      - .:/workspace:ro
       - cpp-cmake-build:/workspace/build
 
     depends_on:
@@ -47,7 +47,7 @@ services:
       - --config_vars
       - /workspace/orderservice/config/config_vars.integration.yaml
     volumes:
-      - .:/workspace
+      - .:/workspace:ro
       - cpp-cmake-build:/workspace/build
 
     depends_on:

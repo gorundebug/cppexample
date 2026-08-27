@@ -43,7 +43,7 @@ services:
       ENABLE_OTLP_TRACING: ${ENABLE_OTLP_TRACING:-OFF}
       USERVER_LTO: ${USERVER_LTO:-OFF}
     volumes:
-      - .:/workspace
+      - .:/workspace:ro
       - cpp-cmake-build:/workspace/build
       - cpp-ccache:/ccache
       - ${DEPENDENCY_CONAN_HOME:-cpp-conan2}:/conan

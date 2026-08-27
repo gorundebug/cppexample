@@ -43,7 +43,7 @@ services:
       FETCH_CPP_DEPENDENCIES: ${FETCH_CPP_DEPENDENCIES:-ON}
       USERVER_LTO: ${USERVER_LTO:-OFF}
     volumes:
-      - .:/workspace
+      - .:/workspace:ro
       - cpp-cmake-build:/workspace/build
       - cpp-ccache:/ccache
       - ${DEPENDENCY_CONAN_HOME:-cpp-conan2}:/conan
