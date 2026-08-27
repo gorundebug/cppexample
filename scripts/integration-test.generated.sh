@@ -21,6 +21,6 @@ cleanup() {
 trap cleanup EXIT
 
 docker compose -f docker-compose.cmake.generated.yml run --build --rm \
-  -e SERVICEGEN_CPP_CMAKE_PRESET="$preset" cpp-build \
+  -e CPP_CMAKE_PRESET="$preset" cpp-build \
   /bin/bash -lc \
-  'ctest --preset "$SERVICEGEN_CPP_CMAKE_PRESET" -L integration --no-tests=ignore'
+  'ctest --preset "$CPP_CMAKE_PRESET" -L integration --no-tests=ignore'

@@ -5,7 +5,7 @@
 #include <userver/components/minimal_server_component_list.hpp>
 #include <userver/server/middlewares/configuration.hpp>
 #include <userver/testsuite/testsuite_support.hpp>
-#ifdef SERVICEGEN_ENABLE_OTLP_TRACING
+#ifdef ENABLE_OTLP_TRACING
 #include <userver/otlp/logs/component.hpp>
 #include <userver/ugrpc/client/client_factory_component.hpp>
 #include <userver/ugrpc/client/component_list.hpp>
@@ -48,7 +48,7 @@ int main(int argc, char* argv[]) {
       userver::components::MinimalServerComponentList()
           .Append<DisabledServerMiddlewarePipeline>()
           .Append<userver::components::TestsuiteSupport>()
-#ifdef SERVICEGEN_ENABLE_OTLP_TRACING
+#ifdef ENABLE_OTLP_TRACING
           .Append<userver::ugrpc::client::ClientFactoryComponent>(
               "grpc-otlp-factory")
 

@@ -6,14 +6,14 @@ sanitizer="${1:?expected asan or tsan}"
 case "$sanitizer" in
   asan)
     cmake_options=(
-      -DSERVICEGEN_ASAN=ON
-      -DSERVICEGEN_UBSAN=ON
+      -DENABLE_ASAN=ON
+      -DENABLE_UBSAN=ON
       '-DUSERVER_SANITIZE=addr;ub'
     )
     ;;
   tsan)
     cmake_options=(
-      -DSERVICEGEN_TSAN=ON
+      -DENABLE_TSAN=ON
       -DUSERVER_SANITIZE=thread
     )
     ;;
@@ -25,13 +25,13 @@ esac
 
 options="${cmake_options[*]}"
 exec docker compose -f docker-compose.cmake.generated.yml run --build --rm \
-  -e SERVICEGEN_CPP_SANITIZER="$sanitizer" \
-  -e SERVICEGEN_CPP_SANITIZER_OPTIONS="$options" cpp-build \
+  -e CPP_SANITIZER="$sanitizer" \
+  -e CPP_SANITIZER_OPTIONS="$options" cpp-build \
   /bin/bash -lc \
   'set -euo pipefail
    source scripts/configure-git-auth.generated.sh
-   build_dir="build/sanitizers/$SERVICEGEN_CPP_SANITIZER"
-   if [[ "$SERVICEGEN_CPP_SANITIZER" == "tsan" ]]; then
+   build_dir="build/sanitizers/$CPP_SANITIZER"
+   if [[ "$CPP_SANITIZER" == "tsan" ]]; then
      export CC=clang
      export CXX=clang++
      conan_dir="build/conan-tsan"
@@ -52,9 +52,9 @@ exec docker compose -f docker-compose.cmake.generated.yml run --build --rm \
      -DUSERVER_SOURCE_DIR="$USERVER_SOURCE_DIR" \
      -DSERVICELIB_SOURCE_DIR="$CPPSERVICELIB_SOURCE_DIR" \
      -DFETCH_CPP_DEPENDENCIES=OFF \
-     $SERVICEGEN_CPP_SANITIZER_OPTIONS
+     $CPP_SANITIZER_OPTIONS
    cmake --build "$build_dir" --parallel
-   case "$SERVICEGEN_CPP_SANITIZER" in
+   case "$CPP_SANITIZER" in
      asan)
        ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 \
        UBSAN_OPTIONS=halt_on_error=1 \

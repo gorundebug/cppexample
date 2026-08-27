@@ -46,10 +46,10 @@ release-test: ## Build and test the optimized standalone service
 	@ctest --test-dir "$(BUILD_DIR)-release" --output-on-failure
 
 asan-test: ## Run standalone service tests with ASan and UBSan in Docker
-	@SERVICEGEN_SANITIZER_INTEGRATION=0 ./scripts/sanitizer-test.generated.sh asan
+	@SANITIZER_INTEGRATION=0 ./scripts/sanitizer-test.generated.sh asan
 
 tsan-test: ## Run standalone service tests with TSan in Docker
-	@SERVICEGEN_SANITIZER_INTEGRATION=0 ./scripts/sanitizer-test.generated.sh tsan
+	@SANITIZER_INTEGRATION=0 ./scripts/sanitizer-test.generated.sh tsan
 
 release-up: release-build ## Build the optimized service
 

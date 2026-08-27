@@ -96,7 +96,7 @@ ENV USERVER_SOURCE_DIR=/opt/userver
 FROM development AS runtime-builder
 
 ARG USERVER_LTO=ON
-ARG SERVICEGEN_RUNTIME_STRIP=ON
+ARG RUNTIME_STRIP=ON
 ARG SERVICEGEN_EXAMPLE_PROFILE=function-call
 COPY . /workspace
 RUN --mount=type=cache,id=cppexample-runtime-build-v2-${TARGETARCH}-${SERVICEGEN_EXAMPLE_PROFILE},target=/workspace/build,sharing=locked \
@@ -123,7 +123,7 @@ RUN --mount=type=cache,id=cppexample-runtime-build-v2-${TARGETARCH}-${SERVICEGEN
     && cp /workspace/build/inventoryservice/example_inventory_service /opt/service-bin/example_inventory_service \
     && mkdir -p /opt/runtime-libs/orderservice \
     && cp /workspace/build/orderservice/example_order_service /opt/service-bin/example_order_service \
-    && if [ "${SERVICEGEN_RUNTIME_STRIP}" = "ON" ]; then \
+    && if [ "${RUNTIME_STRIP}" = "ON" ]; then \
          strip --strip-unneeded /opt/service-bin/*; \
        fi \
     && ldd /opt/service-bin/example_analytics_service \
