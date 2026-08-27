@@ -6,27 +6,27 @@ export SERVICEGEN_FETCH_CPP_DEPENDENCIES := ON
 BUILD_DIR ?= build
 STANDALONE_COMPOSE := $(if $(wildcard docker-compose.yml),docker-compose.yml,docker-compose.generated.yml)
 STANDALONE_DEV_COMPOSE := $(if $(wildcard docker-compose.dev.yml),docker-compose.dev.yml,docker-compose.dev.generated.yml)
+DEPENDENCY_DOCKER_TARGETS := docker-build docker-up docker-build-dev docker-up-dev debug
+include dependency-proxy.generated.mk
+LOCAL_MODULE_CMAKE_ARG :=
+ifeq ($(strip $(USE_LOCAL_MODULES)),1)
+LOCAL_MODULE_CMAKE_ARG := -DSERVICEGEN_MODULES_ROOT="$(abspath ..)"
+export MODULE_INVENTORY_SERVICE_API_SOURCE_CONTEXT := ../inventory_service_api
+export MODULE_MODEL_SOURCE_CONTEXT := ../model
+export MODULE_ORDER_SERVICE_API_SOURCE_CONTEXT := ../order_service_api
+endif
 
-ifneq ($(strip $(SERVICEGEN_DEPENDENCY_PROXY_DIR)),)
-SERVICEGEN_DEPENDENCY_PROXY_HOST ?= localhost
-SERVICEGEN_DEPENDENCY_PROXY_DOCKER_HOST ?= host.docker.internal
-SERVICEGEN_DEPENDENCY_PROXY_PORT ?= $(SERVICEGEN_NEXUS_PORT)
-SERVICEGEN_DEPENDENCY_PROXY_PORT := $(if $(SERVICEGEN_DEPENDENCY_PROXY_PORT),$(SERVICEGEN_DEPENDENCY_PROXY_PORT),18081)
-SERVICEGEN_GIT_MIRROR_PORT ?= 18084
-export SERVICEGEN_GITHUB_RAW_URL := http://$(SERVICEGEN_DEPENDENCY_PROXY_HOST):$(SERVICEGEN_DEPENDENCY_PROXY_PORT)/repository/github-raw
-export SERVICELIB_SOURCE_CONTEXT ?= http://$(SERVICEGEN_DEPENDENCY_PROXY_DOCKER_HOST):$(SERVICEGEN_DEPENDENCY_PROXY_PORT)/repository/github-raw/gorundebug/cppservicelib/archive/refs/tags/v0.2.24.tar.gz
-export USERVER_SOURCE_CONTEXT ?= http://$(SERVICEGEN_DEPENDENCY_PROXY_DOCKER_HOST):$(SERVICEGEN_GIT_MIRROR_PORT)/cgi-bin/git/github.com/userver-framework/userver.git\#c9f77729c0edce7e423def2d4a4450aa7fc9d259
-docker-build docker-up docker-build-dev docker-up-dev: export SERVICEGEN_GITHUB_RAW_URL := http://$(SERVICEGEN_DEPENDENCY_PROXY_DOCKER_HOST):$(SERVICEGEN_DEPENDENCY_PROXY_PORT)/repository/github-raw
-docker-build docker-up docker-build-dev docker-up-dev: export SERVICEGEN_APT_UBUNTU_ARCHIVE_URL := http://$(SERVICEGEN_DEPENDENCY_PROXY_DOCKER_HOST):$(SERVICEGEN_DEPENDENCY_PROXY_PORT)/repository/apt-ubuntu-archive
-docker-build docker-up docker-build-dev docker-up-dev: export SERVICEGEN_APT_UBUNTU_SECURITY_URL := http://$(SERVICEGEN_DEPENDENCY_PROXY_DOCKER_HOST):$(SERVICEGEN_DEPENDENCY_PROXY_PORT)/repository/apt-ubuntu-security
-docker-build docker-up docker-build-dev docker-up-dev: export SERVICEGEN_APT_UBUNTU_PORTS_URL := http://$(SERVICEGEN_DEPENDENCY_PROXY_DOCKER_HOST):$(SERVICEGEN_DEPENDENCY_PROXY_PORT)/repository/apt-ubuntu-ports
+ifneq ($(strip $(DEPENDENCY_PROXY_DIR)),)
+export SERVICELIB_SOURCE_CONTEXT ?= $(DEPENDENCY_PROXY_DOCKER_BASE)/github-raw/gorundebug/cppservicelib/archive/refs/tags/v0.2.24.tar.gz
+export USERVER_SOURCE_CONTEXT ?= $(DEPENDENCY_GIT_MIRROR_DOCKER_BASE)/github.com/userver-framework/userver.git\#c9f77729c0edce7e423def2d4a4450aa7fc9d259
 endif
 
 .PHONY: build test release-build release-test asan-test tsan-test release-up lint fmt clean \
-	docker-build docker-build-dev docker-up docker-up-dev docker-down docker-down-dev docker-clean help
+	docker-build docker-build-dev docker-up docker-up-dev debug docker-down docker-down-dev docker-clean help
 
 build: ## Build the standalone service with CMake
 	@cmake -S . -B "$(BUILD_DIR)" -G Ninja -DCMAKE_BUILD_TYPE=Debug \
+		$(LOCAL_MODULE_CMAKE_ARG) \
 		-DSERVICEGEN_FETCH_CPP_DEPENDENCIES="$(SERVICEGEN_FETCH_CPP_DEPENDENCIES)"
 	@cmake --build "$(BUILD_DIR)" --parallel
 
@@ -36,6 +36,7 @@ test: ## Build and run all service tests
 
 release-build: ## Build the optimized standalone service with CMake
 	@cmake -S . -B "$(BUILD_DIR)-release" -G Ninja -DCMAKE_BUILD_TYPE=Release \
+		$(LOCAL_MODULE_CMAKE_ARG) \
 		-DSERVICEGEN_FETCH_CPP_DEPENDENCIES="$(SERVICEGEN_FETCH_CPP_DEPENDENCIES)"
 	@cmake --build "$(BUILD_DIR)-release" --parallel
 
@@ -66,14 +67,19 @@ clean: ## Remove CMake build artifacts
 docker-build: ## Build the autonomous C++ runtime image from copied sources
 	@docker compose -f docker-compose.cmake.generated.yml build orderservice-runtime
 
-docker-build-dev: build ## Build the source-mounted C++ development image
+docker-build-dev: ## Build this service in the source-mounted C++ development image
 	@docker compose -f docker-compose.cmake.generated.yml build cpp-build
+	@docker compose -f docker-compose.cmake.generated.yml run --rm cpp-build
 
 docker-up: docker-build ## Start this service through Docker Compose
 	@docker compose -f "$(STANDALONE_COMPOSE)" up -d --no-build
 
 docker-up-dev: docker-build-dev ## Start this service with its source directory mounted
 	@docker compose -f "$(STANDALONE_COMPOSE)" -f "$(STANDALONE_DEV_COMPOSE)" up -d --no-build
+
+debug: docker-build-dev ## Start this service under gdbserver on localhost:2345
+	@DEBUG=1 docker compose -f "$(STANDALONE_COMPOSE)" -f "$(STANDALONE_DEV_COMPOSE)" \
+		up -d --no-build --force-recreate
 
 docker-down: ## Stop this service
 	@docker compose -f "$(STANDALONE_COMPOSE)" down

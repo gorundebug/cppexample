@@ -3,11 +3,13 @@ services:
     image: analyticsservice-cpp-build
     working_dir: /workspace
     command:
-      - /workspace/build/example_analytics_service
-      - --config
-      - /workspace/static_config.yaml
-      - --config_vars
-      - /workspace/config/config_vars.integration.yaml
+      - /bin/sh
+      - -lc
+      - |
+        if [ "$${DEBUG:-0}" = "1" ]; then
+          exec gdbserver :2345 /workspace/build/example_analytics_service --config /workspace/static_config.yaml --config_vars /workspace/config/config_vars.integration.yaml
+        fi
+        exec /workspace/build/example_analytics_service --config /workspace/static_config.yaml --config_vars /workspace/config/config_vars.integration.yaml
     volumes:
       - .:/workspace
       - cpp-dev-cmake-build:/workspace/build
@@ -18,4 +20,4 @@ services:
 
 volumes:
   cpp-dev-cmake-build:
-    name: cppexample_cpp-cmake-build
+    name: cppexample_analyticsservice_cpp-cmake-build

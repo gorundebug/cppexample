@@ -3,45 +3,46 @@
 # service source code. Use it through `make docker-up-dev`.
 services:
   analyticsservice:
-    image: cppexample-cpp-build
-    working_dir: /workspace/analyticsservice
+    image: analyticsservice-cpp-build
+    build: !reset null
+    working_dir: /workspace
     command:
-      - /workspace/build/analyticsservice/example_analytics_service
-      - --config
-      - /workspace/analyticsservice/static_config.yaml
-      - --config_vars
-      - /workspace/analyticsservice/config/config_vars.integration.yaml
+      - /bin/sh
+      - -lc
+      - >-
+        if [ "$${DEBUG:-0}" = "1" ]; then
+          exec gdbserver :2345
+          /workspace/build/example_analytics_service
+          --config /workspace/static_config.yaml
+          --config_vars /workspace/config/config_vars.integration.yaml;
+        else
+          exec /workspace/build/example_analytics_service
+          --config /workspace/static_config.yaml
+          --config_vars /workspace/config/config_vars.integration.yaml;
+        fi
     volumes:
-      - .:/workspace
-      - cpp-dev-cmake-build:/workspace/build
+      - ./analyticsservice:/workspace
+      - cpp-dev-cmake-build-analyticsservice:/workspace/build
     security_opt:
       - seccomp:unconfined
     cap_add:
       - SYS_PTRACE
   automationservice:
     image: automationservice-development:latest
-    build:
-      context: .
-      dockerfile: automationservice/Dockerfile
-      target: development
-      extra_hosts:
-        - "host.docker.internal:host-gateway"
-      args:
-        SERVICE_DIR: automationservice
-        GOPROXY: ${GOPROXY:-direct}
-        GOSUMDB: ${GOSUMDB:-sum.golang.org}
-        SERVICEGEN_GITHUB_RAW_URL: ${SERVICEGEN_GITHUB_RAW_URL:-https://github.com}
-      additional_contexts:
-        servicelib-source: "${GOSERVICELIB_SOURCE_CONTEXT:-https://github.com/gorundebug/servicelib.git#v0.2.24}"
-    working_dir: /workspace/automationservice
+    build: !reset null
+    working_dir: /workspace
     command:
-      - go
-      - run
-      - ./cmd/service/main.go
-      - -config
-      - ./config/config.yaml
-      - -values
-      - ./config/overrides.yaml
+      - /bin/sh
+      - -lc
+      - >-
+        if [ "$${DEBUG:-0}" = "1" ]; then
+          exec dlv debug ./cmd/service/main.go
+          --headless --listen=:2345 --api-version=2 --accept-multiclient --continue --
+          -config ./config/config.yaml -values ./config/overrides.yaml;
+        else
+          exec go run ./cmd/service/main.go
+          -config ./config/config.yaml -values ./config/overrides.yaml;
+        fi
     environment:
       GOPROXY: ${GOPROXY:-direct}
       GOSUMDB: ${GOSUMDB:-sum.golang.org}
@@ -51,7 +52,7 @@ services:
       GIT_CONFIG_KEY_1: ${GIT_CONFIG_KEY_1:-}
       GIT_CONFIG_VALUE_1: ${GIT_CONFIG_VALUE_1:-}
     volumes:
-      - .:/workspace
+      - ./automationservice:/workspace
       - go-dev-mod-cache:/go/pkg/mod
       - go-dev-build-cache:/root/.cache/go-build
     security_opt:
@@ -59,33 +60,51 @@ services:
     cap_add:
       - SYS_PTRACE
   inventoryservice:
-    image: cppexample-cpp-build
-    working_dir: /workspace/inventoryservice
+    image: inventoryservice-cpp-build
+    build: !reset null
+    working_dir: /workspace
     command:
-      - /workspace/build/inventoryservice/example_inventory_service
-      - --config
-      - /workspace/inventoryservice/static_config.yaml
-      - --config_vars
-      - /workspace/inventoryservice/config/config_vars.integration.yaml
+      - /bin/sh
+      - -lc
+      - >-
+        if [ "$${DEBUG:-0}" = "1" ]; then
+          exec gdbserver :2345
+          /workspace/build/example_inventory_service
+          --config /workspace/static_config.yaml
+          --config_vars /workspace/config/config_vars.integration.yaml;
+        else
+          exec /workspace/build/example_inventory_service
+          --config /workspace/static_config.yaml
+          --config_vars /workspace/config/config_vars.integration.yaml;
+        fi
     volumes:
-      - .:/workspace
-      - cpp-dev-cmake-build:/workspace/build
+      - ./inventoryservice:/workspace
+      - cpp-dev-cmake-build-inventoryservice:/workspace/build
     security_opt:
       - seccomp:unconfined
     cap_add:
       - SYS_PTRACE
   orderservice:
-    image: cppexample-cpp-build
-    working_dir: /workspace/orderservice
+    image: orderservice-cpp-build
+    build: !reset null
+    working_dir: /workspace
     command:
-      - /workspace/build/orderservice/example_order_service
-      - --config
-      - /workspace/orderservice/static_config.yaml
-      - --config_vars
-      - /workspace/orderservice/config/config_vars.integration.yaml
+      - /bin/sh
+      - -lc
+      - >-
+        if [ "$${DEBUG:-0}" = "1" ]; then
+          exec gdbserver :2345
+          /workspace/build/example_order_service
+          --config /workspace/static_config.yaml
+          --config_vars /workspace/config/config_vars.integration.yaml;
+        else
+          exec /workspace/build/example_order_service
+          --config /workspace/static_config.yaml
+          --config_vars /workspace/config/config_vars.integration.yaml;
+        fi
     volumes:
-      - .:/workspace
-      - cpp-dev-cmake-build:/workspace/build
+      - ./orderservice:/workspace
+      - cpp-dev-cmake-build-orderservice:/workspace/build
     security_opt:
       - seccomp:unconfined
     cap_add:
@@ -96,6 +115,9 @@ volumes:
   go-dev-build-cache:
   rust-dev-cargo-registry:
   rust-dev-cargo-git:
-  rust-dev-target:
-  cpp-dev-cmake-build:
-    name: cppexample_cpp-cmake-build
+  cpp-dev-cmake-build-analyticsservice:
+    name: cppexample_analyticsservice_cpp-cmake-build
+  cpp-dev-cmake-build-inventoryservice:
+    name: cppexample_inventoryservice_cpp-cmake-build
+  cpp-dev-cmake-build-orderservice:
+    name: cppexample_orderservice_cpp-cmake-build

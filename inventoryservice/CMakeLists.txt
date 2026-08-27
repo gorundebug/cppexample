@@ -44,10 +44,7 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
       "Path to a servicelib source checkout")
   set(USERVER_SOURCE_DIR "" CACHE PATH
       "Path to a userver source checkout")
-  set(_servicegen_modules_root_default "${CMAKE_CURRENT_SOURCE_DIR}/..")
-  if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/modules")
-    set(_servicegen_modules_root_default "${CMAKE_CURRENT_SOURCE_DIR}/modules")
-  endif()
+  set(_servicegen_modules_root_default "${CMAKE_CURRENT_SOURCE_DIR}/modules")
   set(SERVICEGEN_MODULES_ROOT "${_servicegen_modules_root_default}" CACHE PATH
       "Path containing local generated contract modules")
   option(SERVICEGEN_FETCH_CPP_DEPENDENCIES
@@ -63,15 +60,15 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
   if(SERVICEGEN_FETCH_CPP_DEPENDENCIES)
     include(FetchContent)
     if(NOT USERVER_SOURCE_DIR)
-      if(DEFINED ENV{SERVICEGEN_GITHUB_RAW_URL} AND
-         NOT "$ENV{SERVICEGEN_GITHUB_RAW_URL}" STREQUAL "" AND
+      if(DEFINED ENV{DEPENDENCY_GITHUB_RAW_URL} AND
+         NOT "$ENV{DEPENDENCY_GITHUB_RAW_URL}" STREQUAL "" AND
          USERVER_REPOSITORY MATCHES "^https://github.com/")
         string(REGEX REPLACE "^https://github.com/" ""
             _servicegen_userver_path "${USERVER_REPOSITORY}")
         string(REGEX REPLACE "\\.git$" ""
             _servicegen_userver_path "${_servicegen_userver_path}")
         FetchContent_Declare(servicegen_userver
-            URL "$ENV{SERVICEGEN_GITHUB_RAW_URL}/${_servicegen_userver_path}/archive/${USERVER_REVISION}.tar.gz"
+            URL "$ENV{DEPENDENCY_GITHUB_RAW_URL}/${_servicegen_userver_path}/archive/${USERVER_REVISION}.tar.gz"
             DOWNLOAD_EXTRACT_TIMESTAMP TRUE)
       else()
         FetchContent_Declare(servicegen_userver
@@ -86,15 +83,15 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
       set(USERVER_SOURCE_DIR "${servicegen_userver_SOURCE_DIR}")
     endif()
     if(NOT SERVICELIB_SOURCE_DIR)
-      if(DEFINED ENV{SERVICEGEN_GITHUB_RAW_URL} AND
-         NOT "$ENV{SERVICEGEN_GITHUB_RAW_URL}" STREQUAL "" AND
+      if(DEFINED ENV{DEPENDENCY_GITHUB_RAW_URL} AND
+         NOT "$ENV{DEPENDENCY_GITHUB_RAW_URL}" STREQUAL "" AND
          SERVICELIB_REPOSITORY MATCHES "^https://github.com/")
         string(REGEX REPLACE "^https://github.com/" ""
             _servicegen_servicelib_path "${SERVICELIB_REPOSITORY}")
         string(REGEX REPLACE "\\.git$" ""
             _servicegen_servicelib_path "${_servicegen_servicelib_path}")
         FetchContent_Declare(servicegen_servicelib
-            URL "$ENV{SERVICEGEN_GITHUB_RAW_URL}/${_servicegen_servicelib_path}/archive/${SERVICELIB_REVISION}.tar.gz"
+            URL "$ENV{DEPENDENCY_GITHUB_RAW_URL}/${_servicegen_servicelib_path}/archive/${SERVICELIB_REVISION}.tar.gz"
             DOWNLOAD_EXTRACT_TIMESTAMP TRUE)
       else()
         FetchContent_Declare(servicegen_servicelib

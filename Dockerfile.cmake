@@ -5,17 +5,17 @@ FROM userver-source AS userver-source
 FROM --platform=$TARGETPLATFORM ubuntu:24.04 AS development
 
 ARG TARGETARCH
-ARG SERVICEGEN_GITHUB_RAW_URL=
-ARG SERVICEGEN_APT_UBUNTU_ARCHIVE_URL=
-ARG SERVICEGEN_APT_UBUNTU_SECURITY_URL=
-ARG SERVICEGEN_APT_UBUNTU_PORTS_URL=
-ARG SERVICEGEN_CONAN_REMOTE_URL=
+ARG DEPENDENCY_GITHUB_RAW_URL=
+ARG DEPENDENCY_APT_UBUNTU_ARCHIVE_URL=
+ARG DEPENDENCY_APT_UBUNTU_SECURITY_URL=
+ARG DEPENDENCY_APT_UBUNTU_PORTS_URL=
+ARG DEPENDENCY_CONAN_REMOTE_URL=
 ARG PIP_INDEX_URL=https://pypi.org/simple
 ARG PIP_TRUSTED_HOST=
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Etc/UTC
-ENV SERVICEGEN_GITHUB_RAW_URL=${SERVICEGEN_GITHUB_RAW_URL}
-ENV SERVICEGEN_CONAN_REMOTE_URL=${SERVICEGEN_CONAN_REMOTE_URL}
+ENV DEPENDENCY_GITHUB_RAW_URL=${DEPENDENCY_GITHUB_RAW_URL}
+ENV DEPENDENCY_CONAN_REMOTE_URL=${DEPENDENCY_CONAN_REMOTE_URL}
 COPY dependency-download-mirrors.generated.env /etc/servicegen/dependency-download-mirrors.generated.env
 COPY dependency-download-mirrors.env /etc/servicegen/dependency-download-mirrors.env
 COPY dependency-download-env.generated.sh /usr/local/bin/servicegen-download-env
@@ -23,11 +23,11 @@ SHELL ["/usr/local/bin/servicegen-download-env", "/bin/sh", "-c"]
 
 COPY docker/userver-packages-ubuntu-24.04.txt /tmp/userver-packages.txt
 
-RUN if [ -n "$SERVICEGEN_APT_UBUNTU_ARCHIVE_URL$SERVICEGEN_APT_UBUNTU_SECURITY_URL$SERVICEGEN_APT_UBUNTU_PORTS_URL" ]; then \
+RUN if [ -n "$DEPENDENCY_APT_UBUNTU_ARCHIVE_URL$DEPENDENCY_APT_UBUNTU_SECURITY_URL$DEPENDENCY_APT_UBUNTU_PORTS_URL" ]; then \
       find /etc/apt -type f \( -name '*.list' -o -name '*.sources' \) -exec sed -i \
-        -e "s|http://archive.ubuntu.com/ubuntu|$SERVICEGEN_APT_UBUNTU_ARCHIVE_URL|g" \
-        -e "s|http://security.ubuntu.com/ubuntu|$SERVICEGEN_APT_UBUNTU_SECURITY_URL|g" \
-        -e "s|http://ports.ubuntu.com/ubuntu-ports|$SERVICEGEN_APT_UBUNTU_PORTS_URL|g" {} +; \
+        -e "s|http://archive.ubuntu.com/ubuntu|$DEPENDENCY_APT_UBUNTU_ARCHIVE_URL|g" \
+        -e "s|http://security.ubuntu.com/ubuntu|$DEPENDENCY_APT_UBUNTU_SECURITY_URL|g" \
+        -e "s|http://ports.ubuntu.com/ubuntu-ports|$DEPENDENCY_APT_UBUNTU_PORTS_URL|g" {} +; \
     fi
 
 RUN rm -f /etc/apt/apt.conf.d/docker-clean
@@ -146,14 +146,14 @@ RUN --mount=type=cache,id=cppexample-runtime-build-v2-${TARGETARCH}-${SERVICEGEN
 FROM ubuntu:24.04 AS runtime-base
 
 ARG DEBIAN_FRONTEND=noninteractive
-ARG SERVICEGEN_APT_UBUNTU_ARCHIVE_URL=
-ARG SERVICEGEN_APT_UBUNTU_SECURITY_URL=
-ARG SERVICEGEN_APT_UBUNTU_PORTS_URL=
-RUN if [ -n "$SERVICEGEN_APT_UBUNTU_ARCHIVE_URL$SERVICEGEN_APT_UBUNTU_SECURITY_URL$SERVICEGEN_APT_UBUNTU_PORTS_URL" ]; then \
+ARG DEPENDENCY_APT_UBUNTU_ARCHIVE_URL=
+ARG DEPENDENCY_APT_UBUNTU_SECURITY_URL=
+ARG DEPENDENCY_APT_UBUNTU_PORTS_URL=
+RUN if [ -n "$DEPENDENCY_APT_UBUNTU_ARCHIVE_URL$DEPENDENCY_APT_UBUNTU_SECURITY_URL$DEPENDENCY_APT_UBUNTU_PORTS_URL" ]; then \
       find /etc/apt -type f \( -name '*.list' -o -name '*.sources' \) -exec sed -i \
-        -e "s|http://archive.ubuntu.com/ubuntu|$SERVICEGEN_APT_UBUNTU_ARCHIVE_URL|g" \
-        -e "s|http://security.ubuntu.com/ubuntu|$SERVICEGEN_APT_UBUNTU_SECURITY_URL|g" \
-        -e "s|http://ports.ubuntu.com/ubuntu-ports|$SERVICEGEN_APT_UBUNTU_PORTS_URL|g" {} +; \
+        -e "s|http://archive.ubuntu.com/ubuntu|$DEPENDENCY_APT_UBUNTU_ARCHIVE_URL|g" \
+        -e "s|http://security.ubuntu.com/ubuntu|$DEPENDENCY_APT_UBUNTU_SECURITY_URL|g" \
+        -e "s|http://ports.ubuntu.com/ubuntu-ports|$DEPENDENCY_APT_UBUNTU_PORTS_URL|g" {} +; \
     fi
 RUN apt-get update \
     && apt-get install --yes --no-install-recommends ca-certificates \
