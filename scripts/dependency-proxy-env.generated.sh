@@ -17,6 +17,6 @@ if [[ -n "${SERVICEGEN_DEPENDENCY_PROXY_DIR:-}" ]]; then
   export SERVICEGEN_APT_UBUNTU_ARCHIVE_URL="${servicegen_proxy_base}/apt-ubuntu-archive"
   export SERVICEGEN_APT_UBUNTU_SECURITY_URL="${servicegen_proxy_base}/apt-ubuntu-security"
   export SERVICEGEN_APT_UBUNTU_PORTS_URL="${servicegen_proxy_base}/apt-ubuntu-ports"
-  export SERVICELIB_SOURCE_CONTEXT="${SERVICELIB_SOURCE_CONTEXT:-${servicegen_proxy_base}/github-raw/gorundebug/cppservicelib/archive/refs/tags/v0.2.20.tar.gz}"
+  export SERVICELIB_SOURCE_CONTEXT="${SERVICELIB_SOURCE_CONTEXT:-${servicegen_proxy_base}/github-raw/gorundebug/cppservicelib/archive/refs/tags/v0.2.21.tar.gz}"
   export USERVER_SOURCE_CONTEXT="${USERVER_SOURCE_CONTEXT:-${servicegen_git_mirror_base}/github.com/userver-framework/userver.git#c9f77729c0edce7e423def2d4a4450aa7fc9d259}"
 fi
