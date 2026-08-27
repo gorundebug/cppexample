@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+project_dir="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
+framework_dir="${CPPSERVICELIB_SOURCE_DIR:-${SERVICELIB_SOURCE_DIR:-/opt/servicelib}}"
+build_type="${1:-Release}"
+output_dir="${2:-$project_dir/build/conan-${build_type,,}}"
+
+if [[ ! -x "$framework_dir/scripts/conan-install.sh" ]]; then
+  echo "cppservicelib Conan entrypoint is missing: $framework_dir/scripts/conan-install.sh" >&2
+  exit 2
+fi
+
+export CPPSERVICELIB_ENABLE_GRPC=True
+export CPPSERVICELIB_ENABLE_KAFKA=True
+export CPPSERVICELIB_ENABLE_CRON=False
+export CPPSERVICELIB_ENABLE_OTLP=True
+export CPPSERVICELIB_BUILD_TESTS="${CPPSERVICELIB_BUILD_TESTS:-True}"
+
+"$framework_dir/scripts/conan-install.sh" "$build_type" "$output_dir" \
+  "${@:3}"
+
+mapfile -t toolchains < <(find "$output_dir" -type f \
+  -name conan_toolchain.cmake -print)
+if [[ "${#toolchains[@]}" -ne 1 ]]; then
+  echo "expected exactly one Conan toolchain below $output_dir, found ${#toolchains[@]}" >&2
+  printf '  %s\n' "${toolchains[@]}" >&2
+  exit 2
+fi
+printf '%s\n' "${toolchains[0]}" > "$output_dir/toolchain.path"
