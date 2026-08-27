@@ -4,6 +4,8 @@
 
 export SERVICEGEN_FETCH_CPP_DEPENDENCIES := ON
 BUILD_DIR ?= build
+STANDALONE_COMPOSE := $(if $(wildcard docker-compose.yml),docker-compose.yml,docker-compose.generated.yml)
+STANDALONE_DEV_COMPOSE := $(if $(wildcard docker-compose.dev.yml),docker-compose.dev.yml,docker-compose.dev.generated.yml)
 
 ifneq ($(strip $(SERVICEGEN_DEPENDENCY_PROXY_DIR)),)
 SERVICEGEN_DEPENDENCY_PROXY_HOST ?= localhost
@@ -14,14 +16,14 @@ SERVICEGEN_GIT_MIRROR_PORT ?= 18084
 export SERVICEGEN_GITHUB_RAW_URL := http://$(SERVICEGEN_DEPENDENCY_PROXY_HOST):$(SERVICEGEN_DEPENDENCY_PROXY_PORT)/repository/github-raw
 export SERVICELIB_SOURCE_CONTEXT ?= http://$(SERVICEGEN_DEPENDENCY_PROXY_DOCKER_HOST):$(SERVICEGEN_DEPENDENCY_PROXY_PORT)/repository/github-raw/gorundebug/cppservicelib/archive/refs/tags/v0.2.24.tar.gz
 export USERVER_SOURCE_CONTEXT ?= http://$(SERVICEGEN_DEPENDENCY_PROXY_DOCKER_HOST):$(SERVICEGEN_GIT_MIRROR_PORT)/cgi-bin/git/github.com/userver-framework/userver.git#c9f77729c0edce7e423def2d4a4450aa7fc9d259
-docker-build docker-up: export SERVICEGEN_GITHUB_RAW_URL := http://$(SERVICEGEN_DEPENDENCY_PROXY_DOCKER_HOST):$(SERVICEGEN_DEPENDENCY_PROXY_PORT)/repository/github-raw
-docker-build docker-up: export SERVICEGEN_APT_UBUNTU_ARCHIVE_URL := http://$(SERVICEGEN_DEPENDENCY_PROXY_DOCKER_HOST):$(SERVICEGEN_DEPENDENCY_PROXY_PORT)/repository/apt-ubuntu-archive
-docker-build docker-up: export SERVICEGEN_APT_UBUNTU_SECURITY_URL := http://$(SERVICEGEN_DEPENDENCY_PROXY_DOCKER_HOST):$(SERVICEGEN_DEPENDENCY_PROXY_PORT)/repository/apt-ubuntu-security
-docker-build docker-up: export SERVICEGEN_APT_UBUNTU_PORTS_URL := http://$(SERVICEGEN_DEPENDENCY_PROXY_DOCKER_HOST):$(SERVICEGEN_DEPENDENCY_PROXY_PORT)/repository/apt-ubuntu-ports
+docker-build docker-up docker-build-dev docker-up-dev: export SERVICEGEN_GITHUB_RAW_URL := http://$(SERVICEGEN_DEPENDENCY_PROXY_DOCKER_HOST):$(SERVICEGEN_DEPENDENCY_PROXY_PORT)/repository/github-raw
+docker-build docker-up docker-build-dev docker-up-dev: export SERVICEGEN_APT_UBUNTU_ARCHIVE_URL := http://$(SERVICEGEN_DEPENDENCY_PROXY_DOCKER_HOST):$(SERVICEGEN_DEPENDENCY_PROXY_PORT)/repository/apt-ubuntu-archive
+docker-build docker-up docker-build-dev docker-up-dev: export SERVICEGEN_APT_UBUNTU_SECURITY_URL := http://$(SERVICEGEN_DEPENDENCY_PROXY_DOCKER_HOST):$(SERVICEGEN_DEPENDENCY_PROXY_PORT)/repository/apt-ubuntu-security
+docker-build docker-up docker-build-dev docker-up-dev: export SERVICEGEN_APT_UBUNTU_PORTS_URL := http://$(SERVICEGEN_DEPENDENCY_PROXY_DOCKER_HOST):$(SERVICEGEN_DEPENDENCY_PROXY_PORT)/repository/apt-ubuntu-ports
 endif
 
 .PHONY: build test release-build release-test asan-test tsan-test release-up lint fmt clean \
-	docker-build docker-up docker-down docker-clean help
+	docker-build docker-build-dev docker-up docker-up-dev docker-down docker-down-dev docker-clean help
 
 build: ## Build the standalone service with CMake
 	@cmake -S . -B "$(BUILD_DIR)" -G Ninja -DCMAKE_BUILD_TYPE=Debug \
@@ -61,17 +63,26 @@ clean: ## Remove CMake build artifacts
 	@cmake -E remove_directory "$(BUILD_DIR)"
 	@cmake -E remove_directory "$(BUILD_DIR)-release"
 
-docker-build: build ## Build the reusable C++ toolchain image and service
+docker-build: ## Build the autonomous C++ runtime image from copied sources
+	@docker compose -f docker-compose.cmake.generated.yml build inventoryservice-runtime
+
+docker-build-dev: build ## Build the source-mounted C++ development image
 	@docker compose -f docker-compose.cmake.generated.yml build cpp-build
 
 docker-up: docker-build ## Start this service through Docker Compose
-	@docker compose up -d
+	@docker compose -f "$(STANDALONE_COMPOSE)" up -d --no-build
+
+docker-up-dev: docker-build-dev ## Start this service with its source directory mounted
+	@docker compose -f "$(STANDALONE_COMPOSE)" -f "$(STANDALONE_DEV_COMPOSE)" up -d --no-build
 
 docker-down: ## Stop this service
-	@docker compose down
+	@docker compose -f "$(STANDALONE_COMPOSE)" down
+
+docker-down-dev: ## Stop the source-mounted standalone service
+	@docker compose -f "$(STANDALONE_COMPOSE)" -f "$(STANDALONE_DEV_COMPOSE)" down
 
 docker-clean: docker-down clean ## Stop the service and remove all volumes
-	@docker compose down --volumes --remove-orphans
+	@docker compose -f "$(STANDALONE_COMPOSE)" down --volumes --remove-orphans
 
 help: ## Show this help
 	@grep -hE '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \

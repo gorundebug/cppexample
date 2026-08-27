@@ -1,16 +1,12 @@
 services:
   analyticsservice:
-    image: cppexample-cpp-build
-    working_dir: /workspace/analyticsservice
+    image: cppexample-analyticsservice
+    working_dir: /app
     command:
-      - /workspace/build/analyticsservice/example_analytics_service
       - --config
-      - /workspace/analyticsservice/static_config.yaml
+      - /app/static_config.yaml
       - --config_vars
-      - /workspace/analyticsservice/config/config_vars.integration.yaml
-    volumes:
-      - .:/workspace
-      - cpp-cmake-build:/workspace/build
+      - /app/config/config_vars.integration.yaml
     stop_grace_period: 30000ms
     restart: unless-stopped
     environment:
@@ -20,10 +16,6 @@ services:
       - "9093:9093"
       - "9203:9203"
       - "2345:2345"
-    security_opt:
-      - seccomp:unconfined
-    cap_add:
-      - SYS_PTRACE
     networks:
       - app_net
 
@@ -42,25 +34,17 @@ services:
     depends_on:
       temporal-create-namespace:
         condition: service_completed_successfully
-    security_opt:
-      - seccomp:unconfined
-    cap_add:
-      - SYS_PTRACE
     networks:
       - app_net
 
   inventoryservice:
-    image: cppexample-cpp-build
-    working_dir: /workspace/inventoryservice
+    image: cppexample-inventoryservice
+    working_dir: /app
     command:
-      - /workspace/build/inventoryservice/example_inventory_service
       - --config
-      - /workspace/inventoryservice/static_config.yaml
+      - /app/static_config.yaml
       - --config_vars
-      - /workspace/inventoryservice/config/config_vars.integration.yaml
-    volumes:
-      - .:/workspace
-      - cpp-cmake-build:/workspace/build
+      - /app/config/config_vars.integration.yaml
     stop_grace_period: 30000ms
     restart: unless-stopped
     environment:
@@ -69,25 +53,17 @@ services:
       - "9092:9092"
       - "9202:9202"
       - "2347:2345"
-    security_opt:
-      - seccomp:unconfined
-    cap_add:
-      - SYS_PTRACE
     networks:
       - app_net
 
   orderservice:
-    image: cppexample-cpp-build
-    working_dir: /workspace/orderservice
+    image: cppexample-orderservice
+    working_dir: /app
     command:
-      - /workspace/build/orderservice/example_order_service
       - --config
-      - /workspace/orderservice/static_config.yaml
+      - /app/static_config.yaml
       - --config_vars
-      - /workspace/orderservice/config/config_vars.integration.yaml
-    volumes:
-      - .:/workspace
-      - cpp-cmake-build:/workspace/build
+      - /app/config/config_vars.integration.yaml
     stop_grace_period: 30000ms
     restart: unless-stopped
     environment:
@@ -96,10 +72,6 @@ services:
       - "9091:9091"
       - "9201:9201"
       - "2348:2345"
-    security_opt:
-      - seccomp:unconfined
-    cap_add:
-      - SYS_PTRACE
     networks:
       - app_net
 
@@ -251,5 +223,3 @@ networks:
 volumes:
   grafana_data:
   temporal_postgresql_data:
-  cpp-cmake-build:
-    name: cppexample_cpp-cmake-build
