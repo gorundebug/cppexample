@@ -1,10 +1,10 @@
-# syntax=docker/dockerfile:1
+ARG DEPENDENCY_DOCKER_REGISTRY=docker.io
 FROM servicelib-source AS servicelib-source
 FROM userver-source AS userver-source
 FROM module-inventory_service_api AS module-inventory_service_api
 FROM module-model AS module-model
 
-FROM --platform=$TARGETPLATFORM ubuntu:24.04 AS development
+FROM --platform=$TARGETPLATFORM ${DEPENDENCY_DOCKER_REGISTRY}/library/ubuntu:24.04 AS development
 
 ARG TARGETARCH
 ARG DEPENDENCY_GITHUB_RAW_URL=
@@ -165,7 +165,7 @@ RUN --mount=type=cache,id=cppexample-runtime-build-v2-${TARGETARCH}-${SERVICEGEN
        done \
     && true
 
-FROM ubuntu:24.04 AS runtime-base
+FROM ${DEPENDENCY_DOCKER_REGISTRY}/library/ubuntu:24.04 AS runtime-base
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG DEPENDENCY_APT_UBUNTU_ARCHIVE_URL=
