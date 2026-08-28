@@ -14,7 +14,7 @@
 #include <servicelib/runtime/config/endpoint_types.hpp>
 #include <servicelib/runtime/environment/environment.hpp>
 #include <servicelib/datasource/kafka/userver.hpp>
-#include <model/include/example/model/types/order_processed.hpp>
+#include <model_cpp/include/example/model/types/order_processed.hpp>
 
 
 namespace example::analytics_service::functions {

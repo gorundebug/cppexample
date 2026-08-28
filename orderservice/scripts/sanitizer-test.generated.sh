@@ -26,6 +26,7 @@ esac
 options="${cmake_options[*]}"
 exec docker compose -f docker-compose.cmake.generated.yml run --build --rm \
   -e CPP_SANITIZER="$sanitizer" \
+  -e SANITIZER_INTEGRATION="${SANITIZER_INTEGRATION:-1}" \
   -e CPP_SANITIZER_OPTIONS="$options" cpp-build \
   /bin/bash -lc \
   'set -euo pipefail
@@ -39,10 +40,14 @@ exec docker compose -f docker-compose.cmake.generated.yml run --build --rm \
        -s:h compiler=clang \
        -s:h compiler.version=18 \
        -s:h compiler.cppstd=20 \
-       -s:h compiler.libcxx=libstdc++11
+       -s:h compiler.libcxx=libstdc++11 \
+       -o 'userver/*:with_jemalloc=False' \
+       -o 'userver/*:with_phdr_cache=False'
    else
      conan_dir="/workspace/build/conan-debug"
-     ./scripts/conan-install.generated.sh Debug "$conan_dir"
+     ./scripts/conan-install.generated.sh Debug "$conan_dir" \
+       -o 'userver/*:with_jemalloc=False' \
+       -o 'userver/*:with_phdr_cache=False'
    fi
    conan_toolchain="$(cat "$conan_dir/toolchain.path")"
    cmake -S . -B "$build_dir" -G Ninja \
@@ -50,7 +55,6 @@ exec docker compose -f docker-compose.cmake.generated.yml run --build --rm \
      -DCMAKE_BUILD_TYPE=Debug \
      -DCMAKE_TOOLCHAIN_FILE="$conan_toolchain" \
      -DMODULES_ROOT=/workspace/modules \
-     -DUSERVER_SOURCE_DIR="$USERVER_SOURCE_DIR" \
      -DSERVICELIB_SOURCE_DIR="$CPPSERVICELIB_SOURCE_DIR" \
      -DFETCH_CPP_DEPENDENCIES=OFF \
      $CPP_SANITIZER_OPTIONS
@@ -65,4 +69,8 @@ exec docker compose -f docker-compose.cmake.generated.yml run --build --rm \
        TSAN_OPTIONS=halt_on_error=1 \
          ctest --test-dir "$build_dir" --output-on-failure
        ;;
-   esac'
+   esac
+   if [[ "$SANITIZER_INTEGRATION" == "1" ]]; then
+     scripts/sanitizer-integration.generated.sh \
+       "$build_dir" "$CPP_SANITIZER"
+   fi'

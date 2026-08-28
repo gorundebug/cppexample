@@ -1,4 +1,6 @@
 __integrationKafkaBrokers_orderEvents: redpanda:9092
+analyticsScheduleEnabled: true
+analyticsScheduleTracingEnabled: false
 analyticsServiceConfigOverridePath: config/overrides.integration.generated.yaml
 analyticsServiceDefaultGrpcTimeout: 0
 analyticsServiceEnvironment: ""

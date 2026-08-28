@@ -2,7 +2,7 @@ ARG DEPENDENCY_DOCKER_REGISTRY=docker.io
 FROM servicelib-source AS servicelib-source
 FROM userver-source AS userver-source
 FROM module-inventory_service_api AS module-inventory_service_api
-FROM module-model AS module-model
+FROM module-model_cpp AS module-model_cpp
 
 FROM --platform=$TARGETPLATFORM ${DEPENDENCY_DOCKER_REGISTRY}/library/ubuntu:24.04 AS development
 
@@ -105,23 +105,23 @@ RUN set -eu; \
     mkdir -p /workspace/modules/inventory_service_api; \
     cp -a "$source_dir/." /workspace/modules/inventory_service_api/; \
     rm -rf /tmp/module-inventory_service_api-source /tmp/module-inventory_service_api-archive
-COPY --from=module-model / /tmp/module-model-source
+COPY --from=module-model_cpp / /tmp/module-model_cpp-source
 RUN set -eu; \
-    source_dir=/tmp/module-model-source; \
+    source_dir=/tmp/module-model_cpp-source; \
     archive=$(find "$source_dir" -mindepth 1 -maxdepth 1 -type f \( -name context -o -name '*.tar' -o -name '*.tar.gz' -o -name '*.tgz' -o -name '*.tar.xz' \) -print -quit); \
     if [ -n "$archive" ]; then \
-      mkdir -p /tmp/module-model-archive; \
-      tar -xf "$archive" -C /tmp/module-model-archive; \
-      source_dir=/tmp/module-model-archive; \
+      mkdir -p /tmp/module-model_cpp-archive; \
+      tar -xf "$archive" -C /tmp/module-model_cpp-archive; \
+      source_dir=/tmp/module-model_cpp-archive; \
     fi; \
-    manifest=$(find "$source_dir" -type f -path '*/model/CMakeLists.txt' -print -quit); \
+    manifest=$(find "$source_dir" -type f -path '*/model_cpp/CMakeLists.txt' -print -quit); \
     if [ -z "$manifest" ]; then manifest="$source_dir/CMakeLists.txt"; fi; \
     if [ ! -f "$manifest" ]; then manifest=$(find "$source_dir" -mindepth 2 -maxdepth 2 -type f -name CMakeLists.txt -print -quit); fi; \
-    if [ -z "$manifest" ] || [ ! -f "$manifest" ]; then echo "module model source context has no CMakeLists.txt" >&2; exit 1; fi; \
+    if [ -z "$manifest" ] || [ ! -f "$manifest" ]; then echo "module model_cpp source context has no CMakeLists.txt" >&2; exit 1; fi; \
     source_dir=${manifest%/CMakeLists.txt}; \
-    mkdir -p /workspace/modules/model; \
-    cp -a "$source_dir/." /workspace/modules/model/; \
-    rm -rf /tmp/module-model-source /tmp/module-model-archive
+    mkdir -p /workspace/modules/model_cpp; \
+    cp -a "$source_dir/." /workspace/modules/model_cpp/; \
+    rm -rf /tmp/module-model_cpp-source /tmp/module-model_cpp-archive
 
 ENV LANG=en_US.UTF-8
 ENV LC_ALL=en_US.UTF-8

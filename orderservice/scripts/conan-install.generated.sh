@@ -11,20 +11,14 @@ if [[ ! -x "$framework_dir/scripts/conan-install.sh" ]]; then
   exit 2
 fi
 
-export CPPSERVICELIB_ENABLE_GRPC=True
-export CPPSERVICELIB_ENABLE_KAFKA=True
 export CPPSERVICELIB_ENABLE_CRON=False
-export CPPSERVICELIB_ENABLE_OTLP=True
-export CPPSERVICELIB_BUILD_TESTS="${CPPSERVICELIB_BUILD_TESTS:-True}"
 
 "$framework_dir/scripts/conan-install.sh" "$build_type" "$output_dir" \
   "${@:3}"
 
-mapfile -t toolchains < <(find "$output_dir" -type f \
-  -name conan_toolchain.cmake -print)
-if [[ "${#toolchains[@]}" -ne 1 ]]; then
-  echo "expected exactly one Conan toolchain below $output_dir, found ${#toolchains[@]}" >&2
-  printf '  %s\n' "${toolchains[@]}" >&2
+toolchain="$output_dir/conan_toolchain.cmake"
+if [[ ! -f "$toolchain" ]]; then
+  echo "Conan toolchain is missing: $toolchain" >&2
   exit 2
 fi
-printf '%s\n' "${toolchains[0]}" > "$output_dir/toolchain.path"
+printf '%s\n' "$toolchain" > "$output_dir/toolchain.path"

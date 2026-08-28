@@ -9,7 +9,7 @@
 
 #include <servicelib/runtime/serde/serde.hpp>
 
-#include <model/include/example/model/types/order_processed.hpp>
+#include <model_cpp/include/example/model/types/order_processed.hpp>
 
 namespace example::model::types::serde {
 
@@ -30,8 +30,8 @@ class OrderProcessedSerde final : public servicelib::serde::Serde<example::model
 
   void SerializeTo(servicelib::serde::SerdeData& output,
                    const example::model::types::OrderProcessed& value) const override {
-    const auto json = userver::formats::json::ValueBuilder(value).ExtractValue();
-    const auto text = userver::formats::json::ToString(json);
+    const auto text = userver::formats::json::ToString(
+        userver::formats::json::ValueBuilder(value).ExtractValue());
     const auto* bytes = reinterpret_cast<const std::byte*>(text.data());
     output.insert(output.end(), bytes, bytes + text.size());
   }

@@ -41,35 +41,16 @@ endif()
 
 set(SERVICELIB_SOURCE_DIR "" CACHE PATH
     "Path to a servicelib source checkout")
-set(USERVER_SOURCE_DIR "" CACHE PATH
-    "Path to a userver source checkout")
 option(FETCH_CPP_DEPENDENCIES
-       "Fetch missing pinned servicelib and userver source trees" OFF)
+       "Fetch a missing pinned servicelib source tree" OFF)
 set(SERVICELIB_REPOSITORY
     "https://github.com/gorundebug/cppservicelib.git" CACHE STRING
     "Standalone cppservicelib repository")
 set(SERVICELIB_REVISION
-    "v0.2.25" CACHE STRING
+    "v0.2.27" CACHE STRING
     "Pinned cppservicelib revision")
-set(USERVER_REPOSITORY
-    "https://github.com/userver-framework/userver.git" CACHE STRING
-    "Standalone userver repository")
-set(USERVER_REVISION
-    "c9f77729c0edce7e423def2d4a4450aa7fc9d259" CACHE STRING
-    "Pinned userver revision")
 if(FETCH_CPP_DEPENDENCIES)
   include(FetchContent)
-  if(NOT USERVER_SOURCE_DIR)
-    FetchContent_Declare(servicegen_userver
-        GIT_REPOSITORY "${USERVER_REPOSITORY}"
-        GIT_TAG "${USERVER_REVISION}"
-        GIT_SHALLOW FALSE)
-    FetchContent_GetProperties(servicegen_userver)
-    if(NOT servicegen_userver_POPULATED)
-      FetchContent_Populate(servicegen_userver)
-    endif()
-    set(USERVER_SOURCE_DIR "${servicegen_userver_SOURCE_DIR}")
-  endif()
   if(NOT SERVICELIB_SOURCE_DIR)
     FetchContent_Declare(servicegen_servicelib
         GIT_REPOSITORY "${SERVICELIB_REPOSITORY}"
@@ -83,28 +64,12 @@ if(FETCH_CPP_DEPENDENCIES)
   endif()
 endif()
 
-if(USERVER_SOURCE_DIR)
-  set(USERVER_CONAN ON CACHE BOOL "" FORCE)
-  set(USERVER_INSTALL OFF CACHE BOOL "" FORCE)
-  set(USERVER_DOWNLOAD_PACKAGES OFF CACHE BOOL "" FORCE)
-  set(USERVER_FEATURE_GRPC ON CACHE BOOL "" FORCE)
-  set(USERVER_FORCE_DOWNLOAD_GRPC OFF CACHE BOOL "" FORCE)
-  set(USERVER_FORCE_DOWNLOAD_PROTOBUF OFF CACHE BOOL "" FORCE)
-  set(USERVER_FEATURE_OTLP ON CACHE BOOL "" FORCE)
-  set(USERVER_FEATURE_KAFKA ON CACHE BOOL "" FORCE)
-
-  set(USERVER_FEATURE_CHAOTIC_EXPERIMENTAL ON CACHE BOOL "" FORCE)
-  add_subdirectory(
-      "${USERVER_SOURCE_DIR}"
-      "${CMAKE_BINARY_DIR}/_deps/userver-build"
-      EXCLUDE_FROM_ALL)
-  userver_setup_environment()
-  list(APPEND CMAKE_MODULE_PATH "${USERVER_SOURCE_DIR}/cmake")
-else()
-  find_package(userver QUIET COMPONENTS core grpc kafka otlp)
-endif()
+find_package(jemalloc CONFIG QUIET)
+find_package(userver CONFIG REQUIRED COMPONENTS
+    core chaotic grpc kafka otlp)
 
 find_package(RdKafka CONFIG REQUIRED)
+set(SERVICELIB_ENABLE_CRON ON CACHE BOOL "" FORCE)
 
 
 if(SERVICELIB_SOURCE_DIR)
@@ -116,9 +81,9 @@ else()
   find_package(servicelib CONFIG QUIET)
 endif()
 
-if(NOT TARGET userver-core)
+if(NOT TARGET userver::core)
   message(FATAL_ERROR
-      "Generated C++ services require userver (target userver-core)")
+      "Generated C++ services require userver (target userver::core)")
 endif()
 if(NOT TARGET servicelib::servicelib)
   message(FATAL_ERROR
@@ -127,7 +92,7 @@ if(NOT TARGET servicelib::servicelib)
 endif()
 
 add_subdirectory(inventory_service_api)
-add_subdirectory(model)
+add_subdirectory(model_cpp)
 add_subdirectory(order_service_api)
 add_subdirectory(analyticsservice)
 add_subdirectory(inventoryservice)

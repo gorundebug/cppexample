@@ -3,6 +3,7 @@
 # The shared dependency proxy is strictly opt-in. Direct script execution and
 # Make targets therefore use exactly the same environment contract.
 if [[ -n "${DEPENDENCY_PROXY_DIR:-}" ]]; then
+  dependency_proxy_host="${DEPENDENCY_PROXY_HOST:-localhost}"
   dependency_proxy_docker_host="${DEPENDENCY_PROXY_DOCKER_HOST:-host.docker.internal}"
   dependency_proxy_port="${DEPENDENCY_PROXY_PORT:-18081}"
   dependency_proxy_base="http://${dependency_proxy_docker_host}:${dependency_proxy_port}/repository"
@@ -10,6 +11,7 @@ if [[ -n "${DEPENDENCY_PROXY_DIR:-}" ]]; then
   dependency_git_mirror_base="http://${dependency_proxy_docker_host}:${dependency_git_mirror_port}/cgi-bin/git"
 
   export DEPENDENCY_CONAN_HOME="${DEPENDENCY_PROXY_DIR}/conan2"
+  export DEPENDENCY_DOCKER_REGISTRY="${dependency_proxy_host}:${DEPENDENCY_PROXY_DOCKER_PORT:-18083}"
   export DEPENDENCY_GITHUB_RAW_URL="${dependency_proxy_base}/github-raw"
   export DEPENDENCY_CONAN_REMOTE_URL="${dependency_proxy_base}/conan-proxy"
   export PIP_INDEX_URL="${dependency_proxy_base}/pypi-proxy/simple"
@@ -17,6 +19,6 @@ if [[ -n "${DEPENDENCY_PROXY_DIR:-}" ]]; then
   export DEPENDENCY_APT_UBUNTU_ARCHIVE_URL="${dependency_proxy_base}/apt-ubuntu-archive"
   export DEPENDENCY_APT_UBUNTU_SECURITY_URL="${dependency_proxy_base}/apt-ubuntu-security"
   export DEPENDENCY_APT_UBUNTU_PORTS_URL="${dependency_proxy_base}/apt-ubuntu-ports"
-  export SERVICELIB_SOURCE_CONTEXT="${SERVICELIB_SOURCE_CONTEXT:-${dependency_proxy_base}/github-raw/gorundebug/cppservicelib/archive/refs/tags/v0.2.25.tar.gz}"
+  export SERVICELIB_SOURCE_CONTEXT="${SERVICELIB_SOURCE_CONTEXT:-${dependency_proxy_base}/github-raw/gorundebug/cppservicelib/archive/refs/tags/v0.2.27.tar.gz}"
   export USERVER_SOURCE_CONTEXT="${USERVER_SOURCE_CONTEXT:-${dependency_git_mirror_base}/github.com/userver-framework/userver.git#c9f77729c0edce7e423def2d4a4450aa7fc9d259}"
 fi

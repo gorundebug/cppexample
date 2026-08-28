@@ -14,8 +14,7 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "FETCH_CPP_DEPENDENCIES": "ON",
-        "SERVICELIB_SOURCE_DIR": "$env{SERVICELIB_SOURCE_DIR}",
-        "USERVER_SOURCE_DIR": "$env{USERVER_SOURCE_DIR}"
+        "SERVICELIB_SOURCE_DIR": "$env{SERVICELIB_SOURCE_DIR}"
       }
     },
     {
@@ -26,8 +25,7 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
         "FETCH_CPP_DEPENDENCIES": "ON",
-        "SERVICELIB_SOURCE_DIR": "$env{SERVICELIB_SOURCE_DIR}",
-        "USERVER_SOURCE_DIR": "$env{USERVER_SOURCE_DIR}"
+        "SERVICELIB_SOURCE_DIR": "$env{SERVICELIB_SOURCE_DIR}"
       }
     },
     {
@@ -38,8 +36,7 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "FETCH_CPP_DEPENDENCIES": "OFF",
-        "SERVICELIB_SOURCE_DIR": "$env{SERVICELIB_SOURCE_DIR}",
-        "USERVER_SOURCE_DIR": "$env{USERVER_SOURCE_DIR}"
+        "SERVICELIB_SOURCE_DIR": "$env{SERVICELIB_SOURCE_DIR}"
       }
     },
     {
@@ -50,8 +47,7 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
         "FETCH_CPP_DEPENDENCIES": "OFF",
-        "SERVICELIB_SOURCE_DIR": "$env{SERVICELIB_SOURCE_DIR}",
-        "USERVER_SOURCE_DIR": "$env{USERVER_SOURCE_DIR}"
+        "SERVICELIB_SOURCE_DIR": "$env{SERVICELIB_SOURCE_DIR}"
       }
     }
   ],

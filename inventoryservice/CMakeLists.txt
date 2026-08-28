@@ -42,46 +42,17 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
 
   set(SERVICELIB_SOURCE_DIR "" CACHE PATH
       "Path to a servicelib source checkout")
-  set(USERVER_SOURCE_DIR "" CACHE PATH
-      "Path to a userver source checkout")
   set(_servicegen_modules_root_default "${CMAKE_CURRENT_SOURCE_DIR}/modules")
   set(MODULES_ROOT "${_servicegen_modules_root_default}" CACHE PATH
       "Path containing local generated contract modules")
   option(FETCH_CPP_DEPENDENCIES
-         "Fetch missing pinned servicelib, userver, and contract modules" ON)
+         "Fetch missing pinned servicelib and contract modules" ON)
   set(SERVICELIB_REPOSITORY "https://github.com/gorundebug/cppservicelib.git" CACHE STRING
       "Standalone cppservicelib repository")
-  set(SERVICELIB_REVISION "v0.2.25" CACHE STRING
+  set(SERVICELIB_REVISION "v0.2.27" CACHE STRING
       "Pinned cppservicelib revision")
-  set(USERVER_REPOSITORY "https://github.com/userver-framework/userver.git" CACHE STRING
-      "Standalone userver repository")
-  set(USERVER_REVISION "c9f77729c0edce7e423def2d4a4450aa7fc9d259" CACHE STRING
-      "Pinned userver revision")
   if(FETCH_CPP_DEPENDENCIES)
     include(FetchContent)
-    if(NOT USERVER_SOURCE_DIR)
-      if(DEFINED ENV{DEPENDENCY_GITHUB_RAW_URL} AND
-         NOT "$ENV{DEPENDENCY_GITHUB_RAW_URL}" STREQUAL "" AND
-         USERVER_REPOSITORY MATCHES "^https://github.com/")
-        string(REGEX REPLACE "^https://github.com/" ""
-            _servicegen_userver_path "${USERVER_REPOSITORY}")
-        string(REGEX REPLACE "\\.git$" ""
-            _servicegen_userver_path "${_servicegen_userver_path}")
-        FetchContent_Declare(servicegen_userver
-            URL "$ENV{DEPENDENCY_GITHUB_RAW_URL}/${_servicegen_userver_path}/archive/${USERVER_REVISION}.tar.gz"
-            DOWNLOAD_EXTRACT_TIMESTAMP TRUE)
-      else()
-        FetchContent_Declare(servicegen_userver
-            GIT_REPOSITORY "${USERVER_REPOSITORY}"
-            GIT_TAG "${USERVER_REVISION}"
-            GIT_SHALLOW FALSE)
-      endif()
-      FetchContent_GetProperties(servicegen_userver)
-      if(NOT servicegen_userver_POPULATED)
-        FetchContent_Populate(servicegen_userver)
-      endif()
-      set(USERVER_SOURCE_DIR "${servicegen_userver_SOURCE_DIR}")
-    endif()
     if(NOT SERVICELIB_SOURCE_DIR)
       if(DEFINED ENV{DEPENDENCY_GITHUB_RAW_URL} AND
          NOT "$ENV{DEPENDENCY_GITHUB_RAW_URL}" STREQUAL "" AND
@@ -107,28 +78,13 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     endif()
   endif()
 
-  if(USERVER_SOURCE_DIR)
-    set(USERVER_CONAN ON CACHE BOOL "" FORCE)
-    set(USERVER_FEATURE_GRPC ON CACHE BOOL "" FORCE)
-    set(USERVER_FORCE_DOWNLOAD_GRPC OFF CACHE BOOL "" FORCE)
-    set(USERVER_FORCE_DOWNLOAD_PROTOBUF OFF CACHE BOOL "" FORCE)
-    if(ENABLE_OTLP_TRACING)
-      set(USERVER_FEATURE_OTLP ON CACHE BOOL "" FORCE)
-    endif()
-    set(USERVER_FEATURE_CHAOTIC_EXPERIMENTAL ON CACHE BOOL "" FORCE)
-    add_subdirectory(
-        "${USERVER_SOURCE_DIR}"
-        "${CMAKE_BINARY_DIR}/_deps/userver-build"
-        EXCLUDE_FROM_ALL)
-    userver_setup_environment()
-    list(APPEND CMAKE_MODULE_PATH "${USERVER_SOURCE_DIR}/cmake")
-  else()
-    set(_servicegen_userver_components core grpc)
-    if(ENABLE_OTLP_TRACING)
-      list(APPEND _servicegen_userver_components otlp)
-    endif()
-    find_package(userver QUIET COMPONENTS ${_servicegen_userver_components})
+  set(_servicegen_userver_components core chaotic grpc)
+  if(ENABLE_OTLP_TRACING)
+    list(APPEND _servicegen_userver_components otlp)
   endif()
+  find_package(jemalloc CONFIG QUIET)
+  find_package(userver CONFIG REQUIRED
+      COMPONENTS ${_servicegen_userver_components})
 
   if(SERVICELIB_SOURCE_DIR)
     add_subdirectory(
@@ -139,10 +95,9 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     find_package(servicelib CONFIG QUIET)
   endif()
 
-  if(NOT TARGET userver-core)
+  if(NOT TARGET userver::core)
     message(FATAL_ERROR
-        "Standalone service requires userver. Set USERVER_SOURCE_DIR, install "
-        "userver, or enable FETCH_CPP_DEPENDENCIES.")
+        "Standalone service requires the Conan userver package.")
   endif()
   if(NOT TARGET servicelib::servicelib)
     message(FATAL_ERROR
@@ -182,11 +137,11 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     endif()
   endif()
   if(NOT TARGET example_model)
-    set(_servicegen_module_source "${MODULES_ROOT}/model")
+    set(_servicegen_module_source "${MODULES_ROOT}/model_cpp")
     if(EXISTS "${_servicegen_module_source}/CMakeLists.txt")
       add_subdirectory(
           "${_servicegen_module_source}"
-          "${CMAKE_BINARY_DIR}/_modules/model")
+          "${CMAKE_BINARY_DIR}/_modules/model_cpp")
     elseif(FETCH_CPP_DEPENDENCIES)
       include(FetchContent)
       FetchContent_Declare(servicegen_module_model
@@ -198,17 +153,17 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
         FetchContent_Populate(servicegen_module_model)
       endif()
       set(_servicegen_fetched_module_source
-          "${servicegen_module_model_SOURCE_DIR}/model")
+          "${servicegen_module_model_SOURCE_DIR}/model_cpp")
       if(NOT EXISTS "${_servicegen_fetched_module_source}/CMakeLists.txt")
         set(_servicegen_fetched_module_source
             "${servicegen_module_model_SOURCE_DIR}")
       endif()
       add_subdirectory(
           "${_servicegen_fetched_module_source}"
-          "${CMAKE_BINARY_DIR}/_modules/model")
+          "${CMAKE_BINARY_DIR}/_modules/model_cpp")
     else()
       message(FATAL_ERROR
-          "Contract module model was not found under "
+          "Contract module model_cpp was not found under "
           "MODULES_ROOT=${MODULES_ROOT}.")
     endif()
   endif()
@@ -238,7 +193,7 @@ target_compile_features(example_inventory_service PRIVATE cxx_std_20)
 target_include_directories(example_inventory_service PRIVATE
     "${_servicegen_include_root}")
 target_link_libraries(example_inventory_service PRIVATE
-    servicelib::servicelib userver-core userver-grpc
+    servicelib::servicelib userver::core userver::grpc
       example_inventory_service_api
       example_model
 
@@ -247,7 +202,7 @@ target_link_libraries(example_inventory_service PRIVATE
 if(ENABLE_OTLP_TRACING)
   target_compile_definitions(example_inventory_service
       PRIVATE ENABLE_OTLP_TRACING=1)
-  target_link_libraries(example_inventory_service PRIVATE userver::otlp userver-grpc)
+  target_link_libraries(example_inventory_service PRIVATE userver::otlp userver::grpc)
 endif()
 
 if(BUILD_TESTING)
@@ -257,7 +212,7 @@ target_compile_features(example_inventory_service_typed_config PRIVATE cxx_std_2
 target_include_directories(example_inventory_service_typed_config PRIVATE
     "${_servicegen_include_root}")
 target_link_libraries(example_inventory_service_typed_config
-    PRIVATE servicelib::servicelib userver-core)
+    PRIVATE servicelib::servicelib userver::core)
 add_test(NAME example_inventory_service_typed_config
     COMMAND example_inventory_service_typed_config)
 
@@ -269,7 +224,7 @@ target_compile_features(example_inventory_service_unit_tests PRIVATE cxx_std_20)
 target_include_directories(example_inventory_service_unit_tests PRIVATE
     "${_servicegen_include_root}")
 target_link_libraries(example_inventory_service_unit_tests PRIVATE
-    servicelib::servicelib userver-core userver::utest userver-grpc
+    servicelib::servicelib userver::core userver::utest userver::grpc
     example_inventory_service_api
     example_model
 

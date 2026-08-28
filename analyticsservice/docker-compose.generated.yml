@@ -11,8 +11,10 @@ services:
     restart: unless-stopped
     environment:
       - DEBUG=${DEBUG:-0}
+      - ANALYTICS_SERVICE_HTTP_PORT
+      - ANALYTICS_SERVICE_GRPC_PORT
       - 'SECDIST_CONFIG=${SECDIST_CONFIG:-{"kafka_settings":{"kafka-consumer-order-events":{"brokers":"redpanda:9092"}}}}'
     ports:
-      - "9093:9093"
-      - "9203:9203"
+      - "${ANALYTICS_SERVICE_HTTP_PORT:-9093}:${ANALYTICS_SERVICE_HTTP_PORT:-9093}"
+      - "${ANALYTICS_SERVICE_GRPC_PORT:-9203}:${ANALYTICS_SERVICE_GRPC_PORT:-9203}"
       - "2345:2345"

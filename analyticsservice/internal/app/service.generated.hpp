@@ -24,10 +24,13 @@
 #include <servicelib/transformation/streams.hpp>
 #include <servicelib/datasource/kafka/userver.hpp>
 #include <userver/kafka/consumer_component.hpp>
+#include <servicelib/datasource/cron/libcron.hpp>
 
 #include <analyticsservice/internal/functions/analytics/count_order_processed.hpp>
+#include <analyticsservice/internal/functions/cron/analytics_schedule_source.hpp>
 #include <analyticsservice/internal/functions/endpoint/order_processed_endpoint_source.hpp>
-#include <model/include/example/model/types/order_processed.hpp>
+#include <model_cpp/include/example/model/types/automation_job.hpp>
+#include <model_cpp/include/example/model/types/order_processed.hpp>
 
 
 namespace example::analytics_service::app {
@@ -57,6 +60,9 @@ class ServiceGenerated
 
  protected:
   struct ServiceMakers final {
+    std::function<std::unique_ptr<functions::AnalyticsScheduleSource>(
+        servicelib::Context, servicelib::IServiceEnvironment&,
+        const servicelib::config::CronEndpointConfig&)> analytics_schedule_source;
     std::function<std::unique_ptr<functions::CountOrderProcessed>(
         servicelib::Context, servicelib::IServiceEnvironment&,
         const servicelib::config::ProcessStreamConfig&)> count_order_processed;
@@ -65,6 +71,7 @@ class ServiceGenerated
         const servicelib::config::KafkaEndpointConfig&)> order_processed_endpoint_source;
   };
   struct ServiceFunctions final {
+    std::unique_ptr<functions::AnalyticsScheduleSource> analytics_schedule_source;
     std::unique_ptr<functions::CountOrderProcessed> count_order_processed;
     std::unique_ptr<functions::OrderProcessedEndpointSource> order_processed_endpoint_source;
   };
@@ -86,12 +93,16 @@ class ServiceGenerated
   void initDataSources(const config::Config& config);
   void releaseRuntime() noexcept;
 
+  using AnalyticsScheduleInput =
+      servicelib::InputStream<std::string, std::monostate, std::exception_ptr,
+                              ServiceGenerated>;
   using ConsumeOrderProcessedInput =
       servicelib::InputStream<example::model::types::OrderProcessed, example::model::types::OrderProcessed, std::exception_ptr,
                               ServiceGenerated>;
 
 
   struct ServiceStreams final {
+    AnalyticsScheduleInput* analytics_schedule{};
     ConsumeOrderProcessedInput* consume_order_processed{};
     servicelib::StreamBase* count_order_processed{nullptr};
 
@@ -128,11 +139,14 @@ class ServiceGenerated
 
   struct ServiceEndpoints final {
     std::shared_ptr<ConsumeOrderProcessedKafkaSourceEndpoint> consume_order_processed;
+    std::shared_ptr<servicelib::datasource::cron::Endpoint> analytics_schedule;
   };
   ServiceEndpoints endpoints_;
 
   struct ServiceConnectors final {
     std::unique_ptr<ConsumeOrderProcessedKafkaConsumerOwner> consume_order_processed_consumer;
+    std::shared_ptr<
+        servicelib::datasource::cron::LibcronDataSource> local_cron_cron_source;
   };
   ServiceConnectors connectors_;
 

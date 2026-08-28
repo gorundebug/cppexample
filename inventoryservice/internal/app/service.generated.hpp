@@ -26,8 +26,8 @@
 
 #include <inventoryservice/internal/functions/endpoint/process_order_item_source.hpp>
 #include <inventoryservice/internal/functions/inventory_item/get_inventory_item_data.hpp>
-#include <model/include/example/model/types/order_item.hpp>
-#include <model/include/example/model/types/order_item_result.hpp>
+#include <model_cpp/include/example/model/types/order_item.hpp>
+#include <model_cpp/include/example/model/types/order_item_result.hpp>
 #include <proto/inventoryserviceapi/processorderitem/processorderitem.pb.h>
 
 

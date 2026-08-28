@@ -13,12 +13,12 @@ ifeq ($(strip $(USE_LOCAL_MODULES)),1)
 export FETCH_CPP_DEPENDENCIES := OFF
 LOCAL_MODULE_CMAKE_ARG := -DMODULES_ROOT="$(abspath ..)"
 export MODULE_INVENTORY_SERVICE_API_SOURCE_CONTEXT := ../inventory_service_api
-export MODULE_MODEL_SOURCE_CONTEXT := ../model
+export MODULE_MODEL_CPP_SOURCE_CONTEXT := ../model_cpp
 export MODULE_ORDER_SERVICE_API_SOURCE_CONTEXT := ../order_service_api
 endif
 
 ifneq ($(strip $(DEPENDENCY_PROXY_DIR)),)
-export SERVICELIB_SOURCE_CONTEXT ?= $(DEPENDENCY_PROXY_DOCKER_BASE)/github-raw/gorundebug/cppservicelib/archive/refs/tags/v0.2.25.tar.gz
+export SERVICELIB_SOURCE_CONTEXT ?= $(DEPENDENCY_PROXY_DOCKER_BASE)/github-raw/gorundebug/cppservicelib/archive/refs/tags/v0.2.27.tar.gz
 export USERVER_SOURCE_CONTEXT ?= $(DEPENDENCY_GIT_MIRROR_DOCKER_BASE)/github.com/userver-framework/userver.git\#c9f77729c0edce7e423def2d4a4450aa7fc9d259
 endif
 
