@@ -10,6 +10,8 @@ DEPENDENCY_DOCKER_TARGETS := build test release-build release-test asan-test tsa
 	docker-build docker-up docker-build-dev docker-up-dev debug
 include dependency-proxy.generated.mk
 USE_LOCAL_MODULES ?= 0
+DEBUG_PORT ?= 2345
+export DEBUG_PORT
 LOCAL_MODULE_CMAKE_ARG :=
 ifeq ($(strip $(USE_LOCAL_MODULES)),1)
 export FETCH_CPP_DEPENDENCIES := OFF
@@ -68,7 +70,7 @@ docker-up: docker-build ## Start this service through Docker Compose
 docker-up-dev: docker-build-dev ## Start this service with its source directory mounted
 	@docker compose -f "$(STANDALONE_COMPOSE)" -f "$(STANDALONE_DEV_COMPOSE)" up -d --no-build
 
-debug: docker-build-dev ## Start this service under gdbserver on localhost:2345
+debug: docker-build-dev ## Start gdbserver on host port $(DEBUG_PORT), container port 2345
 	@DEBUG=1 docker compose -f "$(STANDALONE_COMPOSE)" -f "$(STANDALONE_DEV_COMPOSE)" \
 		up -d --no-build --force-recreate
 
