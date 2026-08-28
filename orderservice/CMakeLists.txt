@@ -51,7 +51,7 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
          "Fetch missing pinned servicelib, userver, and contract modules" ON)
   set(SERVICELIB_REPOSITORY "https://github.com/gorundebug/cppservicelib.git" CACHE STRING
       "Standalone cppservicelib repository")
-  set(SERVICELIB_REVISION "v0.2.24" CACHE STRING
+  set(SERVICELIB_REVISION "v0.2.25" CACHE STRING
       "Pinned cppservicelib revision")
   set(USERVER_REPOSITORY "https://github.com/userver-framework/userver.git" CACHE STRING
       "Standalone userver repository")
@@ -162,10 +162,22 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     elseif(FETCH_CPP_DEPENDENCIES)
       include(FetchContent)
       FetchContent_Declare(servicegen_module_inventory_service_api
-          GIT_REPOSITORY "https://github.com/gorundebug/cppexample-inventory-service-api.git"
+          GIT_REPOSITORY "https://github.com/gorundebug/cppexample.git"
           GIT_TAG "v0.2.14"
           GIT_SHALLOW FALSE)
-      FetchContent_MakeAvailable(servicegen_module_inventory_service_api)
+      FetchContent_GetProperties(servicegen_module_inventory_service_api)
+      if(NOT servicegen_module_inventory_service_api_POPULATED)
+        FetchContent_Populate(servicegen_module_inventory_service_api)
+      endif()
+      set(_servicegen_fetched_module_source
+          "${servicegen_module_inventory_service_api_SOURCE_DIR}/inventory_service_api")
+      if(NOT EXISTS "${_servicegen_fetched_module_source}/CMakeLists.txt")
+        set(_servicegen_fetched_module_source
+            "${servicegen_module_inventory_service_api_SOURCE_DIR}")
+      endif()
+      add_subdirectory(
+          "${_servicegen_fetched_module_source}"
+          "${CMAKE_BINARY_DIR}/_modules/inventory_service_api")
     else()
       message(FATAL_ERROR
           "Contract module inventory_service_api was not found under "
@@ -181,10 +193,22 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     elseif(FETCH_CPP_DEPENDENCIES)
       include(FetchContent)
       FetchContent_Declare(servicegen_module_model
-          GIT_REPOSITORY "https://github.com/gorundebug/cppexample-model.git"
+          GIT_REPOSITORY "https://github.com/gorundebug/cppexample.git"
           GIT_TAG "v0.2.14"
           GIT_SHALLOW FALSE)
-      FetchContent_MakeAvailable(servicegen_module_model)
+      FetchContent_GetProperties(servicegen_module_model)
+      if(NOT servicegen_module_model_POPULATED)
+        FetchContent_Populate(servicegen_module_model)
+      endif()
+      set(_servicegen_fetched_module_source
+          "${servicegen_module_model_SOURCE_DIR}/model")
+      if(NOT EXISTS "${_servicegen_fetched_module_source}/CMakeLists.txt")
+        set(_servicegen_fetched_module_source
+            "${servicegen_module_model_SOURCE_DIR}")
+      endif()
+      add_subdirectory(
+          "${_servicegen_fetched_module_source}"
+          "${CMAKE_BINARY_DIR}/_modules/model")
     else()
       message(FATAL_ERROR
           "Contract module model was not found under "
@@ -200,10 +224,22 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     elseif(FETCH_CPP_DEPENDENCIES)
       include(FetchContent)
       FetchContent_Declare(servicegen_module_order_service_api
-          GIT_REPOSITORY "https://github.com/gorundebug/cppexample-order-service-api.git"
+          GIT_REPOSITORY "https://github.com/gorundebug/cppexample.git"
           GIT_TAG "v0.2.14"
           GIT_SHALLOW FALSE)
-      FetchContent_MakeAvailable(servicegen_module_order_service_api)
+      FetchContent_GetProperties(servicegen_module_order_service_api)
+      if(NOT servicegen_module_order_service_api_POPULATED)
+        FetchContent_Populate(servicegen_module_order_service_api)
+      endif()
+      set(_servicegen_fetched_module_source
+          "${servicegen_module_order_service_api_SOURCE_DIR}/order_service_api")
+      if(NOT EXISTS "${_servicegen_fetched_module_source}/CMakeLists.txt")
+        set(_servicegen_fetched_module_source
+            "${servicegen_module_order_service_api_SOURCE_DIR}")
+      endif()
+      add_subdirectory(
+          "${_servicegen_fetched_module_source}"
+          "${CMAKE_BINARY_DIR}/_modules/order_service_api")
     else()
       message(FATAL_ERROR
           "Contract module order_service_api was not found under "

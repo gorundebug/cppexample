@@ -87,7 +87,23 @@ RUN set -eu; \
     rm -rf /tmp/userver-source
 
 WORKDIR /workspace
-COPY --from=module-model / /workspace/modules/model
+COPY --from=module-model / /tmp/module-model-source
+RUN set -eu; \
+    source_dir=/tmp/module-model-source; \
+    archive=$(find "$source_dir" -mindepth 1 -maxdepth 1 -type f \( -name context -o -name '*.tar' -o -name '*.tar.gz' -o -name '*.tgz' -o -name '*.tar.xz' \) -print -quit); \
+    if [ -n "$archive" ]; then \
+      mkdir -p /tmp/module-model-archive; \
+      tar -xf "$archive" -C /tmp/module-model-archive; \
+      source_dir=/tmp/module-model-archive; \
+    fi; \
+    manifest=$(find "$source_dir" -type f -path '*/model/CMakeLists.txt' -print -quit); \
+    if [ -z "$manifest" ]; then manifest="$source_dir/CMakeLists.txt"; fi; \
+    if [ ! -f "$manifest" ]; then manifest=$(find "$source_dir" -mindepth 2 -maxdepth 2 -type f -name CMakeLists.txt -print -quit); fi; \
+    if [ -z "$manifest" ] || [ ! -f "$manifest" ]; then echo "module model source context has no CMakeLists.txt" >&2; exit 1; fi; \
+    source_dir=${manifest%/CMakeLists.txt}; \
+    mkdir -p /workspace/modules/model; \
+    cp -a "$source_dir/." /workspace/modules/model/; \
+    rm -rf /tmp/module-model-source /tmp/module-model-archive
 
 ENV LANG=en_US.UTF-8
 ENV LC_ALL=en_US.UTF-8
