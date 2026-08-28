@@ -9,6 +9,7 @@ STANDALONE_DEV_COMPOSE := $(if $(wildcard docker-compose.dev.yml),docker-compose
 DEPENDENCY_DOCKER_TARGETS := build test release-build release-test asan-test tsan-test lint \
 	docker-build docker-up docker-build-dev docker-up-dev debug
 include dependency-proxy.generated.mk
+USE_LOCAL_MODULES ?= 0
 LOCAL_MODULE_CMAKE_ARG :=
 ifeq ($(strip $(USE_LOCAL_MODULES)),1)
 export FETCH_CPP_DEPENDENCIES := OFF
