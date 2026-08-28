@@ -6,7 +6,8 @@ export FETCH_CPP_DEPENDENCIES := ON
 BUILD_DIR ?= build
 STANDALONE_COMPOSE := $(if $(wildcard docker-compose.yml),docker-compose.yml,docker-compose.generated.yml)
 STANDALONE_DEV_COMPOSE := $(if $(wildcard docker-compose.dev.yml),docker-compose.dev.yml,docker-compose.dev.generated.yml)
-DEPENDENCY_DOCKER_TARGETS := docker-build docker-up docker-build-dev docker-up-dev debug
+DEPENDENCY_DOCKER_TARGETS := build test release-build release-test asan-test tsan-test lint \
+	docker-build docker-up docker-build-dev docker-up-dev debug
 include dependency-proxy.generated.mk
 LOCAL_MODULE_CMAKE_ARG :=
 ifeq ($(strip $(USE_LOCAL_MODULES)),1)
@@ -25,25 +26,15 @@ endif
 .PHONY: build test release-build release-test asan-test tsan-test release-up lint fmt clean \
 	docker-build docker-build-dev docker-up docker-up-dev debug docker-down docker-down-dev docker-clean help
 
-build: ## Build the standalone service with CMake
-	@cmake -S . -B "$(BUILD_DIR)" -G Ninja -DCMAKE_BUILD_TYPE=Debug \
-		$(LOCAL_MODULE_CMAKE_ARG) \
-		-DFETCH_CPP_DEPENDENCIES="$(FETCH_CPP_DEPENDENCIES)"
-	@cmake --build "$(BUILD_DIR)" --parallel
+build: ## Build the standalone service from copied sources in Docker
+	@docker compose -f docker-compose.cmake.generated.yml build cpp-check
 
-test: ## Build and run all service tests
-	@$(MAKE) build
-	@ctest --test-dir "$(BUILD_DIR)" --output-on-failure
+test: ## Build and run all service tests from copied sources in Docker
+	@docker compose -f docker-compose.cmake.generated.yml build cpp-test
 
-release-build: ## Build the optimized standalone service with CMake
-	@cmake -S . -B "$(BUILD_DIR)-release" -G Ninja -DCMAKE_BUILD_TYPE=Release \
-		$(LOCAL_MODULE_CMAKE_ARG) \
-		-DFETCH_CPP_DEPENDENCIES="$(FETCH_CPP_DEPENDENCIES)"
-	@cmake --build "$(BUILD_DIR)-release" --parallel
+release-build: docker-build ## Build the optimized standalone service in Docker
 
-release-test: ## Build and test the optimized standalone service
-	@$(MAKE) release-build
-	@ctest --test-dir "$(BUILD_DIR)-release" --output-on-failure
+release-test: test ## Build and test the standalone service in Docker
 
 asan-test: ## Run standalone service tests with ASan and UBSan in Docker
 	@SANITIZER_INTEGRATION=0 ./scripts/sanitizer-test.generated.sh asan

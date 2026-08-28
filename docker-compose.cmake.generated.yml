@@ -14,11 +14,15 @@ services:
         DEPENDENCY_APT_UBUNTU_SECURITY_URL: ${DEPENDENCY_APT_UBUNTU_SECURITY_URL:-}
         DEPENDENCY_APT_UBUNTU_PORTS_URL: ${DEPENDENCY_APT_UBUNTU_PORTS_URL:-}
         DEPENDENCY_CONAN_REMOTE_URL: ${DEPENDENCY_CONAN_REMOTE_URL:-}
+        DEPENDENCY_CONAN_UPLOAD_URL: ${DEPENDENCY_CONAN_UPLOAD_URL:-}
+        DEPENDENCY_CONAN_PUBLISH: ${DEPENDENCY_CONAN_PUBLISH:-0}
         PIP_INDEX_URL: ${PIP_INDEX_URL:-https://pypi.org/simple}
         PIP_TRUSTED_HOST: ${PIP_TRUSTED_HOST:-}
       additional_contexts:
         servicelib-source: ${SERVICELIB_SOURCE_CONTEXT:-https://github.com/gorundebug/cppservicelib.git#v0.2.27}
         userver-source: ${USERVER_SOURCE_CONTEXT:-https://github.com/userver-framework/userver.git#c9f77729c0edce7e423def2d4a4450aa7fc9d259}
+      secrets:
+        - dependency_conan_credential
     extra_hosts:
       - "host.docker.internal:host-gateway"
     working_dir: /workspace/source
@@ -27,6 +31,9 @@ services:
       CPPSERVICELIB_SOURCE_DIR: ${SERVICELIB_CONTAINER_SOURCE_DIR:-/opt/servicelib}
       USERVER_SOURCE_DIR: ${USERVER_CONTAINER_SOURCE_DIR:-/opt/userver}
       DEPENDENCY_CONAN_REMOTE_URL: ${DEPENDENCY_CONAN_REMOTE_URL:-}
+      DEPENDENCY_CONAN_UPLOAD_URL: ${DEPENDENCY_CONAN_UPLOAD_URL:-}
+      DEPENDENCY_CONAN_PUBLISH: ${DEPENDENCY_CONAN_PUBLISH:-0}
+      DEPENDENCY_CONAN_CREDENTIAL_FILE: /run/secrets/dependency_conan_credential
       PIP_INDEX_URL: ${PIP_INDEX_URL:-https://pypi.org/simple}
       PIP_TRUSTED_HOST: ${PIP_TRUSTED_HOST:-}
       CCACHE_DIR: /ccache
@@ -48,10 +55,12 @@ services:
       - cpp-cmake-build:/workspace/build
       - cpp-ccache:/ccache
       - ${DEPENDENCY_CONAN_HOME:-cpp-conan2}:/conan
+    secrets:
+      - dependency_conan_credential
     command:
       - /bin/bash
       - -c
-      - source scripts/configure-git-auth.generated.sh && ./scripts/conan-install.generated.sh Debug /workspace/build/conan-debug && conan_toolchain="$(cat /workspace/build/conan-debug/toolchain.path)" && ./scripts/run_with_progress.generated.sh "Debug configure" cmake --fresh --preset docker-debug -DCMAKE_TOOLCHAIN_FILE="$${conan_toolchain}" -DFETCH_CPP_DEPENDENCIES="${FETCH_CPP_DEPENDENCIES:-OFF}" && ./scripts/run_with_progress.generated.sh "Debug build" cmake --build --preset docker-debug && ./scripts/run_with_progress.generated.sh "Test suite" ctest --preset docker-debug
+      - source scripts/configure-git-auth.generated.sh && ./scripts/conan-install.generated.sh Debug /workspace/build/conan-debug && conan_toolchain="$(cat /workspace/build/conan-debug/toolchain.path)" && ./scripts/run_with_progress.generated.sh "Debug configure" cmake --fresh --preset docker-debug -DCMAKE_TOOLCHAIN_FILE="$${conan_toolchain}" -DFETCH_CPP_DEPENDENCIES="${FETCH_CPP_DEPENDENCIES:-OFF}" && ./scripts/run_with_progress.generated.sh "Debug build" cmake --build --preset docker-debug && ./scripts/run_with_progress.generated.sh "Test suite" ctest --test-dir /workspace/build --output-on-failure --no-tests=error
   analyticsservice-runtime:
     image: cppexample-analyticsservice
     build:
@@ -67,6 +76,8 @@ services:
         DEPENDENCY_APT_UBUNTU_SECURITY_URL: ${DEPENDENCY_APT_UBUNTU_SECURITY_URL:-}
         DEPENDENCY_APT_UBUNTU_PORTS_URL: ${DEPENDENCY_APT_UBUNTU_PORTS_URL:-}
         DEPENDENCY_CONAN_REMOTE_URL: ${DEPENDENCY_CONAN_REMOTE_URL:-}
+        DEPENDENCY_CONAN_UPLOAD_URL: ${DEPENDENCY_CONAN_UPLOAD_URL:-}
+        DEPENDENCY_CONAN_PUBLISH: ${DEPENDENCY_CONAN_PUBLISH:-0}
         PIP_INDEX_URL: ${PIP_INDEX_URL:-https://pypi.org/simple}
         PIP_TRUSTED_HOST: ${PIP_TRUSTED_HOST:-}
         USERVER_LTO: ${USERVER_LTO:-ON}
@@ -75,6 +86,8 @@ services:
       additional_contexts:
         servicelib-source: ${SERVICELIB_SOURCE_CONTEXT:-https://github.com/gorundebug/cppservicelib.git#v0.2.27}
         userver-source: ${USERVER_SOURCE_CONTEXT:-https://github.com/userver-framework/userver.git#c9f77729c0edce7e423def2d4a4450aa7fc9d259}
+      secrets:
+        - dependency_conan_credential
   inventoryservice-runtime:
     image: cppexample-inventoryservice
     build:
@@ -90,6 +103,8 @@ services:
         DEPENDENCY_APT_UBUNTU_SECURITY_URL: ${DEPENDENCY_APT_UBUNTU_SECURITY_URL:-}
         DEPENDENCY_APT_UBUNTU_PORTS_URL: ${DEPENDENCY_APT_UBUNTU_PORTS_URL:-}
         DEPENDENCY_CONAN_REMOTE_URL: ${DEPENDENCY_CONAN_REMOTE_URL:-}
+        DEPENDENCY_CONAN_UPLOAD_URL: ${DEPENDENCY_CONAN_UPLOAD_URL:-}
+        DEPENDENCY_CONAN_PUBLISH: ${DEPENDENCY_CONAN_PUBLISH:-0}
         PIP_INDEX_URL: ${PIP_INDEX_URL:-https://pypi.org/simple}
         PIP_TRUSTED_HOST: ${PIP_TRUSTED_HOST:-}
         USERVER_LTO: ${USERVER_LTO:-ON}
@@ -98,6 +113,8 @@ services:
       additional_contexts:
         servicelib-source: ${SERVICELIB_SOURCE_CONTEXT:-https://github.com/gorundebug/cppservicelib.git#v0.2.27}
         userver-source: ${USERVER_SOURCE_CONTEXT:-https://github.com/userver-framework/userver.git#c9f77729c0edce7e423def2d4a4450aa7fc9d259}
+      secrets:
+        - dependency_conan_credential
   orderservice-runtime:
     image: cppexample-orderservice
     build:
@@ -113,6 +130,8 @@ services:
         DEPENDENCY_APT_UBUNTU_SECURITY_URL: ${DEPENDENCY_APT_UBUNTU_SECURITY_URL:-}
         DEPENDENCY_APT_UBUNTU_PORTS_URL: ${DEPENDENCY_APT_UBUNTU_PORTS_URL:-}
         DEPENDENCY_CONAN_REMOTE_URL: ${DEPENDENCY_CONAN_REMOTE_URL:-}
+        DEPENDENCY_CONAN_UPLOAD_URL: ${DEPENDENCY_CONAN_UPLOAD_URL:-}
+        DEPENDENCY_CONAN_PUBLISH: ${DEPENDENCY_CONAN_PUBLISH:-0}
         PIP_INDEX_URL: ${PIP_INDEX_URL:-https://pypi.org/simple}
         PIP_TRUSTED_HOST: ${PIP_TRUSTED_HOST:-}
         USERVER_LTO: ${USERVER_LTO:-ON}
@@ -121,6 +140,8 @@ services:
       additional_contexts:
         servicelib-source: ${SERVICELIB_SOURCE_CONTEXT:-https://github.com/gorundebug/cppservicelib.git#v0.2.27}
         userver-source: ${USERVER_SOURCE_CONTEXT:-https://github.com/userver-framework/userver.git#c9f77729c0edce7e423def2d4a4450aa7fc9d259}
+      secrets:
+        - dependency_conan_credential
 
 volumes:
   cpp-cmake-build:
@@ -129,3 +150,7 @@ volumes:
     name: cppexample_cpp-ccache
   cpp-conan2:
     name: dependency-conan2
+
+secrets:
+  dependency_conan_credential:
+    file: ${DEPENDENCY_CONAN_CREDENTIAL_FILE:-/dev/null}
