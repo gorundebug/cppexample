@@ -2,6 +2,9 @@ dataConnectors:
   orderEvents:
     brokers: redpanda:9092
 endpoints:
+  analyticsSchedule:
+    enabled: true
+    tracingEnabled: false
   orderProcessed:
     enabled: true
 services:
