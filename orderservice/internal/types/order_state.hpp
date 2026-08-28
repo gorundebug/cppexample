@@ -12,7 +12,7 @@
 #include <userver/formats/serialize/common_containers.hpp>
 #include <userver/formats/serialize/to.hpp>
 
-#include <model/include/example/model/types/order_item_result.hpp>
+#include <model_cpp/include/example/model/types/order_item_result.hpp>
 
 namespace example::order_service::types {
 
