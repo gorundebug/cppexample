@@ -33,9 +33,9 @@ services:
         PIP_INDEX_URL: ${PIP_INDEX_URL:-https://pypi.org/simple}
         PIP_TRUSTED_HOST: ${PIP_TRUSTED_HOST:-}
       additional_contexts:
-        servicelib-source: ${SERVICELIB_SOURCE_CONTEXT:-https://github.com/gorundebug/cppservicelib.git#v0.2.28}
+        servicelib-source: ${SERVICELIB_SOURCE_CONTEXT:-https://github.com/gorundebug/cppservicelib.git#v0.2.29}
         userver-source: ${USERVER_SOURCE_CONTEXT:-https://github.com/userver-framework/userver.git#c9f77729c0edce7e423def2d4a4450aa7fc9d259}
-        module-model_cpp: ${MODULE_MODEL_CPP_SOURCE_CONTEXT:-https://github.com/gorundebug/cppexample.git#v0.2.14}
+        module-model_cpp: ${MODULE_MODEL_CPP_SOURCE_CONTEXT:-https://github.com/gorundebug/cppexample.git#v0.2.29}
       secrets:
         - dependency_conan_credential
     extra_hosts:
@@ -99,9 +99,9 @@ services:
         RUNTIME_STRIP: ${RUNTIME_STRIP:-ON}
         SERVICEGEN_EXAMPLE_PROFILE: ${SERVICEGEN_EXAMPLE_PROFILE:-function-call}
       additional_contexts:
-        servicelib-source: ${SERVICELIB_SOURCE_CONTEXT:-https://github.com/gorundebug/cppservicelib.git#v0.2.28}
+        servicelib-source: ${SERVICELIB_SOURCE_CONTEXT:-https://github.com/gorundebug/cppservicelib.git#v0.2.29}
         userver-source: ${USERVER_SOURCE_CONTEXT:-https://github.com/userver-framework/userver.git#c9f77729c0edce7e423def2d4a4450aa7fc9d259}
-        module-model_cpp: ${MODULE_MODEL_CPP_SOURCE_CONTEXT:-https://github.com/gorundebug/cppexample.git#v0.2.14}
+        module-model_cpp: ${MODULE_MODEL_CPP_SOURCE_CONTEXT:-https://github.com/gorundebug/cppexample.git#v0.2.29}
       secrets:
         - dependency_conan_credential
 
