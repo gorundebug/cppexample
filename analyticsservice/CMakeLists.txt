@@ -49,7 +49,7 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
          "Fetch missing pinned servicelib and contract modules" ON)
   set(SERVICELIB_REPOSITORY "https://github.com/gorundebug/cppservicelib.git" CACHE STRING
       "Standalone cppservicelib repository")
-  set(SERVICELIB_REVISION "v0.2.27" CACHE STRING
+  set(SERVICELIB_REVISION "v0.2.28" CACHE STRING
       "Pinned cppservicelib revision")
   if(FETCH_CPP_DEPENDENCIES)
     include(FetchContent)

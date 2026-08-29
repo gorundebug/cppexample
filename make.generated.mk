@@ -51,8 +51,8 @@ DEPENDENCY_HOST_TARGETS := $(LANG_HOST_PREP_TARGETS)
 include dependency-proxy.generated.mk
 
 ifneq ($(strip $(DEPENDENCY_PROXY_DIR)),)
-export GOSERVICELIB_SOURCE_CONTEXT ?= $(DEPENDENCY_PROXY_DOCKER_BASE)/github-raw/gorundebug/servicelib/archive/refs/tags/v0.2.27.tar.gz
-export SERVICELIB_SOURCE_CONTEXT ?= $(DEPENDENCY_PROXY_DOCKER_BASE)/github-raw/gorundebug/cppservicelib/archive/refs/tags/v0.2.27.tar.gz
+export GOSERVICELIB_SOURCE_CONTEXT ?= $(DEPENDENCY_PROXY_DOCKER_BASE)/github-raw/gorundebug/servicelib/archive/refs/tags/v0.2.28.tar.gz
+export SERVICELIB_SOURCE_CONTEXT ?= $(DEPENDENCY_PROXY_DOCKER_BASE)/github-raw/gorundebug/cppservicelib/archive/refs/tags/v0.2.28.tar.gz
 export USERVER_SOURCE_CONTEXT ?= $(DEPENDENCY_GIT_MIRROR_DOCKER_BASE)/github.com/userver-framework/userver.git\#c9f77729c0edce7e423def2d4a4450aa7fc9d259
 endif
 
