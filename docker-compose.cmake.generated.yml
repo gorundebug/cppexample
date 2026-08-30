@@ -1,6 +1,6 @@
 services:
   cpp-build:
-    image: cppexample-cpp-build
+    image: cppexample-cpp-build:local
     build:
       context: .
       dockerfile: Dockerfile.cmake
@@ -28,11 +28,11 @@ services:
     working_dir: /workspace/source
     environment:
       SERVICELIB_SOURCE_DIR: ${SERVICELIB_CONTAINER_SOURCE_DIR:-/opt/servicelib}
-      CPPSERVICELIB_SOURCE_DIR: ${SERVICELIB_CONTAINER_SOURCE_DIR:-/opt/servicelib}
       USERVER_SOURCE_DIR: ${USERVER_CONTAINER_SOURCE_DIR:-/opt/userver}
       DEPENDENCY_CONAN_REMOTE_URL: ${DEPENDENCY_CONAN_REMOTE_URL:-}
       DEPENDENCY_CONAN_UPLOAD_URL: ${DEPENDENCY_CONAN_UPLOAD_URL:-}
       DEPENDENCY_CONAN_PUBLISH: ${DEPENDENCY_CONAN_PUBLISH:-0}
+      CPPSERVICELIB_CONAN_LOCKFILE: ${CPPSERVICELIB_CONAN_LOCKFILE:-}
       DEPENDENCY_CONAN_CREDENTIAL_FILE: /run/secrets/dependency_conan_credential
       PIP_INDEX_URL: ${PIP_INDEX_URL:-https://pypi.org/simple}
       PIP_TRUSTED_HOST: ${PIP_TRUSTED_HOST:-}
@@ -62,7 +62,7 @@ services:
       - -c
       - source scripts/configure-git-auth.generated.sh && ./scripts/conan-install.generated.sh Debug /workspace/build/conan-debug && conan_toolchain="$(cat /workspace/build/conan-debug/toolchain.path)" && ./scripts/run_with_progress.generated.sh "Debug configure" cmake --fresh --preset docker-debug -DCMAKE_TOOLCHAIN_FILE="$${conan_toolchain}" -DFETCH_CPP_DEPENDENCIES="${FETCH_CPP_DEPENDENCIES:-OFF}" && ./scripts/run_with_progress.generated.sh "Debug build" cmake --build --preset docker-debug && ./scripts/run_with_progress.generated.sh "Test suite" ctest --test-dir /workspace/build --output-on-failure --no-tests=error
   analyticsservice-runtime:
-    image: cppexample-analyticsservice
+    image: cppexample-analyticsservice:local
     build:
       context: .
       dockerfile: Dockerfile.cmake
@@ -82,14 +82,14 @@ services:
         PIP_TRUSTED_HOST: ${PIP_TRUSTED_HOST:-}
         USERVER_LTO: ${USERVER_LTO:-ON}
         RUNTIME_STRIP: ${RUNTIME_STRIP:-ON}
-        SERVICEGEN_EXAMPLE_PROFILE: ${SERVICEGEN_EXAMPLE_PROFILE:-function-call}
+        EXAMPLE_PROFILE: ${EXAMPLE_PROFILE:-function-call}
       additional_contexts:
         servicelib-source: ${SERVICELIB_SOURCE_CONTEXT:-https://github.com/gorundebug/cppservicelib.git#v0.2.31}
         userver-source: ${USERVER_SOURCE_CONTEXT:-https://github.com/userver-framework/userver.git#c9f77729c0edce7e423def2d4a4450aa7fc9d259}
       secrets:
         - dependency_conan_credential
   inventoryservice-runtime:
-    image: cppexample-inventoryservice
+    image: cppexample-inventoryservice:local
     build:
       context: .
       dockerfile: Dockerfile.cmake
@@ -109,14 +109,14 @@ services:
         PIP_TRUSTED_HOST: ${PIP_TRUSTED_HOST:-}
         USERVER_LTO: ${USERVER_LTO:-ON}
         RUNTIME_STRIP: ${RUNTIME_STRIP:-ON}
-        SERVICEGEN_EXAMPLE_PROFILE: ${SERVICEGEN_EXAMPLE_PROFILE:-function-call}
+        EXAMPLE_PROFILE: ${EXAMPLE_PROFILE:-function-call}
       additional_contexts:
         servicelib-source: ${SERVICELIB_SOURCE_CONTEXT:-https://github.com/gorundebug/cppservicelib.git#v0.2.31}
         userver-source: ${USERVER_SOURCE_CONTEXT:-https://github.com/userver-framework/userver.git#c9f77729c0edce7e423def2d4a4450aa7fc9d259}
       secrets:
         - dependency_conan_credential
   orderservice-runtime:
-    image: cppexample-orderservice
+    image: cppexample-orderservice:local
     build:
       context: .
       dockerfile: Dockerfile.cmake
@@ -136,7 +136,7 @@ services:
         PIP_TRUSTED_HOST: ${PIP_TRUSTED_HOST:-}
         USERVER_LTO: ${USERVER_LTO:-ON}
         RUNTIME_STRIP: ${RUNTIME_STRIP:-ON}
-        SERVICEGEN_EXAMPLE_PROFILE: ${SERVICEGEN_EXAMPLE_PROFILE:-function-call}
+        EXAMPLE_PROFILE: ${EXAMPLE_PROFILE:-function-call}
       additional_contexts:
         servicelib-source: ${SERVICELIB_SOURCE_CONTEXT:-https://github.com/gorundebug/cppservicelib.git#v0.2.31}
         userver-source: ${USERVER_SOURCE_CONTEXT:-https://github.com/userver-framework/userver.git#c9f77729c0edce7e423def2d4a4450aa7fc9d259}

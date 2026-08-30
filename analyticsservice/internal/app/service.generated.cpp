@@ -216,6 +216,8 @@ AnalyticsServiceComponent::AnalyticsServiceComponent(
 
 AnalyticsServiceComponent::~AnalyticsServiceComponent() { service_->stop(); }
 
+void AnalyticsServiceComponent::OnAllComponentsAreStopping() { service_->stop(); }
+
 
 
 userver::yaml_config::Schema AnalyticsServiceComponent::GetStaticConfigSchema() {

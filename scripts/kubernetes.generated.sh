@@ -172,22 +172,22 @@ build_images() {
   progress "building existing minimal runtime images"
   make docker-build
   progress "publishing analyticsservice image"
-  docker tag "cppexample-analyticsservice:latest" \
+  docker tag "cppexample-analyticsservice:local" \
     "${HOST_REGISTRY}/cppexample/analyticsservice:${IMAGE_TAG}"
   docker push \
     "${HOST_REGISTRY}/cppexample/analyticsservice:${IMAGE_TAG}"
   progress "publishing automationservice image"
-  docker tag "automationservice:latest" \
+  docker tag "automationservice:local" \
     "${HOST_REGISTRY}/cppexample/automationservice:${IMAGE_TAG}"
   docker push \
     "${HOST_REGISTRY}/cppexample/automationservice:${IMAGE_TAG}"
   progress "publishing inventoryservice image"
-  docker tag "cppexample-inventoryservice:latest" \
+  docker tag "cppexample-inventoryservice:local" \
     "${HOST_REGISTRY}/cppexample/inventoryservice:${IMAGE_TAG}"
   docker push \
     "${HOST_REGISTRY}/cppexample/inventoryservice:${IMAGE_TAG}"
   progress "publishing orderservice image"
-  docker tag "cppexample-orderservice:latest" \
+  docker tag "cppexample-orderservice:local" \
     "${HOST_REGISTRY}/cppexample/orderservice:${IMAGE_TAG}"
   docker push \
     "${HOST_REGISTRY}/cppexample/orderservice:${IMAGE_TAG}"

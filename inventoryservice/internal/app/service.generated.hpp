@@ -159,6 +159,8 @@ class InventoryServiceComponent final : public userver::components::ComponentBas
       const userver::components::ComponentContext& context);
   ~InventoryServiceComponent() override;
 
+  void OnAllComponentsAreStopping() override;
+
   Service& service() noexcept { return *service_; }
 
 

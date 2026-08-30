@@ -28,7 +28,7 @@ COPY dependency-download-mirrors.env /etc/servicegen/dependency-download-mirrors
 COPY dependency-download-env.generated.sh /usr/local/bin/servicegen-download-env
 SHELL ["/usr/local/bin/servicegen-download-env", "/bin/sh", "-c"]
 
-COPY docker/userver-packages-ubuntu-24.04.txt /tmp/userver-packages.txt
+COPY docker/userver-packages.txt /tmp/userver-packages.txt
 
 RUN if [ -n "$DEPENDENCY_APT_UBUNTU_ARCHIVE_URL$DEPENDENCY_APT_UBUNTU_SECURITY_URL$DEPENDENCY_APT_UBUNTU_PORTS_URL" ]; then \
       find /etc/apt -type f \( -name '*.list' -o -name '*.sources' \) -exec sed -i \
@@ -148,8 +148,14 @@ RUN set -eu; \
 ENV LANG=en_US.UTF-8
 ENV LC_ALL=en_US.UTF-8
 ENV SERVICELIB_SOURCE_DIR=/opt/servicelib
-ENV CPPSERVICELIB_SOURCE_DIR=/opt/servicelib
 ENV USERVER_SOURCE_DIR=/opt/userver
+
+# The ordinary build/test/sanitizer image owns an immutable copy of the
+# service sources.  Development and debugger commands may overlay this path
+# with the explicitly read-only source mount from the dev compose file.
+FROM development AS source-builder
+COPY . /workspace/source
+WORKDIR /workspace/source
 
 FROM development AS debug-builder
 
@@ -178,9 +184,9 @@ FROM development AS runtime-builder
 
 ARG USERVER_LTO=ON
 ARG RUNTIME_STRIP=ON
-ARG SERVICEGEN_EXAMPLE_PROFILE=function-call
+ARG EXAMPLE_PROFILE=function-call
 COPY . /workspace
-RUN --mount=type=cache,id=cppexample-runtime-build-v2-${TARGETARCH}-${SERVICEGEN_EXAMPLE_PROFILE},target=/workspace/build,sharing=locked \
+RUN --mount=type=cache,id=cppexample-runtime-build-v2-${TARGETARCH}-${EXAMPLE_PROFILE},target=/workspace/build,sharing=locked \
     --mount=type=cache,id=cppexample-runtime-ccache-${TARGETARCH},target=/ccache \
     --mount=type=cache,id=servicegen-conan2-${TARGETARCH},target=/conan,sharing=locked \
     --mount=type=secret,id=dependency_conan_credential \

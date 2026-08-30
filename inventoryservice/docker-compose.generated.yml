@@ -1,6 +1,6 @@
 services:
   inventoryservice:
-    image: cppexample-inventoryservice
+    image: cppexample-inventoryservice:local
     working_dir: /app
     command:
       - --config

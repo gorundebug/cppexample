@@ -362,6 +362,8 @@ OrderServiceComponent::OrderServiceComponent(
 
 OrderServiceComponent::~OrderServiceComponent() { service_->stop(); }
 
+void OrderServiceComponent::OnAllComponentsAreStopping() { service_->stop(); }
+
 std::shared_ptr<
     servicelib::datasource::http::IUserverEndpoint>
 OrderServiceComponent::httpDataSourceEndpoint(int endpoint_id) const {

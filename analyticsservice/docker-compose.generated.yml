@@ -1,6 +1,6 @@
 services:
   analyticsservice:
-    image: cppexample-analyticsservice
+    image: cppexample-analyticsservice:local
     working_dir: /app
     command:
       - --config

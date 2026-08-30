@@ -6,7 +6,7 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
   set(CMAKE_CXX_STANDARD_REQUIRED ON)
   set(CMAKE_CXX_EXTENSIONS OFF)
 
-  find_package(userver CONFIG REQUIRED COMPONENTS core chaotic)
+  find_package(userver CONFIG REQUIRED COMPONENTS core chaotic chaotic-openapi)
 endif()
 
 set(_GENERATED_DIR "${CMAKE_BINARY_DIR}/generated/example/order_service_api")

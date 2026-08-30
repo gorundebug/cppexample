@@ -193,6 +193,8 @@ InventoryServiceComponent::InventoryServiceComponent(
 
 InventoryServiceComponent::~InventoryServiceComponent() { service_->stop(); }
 
+void InventoryServiceComponent::OnAllComponentsAreStopping() { service_->stop(); }
+
 
 
 userver::yaml_config::Schema InventoryServiceComponent::GetStaticConfigSchema() {

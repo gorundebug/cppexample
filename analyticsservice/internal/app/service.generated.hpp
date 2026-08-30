@@ -168,6 +168,8 @@ class AnalyticsServiceComponent final : public userver::components::ComponentBas
       const userver::components::ComponentContext& context);
   ~AnalyticsServiceComponent() override;
 
+  void OnAllComponentsAreStopping() override;
+
   Service& service() noexcept { return *service_; }
 
 

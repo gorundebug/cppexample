@@ -18,40 +18,23 @@ case "$sanitizer" in
 esac
 
 service_dirs=(
-
-  "analyticsservice"
-
-
-  "inventoryservice"
-
-
-  "orderservice"
+  "."
 
 )
 service_targets=(
   "example_analytics_service"
-  "example_inventory_service"
-  "example_order_service"
 )
 service_names=(
   "analyticsservice"
-  "inventoryservice"
-  "orderservice"
 )
 http_ports=(
   "9093"
-  "9092"
-  "9091"
 )
 grpc_ports=(
   "9203"
-  "9202"
-  "9201"
 )
 secdist_values=(
   '{"kafka_settings":{"kafka-consumer-order-events":{"brokers":"redpanda:9092"}}}'
-  ''
-  ''
 )
 
 if [[ "${#service_dirs[@]}" -eq 0 ]]; then
@@ -108,7 +91,7 @@ for index in "${!service_dirs[@]}"; do
       environment+=("SECDIST_CONFIG=$secdist")
     fi
     exec env "${environment[@]}" \
-      "${build_dir%/}/$service_name/$target" \
+      "${build_dir%/}/$target" \
         --config static_config.yaml \
         --config_vars "$config_dir/$service_name.yaml"
   ) &

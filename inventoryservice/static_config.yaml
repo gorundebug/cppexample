@@ -65,7 +65,7 @@ components_manager:
 
     grpc-server:
       port: 9202
-      completion-queue-count: 4
+      completion-queue-count: 1
     grpc-server-middlewares-pipeline:
     servicelib-runtime:
       config-path: config/config.yaml

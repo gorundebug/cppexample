@@ -264,6 +264,8 @@ class OrderServiceComponent final : public userver::components::ComponentBase {
       const userver::components::ComponentContext& context);
   ~OrderServiceComponent() override;
 
+  void OnAllComponentsAreStopping() override;
+
   Service& service() noexcept { return *service_; }
   std::shared_ptr<
       servicelib::datasource::http::IUserverEndpoint>

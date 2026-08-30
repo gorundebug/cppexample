@@ -1,6 +1,6 @@
 services:
   orderservice:
-    image: cppexample-orderservice
+    image: cppexample-orderservice:local
     working_dir: /app
     command:
       - --config

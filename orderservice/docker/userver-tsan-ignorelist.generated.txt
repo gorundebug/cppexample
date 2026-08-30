@@ -1,0 +1,10 @@
+# Project-side additions to userver's upstream TSan ignorelist.
+#
+# userver v3.1 reports its Awaiter bookkeeping during orderly component
+# shutdown as a race between Awaiter construction and WaitListLight wake-up.
+# Keep this rule source-scoped: the rest of userver and all application code
+# remain instrumented by ThreadSanitizer.
+[thread]
+src:*userver/engine/impl/awaiter.hpp
+mainfile:*core/src/engine/task/task_base.cpp
+fun:*WaitListLight*SetSignalAndNotifyOne*
