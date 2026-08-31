@@ -14,7 +14,7 @@ jobs:
       - name: Checkout pinned cppservicelib
         run: |
           git clone "https://github.com/gorundebug/cppservicelib.git" .servicelib
-          git -C .servicelib checkout "v0.2.52"
+          git -C .servicelib checkout "v0.2.53"
 
       - name: Checkout pinned userver
         run: |
@@ -41,7 +41,7 @@ jobs:
       - name: Checkout pinned cppservicelib
         run: |
           git clone "https://github.com/gorundebug/cppservicelib.git" .servicelib
-          git -C .servicelib checkout "v0.2.52"
+          git -C .servicelib checkout "v0.2.53"
 
       - name: Checkout pinned userver
         run: |
