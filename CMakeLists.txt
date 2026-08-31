@@ -45,8 +45,13 @@ if(USE_CCACHE AND NOT CMAKE_CXX_COMPILER_LAUNCHER)
   endif()
 endif()
 
-set(SERVICELIB_SOURCE_DIR "" CACHE PATH
+set(_servicelib_source_dir_default "")
+if(DEFINED ENV{SERVICELIB_SOURCE_DIR})
+  set(_servicelib_source_dir_default "$ENV{SERVICELIB_SOURCE_DIR}")
+endif()
+set(SERVICELIB_SOURCE_DIR "${_servicelib_source_dir_default}" CACHE PATH
     "Path to a servicelib source checkout")
+unset(_servicelib_source_dir_default)
 option(FETCH_CPP_DEPENDENCIES
        "Fetch a missing pinned servicelib source tree" OFF)
 set(SERVICELIB_REPOSITORY
