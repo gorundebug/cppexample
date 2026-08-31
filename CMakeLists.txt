@@ -58,7 +58,7 @@ set(SERVICELIB_REPOSITORY
     "https://github.com/gorundebug/cppservicelib.git" CACHE STRING
     "Standalone cppservicelib repository")
 set(SERVICELIB_REVISION
-    "v0.2.43" CACHE STRING
+    "v0.2.44" CACHE STRING
     "Pinned cppservicelib revision")
 if(FETCH_CPP_DEPENDENCIES)
   include(FetchContent)
