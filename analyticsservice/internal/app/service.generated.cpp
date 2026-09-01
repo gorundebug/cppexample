@@ -4,6 +4,7 @@
 #include <chrono>
 #include <cstdlib>
 #include <exception>
+#include <mutex>
 #include <vector>
 #include <stdexcept>
 #include <string>
@@ -28,10 +29,11 @@ ServiceGenerated::~ServiceGenerated() { stop(); }
 
 void ServiceGenerated::start() {
   try {
+    const servicelib::Context context;
     serviceInit();
     initMakers();
-    customMakersInit();
-    initRuntime();
+    customMakersInit(context);
+    initRuntime(context);
     servicelib::ServiceApp<ServiceGenerated, DataTypes>::start();
     user_lifecycle_started_ = true;
     serviceStarted();
@@ -63,7 +65,8 @@ void ServiceGenerated::initMakers() {
   };
 }
 
-void ServiceGenerated::initFunctions(const config::Config& cfg) {
+void ServiceGenerated::initFunctions(
+    servicelib::Context context, const config::Config& cfg) {
   if (!makers_.analytics_schedule_source) {
     throw std::logic_error("function maker AnalyticsScheduleSource is not configured");
   }
@@ -73,44 +76,85 @@ void ServiceGenerated::initFunctions(const config::Config& cfg) {
   if (!makers_.order_processed_endpoint_source) {
     throw std::logic_error("function maker OrderProcessedEndpointSource is not configured");
   }
+  std::stop_source maker_cancellation;
+  std::mutex maker_error_mutex;
+  std::exception_ptr first_maker_error;
+  const auto maker_context = context.withExternalCancellation(
+      maker_cancellation.get_token());
   std::vector<userver::engine::TaskWithResult<void>> maker_tasks;
   maker_tasks.reserve(3);
   maker_tasks.push_back(userver::utils::Async(
-      "service-function-maker-analytics_schedule_source", [this, &cfg] {
-        functions_.analytics_schedule_source = makers_.analytics_schedule_source(
-            servicelib::Context{}, *this, cfg.endpoints.analyticsSchedule);
-        if (!functions_.analytics_schedule_source) {
-          throw std::logic_error("function maker AnalyticsScheduleSource returned null");
+      "service-function-maker-analytics_schedule_source", [this, &cfg, maker_context,
+                                            &maker_cancellation,
+                                            &maker_error_mutex,
+                                            &first_maker_error] {
+        try {
+          functions_.analytics_schedule_source = makers_.analytics_schedule_source(
+              maker_context, *this, cfg.endpoints.analyticsSchedule);
+          if (!functions_.analytics_schedule_source) {
+            throw std::logic_error("function maker AnalyticsScheduleSource returned null");
+          }
+        } catch (...) {
+          maker_cancellation.request_stop();
+          const std::lock_guard lock(maker_error_mutex);
+          if (!first_maker_error) {
+            first_maker_error = std::current_exception();
+          }
+          throw;
         }
       }));
   maker_tasks.push_back(userver::utils::Async(
-      "service-function-maker-count_order_processed", [this, &cfg] {
-        functions_.count_order_processed = makers_.count_order_processed(
-            servicelib::Context{}, *this, cfg.streams.countOrderProcessed);
-        if (!functions_.count_order_processed) {
-          throw std::logic_error("function maker CountOrderProcessed returned null");
+      "service-function-maker-count_order_processed", [this, &cfg, maker_context,
+                                            &maker_cancellation,
+                                            &maker_error_mutex,
+                                            &first_maker_error] {
+        try {
+          functions_.count_order_processed = makers_.count_order_processed(
+              maker_context, *this, cfg.streams.countOrderProcessed);
+          if (!functions_.count_order_processed) {
+            throw std::logic_error("function maker CountOrderProcessed returned null");
+          }
+        } catch (...) {
+          maker_cancellation.request_stop();
+          const std::lock_guard lock(maker_error_mutex);
+          if (!first_maker_error) {
+            first_maker_error = std::current_exception();
+          }
+          throw;
         }
       }));
   maker_tasks.push_back(userver::utils::Async(
-      "service-function-maker-order_processed_endpoint_source", [this, &cfg] {
-        functions_.order_processed_endpoint_source = makers_.order_processed_endpoint_source(
-            servicelib::Context{}, *this, cfg.endpoints.orderProcessed);
-        if (!functions_.order_processed_endpoint_source) {
-          throw std::logic_error("function maker OrderProcessedEndpointSource returned null");
+      "service-function-maker-order_processed_endpoint_source", [this, &cfg, maker_context,
+                                            &maker_cancellation,
+                                            &maker_error_mutex,
+                                            &first_maker_error] {
+        try {
+          functions_.order_processed_endpoint_source = makers_.order_processed_endpoint_source(
+              maker_context, *this, cfg.endpoints.orderProcessed);
+          if (!functions_.order_processed_endpoint_source) {
+            throw std::logic_error("function maker OrderProcessedEndpointSource returned null");
+          }
+        } catch (...) {
+          maker_cancellation.request_stop();
+          const std::lock_guard lock(maker_error_mutex);
+          if (!first_maker_error) {
+            first_maker_error = std::current_exception();
+          }
+          throw;
         }
       }));
-  std::exception_ptr maker_error;
+
   for (auto& task : maker_tasks) {
     try {
       task.Get();
     } catch (...) {
-      if (!maker_error) maker_error = std::current_exception();
+      // The task recorded the first failure before requesting cancellation.
     }
   }
-  if (maker_error) std::rethrow_exception(maker_error);
+  if (first_maker_error) std::rethrow_exception(first_maker_error);
 }
 
-void ServiceGenerated::initRuntime() {
+void ServiceGenerated::initRuntime(servicelib::Context context) {
   const auto runtime_config = getRuntimeConfigSnapshot();
   if (!runtime_config) {
     throw std::runtime_error("servicelib runtime config is not published");
@@ -121,8 +165,8 @@ void ServiceGenerated::initRuntime() {
   if (!config_snapshot) {
     throw std::runtime_error("servicelib runtime config has unexpected type");
   }
-  initFunctions(*config_snapshot);
-  customFunctionsInit();
+  initFunctions(context, *config_snapshot);
+  customFunctionsInit(context);
   initStreams(*config_snapshot);
   initDataSources(*config_snapshot);
 
