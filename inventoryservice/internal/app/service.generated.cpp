@@ -4,11 +4,13 @@
 #include <chrono>
 #include <cstdlib>
 #include <exception>
+#include <vector>
 #include <stdexcept>
 #include <string>
 #include <string_view>
 
 #include <userver/yaml_config/merge_schemas.hpp>
+#include <userver/utils/async.hpp>
 
 #include "inventoryservice/internal/app/service.hpp"
 
@@ -59,19 +61,36 @@ void ServiceGenerated::initFunctions(const config::Config& cfg) {
   if (!makers_.get_inventory_item_data) {
     throw std::logic_error("function maker GetInventoryItemData is not configured");
   }
-  functions_.get_inventory_item_data = makers_.get_inventory_item_data(
-      servicelib::Context{}, *this, cfg.streams.getInventoryItemData);
-  if (!functions_.get_inventory_item_data) {
-    throw std::logic_error("function maker GetInventoryItemData returned null");
-  }
   if (!makers_.process_order_item_source) {
     throw std::logic_error("function maker ProcessOrderItemSource is not configured");
   }
-  functions_.process_order_item_source = makers_.process_order_item_source(
-      servicelib::Context{}, *this, cfg.endpoints.processOrderItem);
-  if (!functions_.process_order_item_source) {
-    throw std::logic_error("function maker ProcessOrderItemSource returned null");
+  std::vector<userver::engine::TaskWithResult<void>> maker_tasks;
+  maker_tasks.reserve(2);
+  maker_tasks.push_back(userver::utils::Async(
+      "service-function-maker-get_inventory_item_data", [this, &cfg] {
+        functions_.get_inventory_item_data = makers_.get_inventory_item_data(
+            servicelib::Context{}, *this, cfg.streams.getInventoryItemData);
+        if (!functions_.get_inventory_item_data) {
+          throw std::logic_error("function maker GetInventoryItemData returned null");
+        }
+      }));
+  maker_tasks.push_back(userver::utils::Async(
+      "service-function-maker-process_order_item_source", [this, &cfg] {
+        functions_.process_order_item_source = makers_.process_order_item_source(
+            servicelib::Context{}, *this, cfg.endpoints.processOrderItem);
+        if (!functions_.process_order_item_source) {
+          throw std::logic_error("function maker ProcessOrderItemSource returned null");
+        }
+      }));
+  std::exception_ptr maker_error;
+  for (auto& task : maker_tasks) {
+    try {
+      task.Get();
+    } catch (...) {
+      if (!maker_error) maker_error = std::current_exception();
+    }
   }
+  if (maker_error) std::rethrow_exception(maker_error);
 }
 
 void ServiceGenerated::initRuntime() {

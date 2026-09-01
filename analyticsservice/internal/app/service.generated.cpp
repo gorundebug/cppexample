@@ -4,11 +4,13 @@
 #include <chrono>
 #include <cstdlib>
 #include <exception>
+#include <vector>
 #include <stdexcept>
 #include <string>
 #include <string_view>
 
 #include <userver/yaml_config/merge_schemas.hpp>
+#include <userver/utils/async.hpp>
 
 #include "analyticsservice/internal/app/service.hpp"
 
@@ -65,27 +67,47 @@ void ServiceGenerated::initFunctions(const config::Config& cfg) {
   if (!makers_.analytics_schedule_source) {
     throw std::logic_error("function maker AnalyticsScheduleSource is not configured");
   }
-  functions_.analytics_schedule_source = makers_.analytics_schedule_source(
-      servicelib::Context{}, *this, cfg.endpoints.analyticsSchedule);
-  if (!functions_.analytics_schedule_source) {
-    throw std::logic_error("function maker AnalyticsScheduleSource returned null");
-  }
   if (!makers_.count_order_processed) {
     throw std::logic_error("function maker CountOrderProcessed is not configured");
-  }
-  functions_.count_order_processed = makers_.count_order_processed(
-      servicelib::Context{}, *this, cfg.streams.countOrderProcessed);
-  if (!functions_.count_order_processed) {
-    throw std::logic_error("function maker CountOrderProcessed returned null");
   }
   if (!makers_.order_processed_endpoint_source) {
     throw std::logic_error("function maker OrderProcessedEndpointSource is not configured");
   }
-  functions_.order_processed_endpoint_source = makers_.order_processed_endpoint_source(
-      servicelib::Context{}, *this, cfg.endpoints.orderProcessed);
-  if (!functions_.order_processed_endpoint_source) {
-    throw std::logic_error("function maker OrderProcessedEndpointSource returned null");
+  std::vector<userver::engine::TaskWithResult<void>> maker_tasks;
+  maker_tasks.reserve(3);
+  maker_tasks.push_back(userver::utils::Async(
+      "service-function-maker-analytics_schedule_source", [this, &cfg] {
+        functions_.analytics_schedule_source = makers_.analytics_schedule_source(
+            servicelib::Context{}, *this, cfg.endpoints.analyticsSchedule);
+        if (!functions_.analytics_schedule_source) {
+          throw std::logic_error("function maker AnalyticsScheduleSource returned null");
+        }
+      }));
+  maker_tasks.push_back(userver::utils::Async(
+      "service-function-maker-count_order_processed", [this, &cfg] {
+        functions_.count_order_processed = makers_.count_order_processed(
+            servicelib::Context{}, *this, cfg.streams.countOrderProcessed);
+        if (!functions_.count_order_processed) {
+          throw std::logic_error("function maker CountOrderProcessed returned null");
+        }
+      }));
+  maker_tasks.push_back(userver::utils::Async(
+      "service-function-maker-order_processed_endpoint_source", [this, &cfg] {
+        functions_.order_processed_endpoint_source = makers_.order_processed_endpoint_source(
+            servicelib::Context{}, *this, cfg.endpoints.orderProcessed);
+        if (!functions_.order_processed_endpoint_source) {
+          throw std::logic_error("function maker OrderProcessedEndpointSource returned null");
+        }
+      }));
+  std::exception_ptr maker_error;
+  for (auto& task : maker_tasks) {
+    try {
+      task.Get();
+    } catch (...) {
+      if (!maker_error) maker_error = std::current_exception();
+    }
   }
+  if (maker_error) std::rethrow_exception(maker_error);
 }
 
 void ServiceGenerated::initRuntime() {
