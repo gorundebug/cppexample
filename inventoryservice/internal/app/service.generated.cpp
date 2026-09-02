@@ -11,6 +11,7 @@
 #include <string_view>
 
 #include <userver/yaml_config/merge_schemas.hpp>
+#include <userver/engine/mutex.hpp>
 #include <userver/utils/async.hpp>
 
 #include "inventoryservice/internal/app/service.hpp"
@@ -74,7 +75,7 @@ void ServiceGenerated::initFunctions(
     throw std::logic_error("function maker ProcessOrderItemSource is not configured");
   }
   std::stop_source maker_cancellation;
-  std::mutex maker_error_mutex;
+  userver::engine::Mutex maker_error_mutex;
   std::exception_ptr first_maker_error;
   const auto maker_context = context.withExternalCancellation(
       maker_cancellation.get_token());
