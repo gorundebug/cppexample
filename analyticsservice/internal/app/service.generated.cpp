@@ -67,21 +67,8 @@ void ServiceGenerated::initMakers() {
 
 void ServiceGenerated::initInfrastructure(
     servicelib::Context context, const config::Config& cfg) {
-  std::stop_source maker_cancellation;
-  std::mutex maker_error_mutex;
-  std::exception_ptr first_maker_error;
-  const auto maker_context = context.withExternalCancellation(
-      maker_cancellation.get_token());
-  std::vector<userver::engine::TaskWithResult<void>> maker_tasks;
-  for (auto& task : maker_tasks) {
-    try {
-      task.Get();
-    } catch (...) {
-      // The task recorded the first failure before requesting cancellation.
-    }
-  }
-  maker_cancellation.request_stop();
-  if (first_maker_error) std::rethrow_exception(first_maker_error);
+  (void)context;
+  (void)cfg;
 }
 
 void ServiceGenerated::initFunctions(
