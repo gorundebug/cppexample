@@ -3,18 +3,23 @@ bin/
 generated/
 build/
 dist/
+node_modules/
+*.tsbuildinfo
 compile_commands.json
 .ccache/
-.cppservicelib
-.pyservicelib
+.cppservicelib/
+.pyservicelib/
 .servicegen/
+.artifacts/
+report.*.json
+Heap.*.heapsnapshot
 
 # Go
 *.test
 *.out
 coverage.out
 
-# Tools (downloaded binaries); userver source patches are project inputs.
+# Tools (downloaded binaries); userver compatibility patches are source input.
 tools/*
 
 # Proto descriptors (binary, regenerated)
@@ -38,12 +43,6 @@ go.work.sum
 .DS_Store
 Thumbs.db
 
-# Local temporary files
-tmp/
+# Go services (cloned separately via clone.generated.sh in all-Go projects)
 
-# Services and modules restored by clone.sh
-/inventoryservice/
-/orderservice/
-/inventory_service_api/
-/model/
-/order_service_api/
+# Go modules (cloned separately via clone.generated.sh in all-Go projects)
