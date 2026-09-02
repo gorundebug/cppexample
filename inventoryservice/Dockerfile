@@ -70,7 +70,7 @@ RUN set -eu; \
     source_dir=${manifest%/CMakeLists.txt}; \
     if [ -z "$source_dir" ] || [ "$source_dir" = "/" ]; then echo "unsafe cppservicelib source directory" >&2; exit 1; fi; \
     mkdir -p /opt/servicelib; \
-    cp -a "$source_dir/." /opt/servicelib/; \
+    cp -R "$source_dir/." /opt/servicelib/; \
     rm -rf /tmp/servicelib-source
 
 COPY --from=userver-source / /tmp/userver-source
@@ -88,7 +88,7 @@ RUN set -eu; \
     source_dir=${manifest%/CMakeLists.txt}; \
     if [ -z "$source_dir" ] || [ "$source_dir" = "/" ]; then echo "unsafe userver source directory" >&2; exit 1; fi; \
     mkdir -p /opt/userver; \
-    cp -a "$source_dir/." /opt/userver/; \
+    cp -R "$source_dir/." /opt/userver/; \
     rm -rf /tmp/userver-source
 
 WORKDIR /workspace
@@ -107,7 +107,7 @@ RUN set -eu; \
     if [ -z "$manifest" ] || [ ! -f "$manifest" ]; then echo "module inventory_service_api source context has no CMakeLists.txt" >&2; exit 1; fi; \
     source_dir=${manifest%/CMakeLists.txt}; \
     mkdir -p /workspace/modules/inventory_service_api; \
-    cp -a "$source_dir/." /workspace/modules/inventory_service_api/; \
+    cp -R "$source_dir/." /workspace/modules/inventory_service_api/; \
     rm -rf /tmp/module-inventory_service_api-source /tmp/module-inventory_service_api-archive
 COPY --from=module-model_cpp / /tmp/module-model_cpp-source
 RUN set -eu; \
@@ -124,7 +124,7 @@ RUN set -eu; \
     if [ -z "$manifest" ] || [ ! -f "$manifest" ]; then echo "module model_cpp source context has no CMakeLists.txt" >&2; exit 1; fi; \
     source_dir=${manifest%/CMakeLists.txt}; \
     mkdir -p /workspace/modules/model_cpp; \
-    cp -a "$source_dir/." /workspace/modules/model_cpp/; \
+    cp -R "$source_dir/." /workspace/modules/model_cpp/; \
     rm -rf /tmp/module-model_cpp-source /tmp/module-model_cpp-archive
 
 ENV LANG=en_US.UTF-8

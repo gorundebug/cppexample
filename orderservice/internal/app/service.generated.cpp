@@ -93,6 +93,70 @@ void ServiceGenerated::initMakers() {
     return functions::MakeSoftDeadline(
         std::move(context), environment, config);
   };
+  makers_.inventory_service_api_client = [this](
+      servicelib::Context context, servicelib::IServiceEnvironment& environment,
+      const servicelib::config::GrpcDataConnectorConfig& config) {
+    return userver::utils::Async(
+        "service-grpc-client-maker-inventory_service_api_client",
+        [this, context = std::move(context), &environment, config]() mutable {
+          (void)context;
+          (void)environment;
+          userver::ugrpc::client::ClientSettings settings{
+              .client_name = config.name,
+              .endpoint = config.address,
+          };
+          if (config.connectionsCount < 1) {
+            throw std::invalid_argument(
+                "gRPC connector " + config.name +
+                " connectionsCount must be at least 1");
+          }
+          if (config.connectionsCount > 1) {
+            settings.dedicated_methods_config.emplace(
+                "ProcessOrderItem", config.connectionsCount);
+          }
+          return component_context_
+              .FindComponent<userver::ugrpc::client::ClientFactoryComponent>()
+              .GetFactory()
+              .MakeClient<inventoryserviceapi::InventoryServiceApiClient>(std::move(settings));
+        });
+  };
+}
+
+void ServiceGenerated::initInfrastructure(
+    servicelib::Context context, const config::Config& cfg) {
+  std::stop_source maker_cancellation;
+  std::mutex maker_error_mutex;
+  std::exception_ptr first_maker_error;
+  const auto maker_context = context.withExternalCancellation(
+      maker_cancellation.get_token());
+  std::vector<userver::engine::TaskWithResult<void>> maker_tasks;
+  if (!makers_.inventory_service_api_client) {
+    throw std::logic_error("infrastructure maker inventory_service_api_client is not configured");
+  }
+  maker_tasks.push_back(userver::utils::Async(
+      "service-grpc-client-init-inventory_service_api_client",
+      [this, &cfg, maker_context, &maker_cancellation, &maker_error_mutex,
+       &first_maker_error] {
+        try {
+          auto task = makers_.inventory_service_api_client(
+              maker_context, *this, cfg.dataConnectors.inventoryServiceApi);
+          connectors_.inventory_service_api_client.emplace(task.Get());
+        } catch (...) {
+          maker_cancellation.request_stop();
+          const std::lock_guard lock(maker_error_mutex);
+          if (!first_maker_error) first_maker_error = std::current_exception();
+          throw;
+        }
+      }));
+  for (auto& task : maker_tasks) {
+    try {
+      task.Get();
+    } catch (...) {
+      // The task recorded the first failure before requesting cancellation.
+    }
+  }
+  maker_cancellation.request_stop();
+  if (first_maker_error) std::rethrow_exception(first_maker_error);
 }
 
 void ServiceGenerated::initFunctions(
@@ -134,8 +198,9 @@ void ServiceGenerated::initFunctions(
                                             &maker_error_mutex,
                                             &first_maker_error] {
         try {
-          functions_.map_order_item_result_to_order_state = makers_.map_order_item_result_to_order_state(
+          auto maker_task = makers_.map_order_item_result_to_order_state(
               maker_context, *this, cfg.streams.mapOrderItemResultToOrderState);
+          functions_.map_order_item_result_to_order_state = maker_task.Get();
           if (!functions_.map_order_item_result_to_order_state) {
             throw std::logic_error("function maker MapOrderItemResultToOrderState returned null");
           }
@@ -154,8 +219,9 @@ void ServiceGenerated::initFunctions(
                                             &maker_error_mutex,
                                             &first_maker_error] {
         try {
-          functions_.map_to_order_processed = makers_.map_to_order_processed(
+          auto maker_task = makers_.map_to_order_processed(
               maker_context, *this, cfg.streams.mapToOrderProcessed);
+          functions_.map_to_order_processed = maker_task.Get();
           if (!functions_.map_to_order_processed) {
             throw std::logic_error("function maker MapToOrderProcessed returned null");
           }
@@ -174,8 +240,9 @@ void ServiceGenerated::initFunctions(
                                             &maker_error_mutex,
                                             &first_maker_error] {
         try {
-          functions_.map_to_order_state = makers_.map_to_order_state(
+          auto maker_task = makers_.map_to_order_state(
               maker_context, *this, cfg.streams.mapToOrderState);
+          functions_.map_to_order_state = maker_task.Get();
           if (!functions_.map_to_order_state) {
             throw std::logic_error("function maker MapToOrderState returned null");
           }
@@ -194,8 +261,9 @@ void ServiceGenerated::initFunctions(
                                             &maker_error_mutex,
                                             &first_maker_error] {
         try {
-          functions_.order_processed_endpoint_sink = makers_.order_processed_endpoint_sink(
+          auto maker_task = makers_.order_processed_endpoint_sink(
               maker_context, *this, cfg.endpoints.orderProcessed);
+          functions_.order_processed_endpoint_sink = maker_task.Get();
           if (!functions_.order_processed_endpoint_sink) {
             throw std::logic_error("function maker OrderProcessedEndpointSink returned null");
           }
@@ -214,8 +282,9 @@ void ServiceGenerated::initFunctions(
                                             &maker_error_mutex,
                                             &first_maker_error] {
         try {
-          functions_.process_order_item_sink = makers_.process_order_item_sink(
+          auto maker_task = makers_.process_order_item_sink(
               maker_context, *this, cfg.endpoints.processOrderItem);
+          functions_.process_order_item_sink = maker_task.Get();
           if (!functions_.process_order_item_sink) {
             throw std::logic_error("function maker ProcessOrderItemSink returned null");
           }
@@ -234,8 +303,9 @@ void ServiceGenerated::initFunctions(
                                             &maker_error_mutex,
                                             &first_maker_error] {
         try {
-          functions_.process_order_items = makers_.process_order_items(
+          auto maker_task = makers_.process_order_items(
               maker_context, *this, cfg.streams.processOrderItems);
+          functions_.process_order_items = maker_task.Get();
           if (!functions_.process_order_items) {
             throw std::logic_error("function maker ProcessOrderItems returned null");
           }
@@ -254,8 +324,9 @@ void ServiceGenerated::initFunctions(
                                             &maker_error_mutex,
                                             &first_maker_error] {
         try {
-          functions_.process_order_source = makers_.process_order_source(
+          auto maker_task = makers_.process_order_source(
               maker_context, *this, cfg.endpoints.processOrder);
+          functions_.process_order_source = maker_task.Get();
           if (!functions_.process_order_source) {
             throw std::logic_error("function maker ProcessOrderSource returned null");
           }
@@ -274,8 +345,9 @@ void ServiceGenerated::initFunctions(
                                             &maker_error_mutex,
                                             &first_maker_error] {
         try {
-          functions_.soft_deadline = makers_.soft_deadline(
+          auto maker_task = makers_.soft_deadline(
               maker_context, *this, cfg.streams.softDeadline);
+          functions_.soft_deadline = maker_task.Get();
           if (!functions_.soft_deadline) {
             throw std::logic_error("function maker SoftDeadline returned null");
           }
@@ -296,6 +368,7 @@ void ServiceGenerated::initFunctions(
       // The task recorded the first failure before requesting cancellation.
     }
   }
+  maker_cancellation.request_stop();
   if (first_maker_error) std::rethrow_exception(first_maker_error);
 }
 
@@ -310,6 +383,7 @@ void ServiceGenerated::initRuntime(servicelib::Context context) {
   if (!config_snapshot) {
     throw std::runtime_error("servicelib runtime config has unexpected type");
   }
+  initInfrastructure(context, *config_snapshot);
   initFunctions(context, *config_snapshot);
   customFunctionsInit(context);
   initStreams(*config_snapshot);
@@ -346,27 +420,6 @@ void ServiceGenerated::initStreams(const config::Config& cfg) {
 void ServiceGenerated::initDataSinks(const config::Config& cfg) {
   (void)cfg;
 
-  connectors_.inventory_service_api_client.emplace(
-      component_context_
-          .FindComponent<userver::ugrpc::client::ClientFactoryComponent>()
-          .GetFactory()
-          .MakeClient<inventoryserviceapi::InventoryServiceApiClient>([&cfg] {
-            const auto& connector = cfg.dataConnectors.inventoryServiceApi;
-            userver::ugrpc::client::ClientSettings settings{
-                .client_name = connector.name,
-                .endpoint = connector.address,
-            };
-            if (connector.connectionsCount < 1) {
-              throw std::invalid_argument(
-                  "gRPC connector " + connector.name +
-                  " connectionsCount must be at least 1");
-            }
-            if (connector.connectionsCount > 1) {
-              settings.dedicated_methods_config.emplace(
-                  "ProcessOrderItem", connector.connectionsCount);
-            }
-            return settings;
-          }()));
   connectors_.inventory_service_api_sink =
       servicelib::datasink::grpc::UserverDataSink::make(
           streams_.process_order_item.get());

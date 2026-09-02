@@ -2,6 +2,9 @@
 
 #include <memory>
 
+#include <userver/engine/task/task_with_result.hpp>
+#include <userver/utils/async.hpp>
+
 #include <chrono>
 #include <cstddef>
 #include <ctime>
@@ -58,11 +61,14 @@ struct MapOrderItemResultToOrderState final {
   }
 };
 
-inline std::unique_ptr<MapOrderItemResultToOrderState> MakeMapOrderItemResultToOrderState(
+inline userver::engine::TaskWithResult<std::unique_ptr<MapOrderItemResultToOrderState>> MakeMapOrderItemResultToOrderState(
     servicelib::Context context, servicelib::IServiceEnvironment& environment,
     const servicelib::config::MapStreamConfig& config) {
+  return userver::utils::Async(
+      "maker-MakeMapOrderItemResultToOrderState", [context = std::move(context), &environment, config]() mutable {
   (void)context; (void)environment; (void)config;
   return std::make_unique<MapOrderItemResultToOrderState>();
+      });
 }
 
 }  // namespace example::order_service::functions

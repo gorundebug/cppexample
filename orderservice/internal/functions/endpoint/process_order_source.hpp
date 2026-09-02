@@ -6,6 +6,9 @@
 #include <ctime>
 #include <exception>
 #include <memory>
+
+#include <userver/engine/task/task_with_result.hpp>
+#include <userver/utils/async.hpp>
 #include <mutex>
 #include <stdexcept>
 #include <string>
@@ -272,11 +275,14 @@ struct ProcessOrderSource final {
   std::chrono::steady_clock::duration timeout_;
 };
 
-inline std::unique_ptr<ProcessOrderSource> MakeProcessOrderSource(
+inline userver::engine::TaskWithResult<std::unique_ptr<ProcessOrderSource>> MakeProcessOrderSource(
     servicelib::Context context, servicelib::IServiceEnvironment& environment,
     const servicelib::config::HttpEndpointConfig& config) {
+  return userver::utils::Async(
+      "maker-MakeProcessOrderSource", [context = std::move(context), &environment, config]() mutable {
   (void)context; (void)environment; (void)config;
   return std::make_unique<ProcessOrderSource>();
+      });
 }
 
 }  // namespace example::order_service::functions

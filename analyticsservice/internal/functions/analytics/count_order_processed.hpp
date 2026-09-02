@@ -3,6 +3,9 @@
 #include <chrono>
 #include <atomic>
 #include <memory>
+
+#include <userver/engine/task/task_with_result.hpp>
+#include <userver/utils/async.hpp>
 #include <cstddef>
 #include <cstdint>
 #include <stdexcept>
@@ -45,11 +48,14 @@ struct CountOrderProcessed final {
   std::shared_ptr<State> state_;
 };
 
-inline std::unique_ptr<CountOrderProcessed> MakeCountOrderProcessed(
+inline userver::engine::TaskWithResult<std::unique_ptr<CountOrderProcessed>> MakeCountOrderProcessed(
     servicelib::Context context, servicelib::IServiceEnvironment& environment,
     const servicelib::config::ProcessStreamConfig& config) {
+  return userver::utils::Async(
+      "maker-MakeCountOrderProcessed", [context = std::move(context), &environment, config]() mutable {
   (void)context; (void)environment; (void)config;
   return std::make_unique<CountOrderProcessed>();
+      });
 }
 
 }  // namespace example::analytics_service::functions

@@ -4,6 +4,9 @@
 #include <chrono>
 #include <cstddef>
 #include <memory>
+
+#include <userver/engine/task/task_with_result.hpp>
+#include <userver/utils/async.hpp>
 #include <stdexcept>
 #include <tuple>
 #include <unordered_map>
@@ -79,11 +82,14 @@ struct GetInventoryItemData final {
   std::shared_ptr<State> state_;
 };
 
-inline std::unique_ptr<GetInventoryItemData> MakeGetInventoryItemData(
+inline userver::engine::TaskWithResult<std::unique_ptr<GetInventoryItemData>> MakeGetInventoryItemData(
     servicelib::Context context, servicelib::IServiceEnvironment& environment,
     const servicelib::config::ProcessStreamConfig& config) {
+  return userver::utils::Async(
+      "maker-MakeGetInventoryItemData", [context = std::move(context), &environment, config]() mutable {
   (void)context; (void)environment; (void)config;
   return std::make_unique<GetInventoryItemData>();
+      });
 }
 
 }  // namespace example::inventory_service::functions

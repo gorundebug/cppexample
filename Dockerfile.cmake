@@ -68,7 +68,7 @@ RUN set -eu; \
     source_dir=${manifest%/CMakeLists.txt}; \
     if [ -z "$source_dir" ] || [ "$source_dir" = "/" ]; then echo "unsafe cppservicelib source directory" >&2; exit 1; fi; \
     mkdir -p /opt/servicelib; \
-    cp -a "$source_dir/." /opt/servicelib/; \
+    cp -R "$source_dir/." /opt/servicelib/; \
     rm -rf /tmp/servicelib-source
 
 COPY --from=userver-source / /tmp/userver-source
@@ -86,7 +86,7 @@ RUN set -eu; \
     source_dir=${manifest%/CMakeLists.txt}; \
     if [ -z "$source_dir" ] || [ "$source_dir" = "/" ]; then echo "unsafe userver source directory" >&2; exit 1; fi; \
     mkdir -p /opt/userver; \
-    cp -a "$source_dir/." /opt/userver/; \
+    cp -R "$source_dir/." /opt/userver/; \
     rm -rf /tmp/userver-source
 
 WORKDIR /workspace

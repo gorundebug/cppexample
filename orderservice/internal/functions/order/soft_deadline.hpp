@@ -2,6 +2,9 @@
 
 #include <memory>
 
+#include <userver/engine/task/task_with_result.hpp>
+#include <userver/utils/async.hpp>
+
 #include <chrono>
 #include <cstddef>
 #include <stdexcept>
@@ -43,12 +46,15 @@ struct SoftDeadline final {
   std::chrono::steady_clock::duration margin_;
 };
 
-inline std::unique_ptr<SoftDeadline> MakeSoftDeadline(
+inline userver::engine::TaskWithResult<std::unique_ptr<SoftDeadline>> MakeSoftDeadline(
     servicelib::Context context, servicelib::IServiceEnvironment& environment,
     const servicelib::config::DelayStreamConfig& config) {
+  return userver::utils::Async(
+      "maker-MakeSoftDeadline", [context = std::move(context), &environment, config]() mutable {
   (void)context; (void)environment;
   return std::make_unique<SoftDeadline>(
       std::chrono::milliseconds{config.duration});
+      });
 }
 
 }  // namespace example::order_service::functions

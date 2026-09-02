@@ -12,6 +12,7 @@
 #include <userver/components/component_base.hpp>
 #include <userver/components/component_context.hpp>
 #include <userver/components/statistics_storage.hpp>
+#include <userver/engine/task/task_with_result.hpp>
 
 
 #include "inventoryservice/config/config.generated.hpp"
@@ -58,10 +59,12 @@ class ServiceGenerated
 
  protected:
   struct ServiceMakers final {
-    std::function<std::unique_ptr<functions::GetInventoryItemData>(
+    std::function<userver::engine::TaskWithResult<
+        std::unique_ptr<functions::GetInventoryItemData>>(
         servicelib::Context, servicelib::IServiceEnvironment&,
         const servicelib::config::ProcessStreamConfig&)> get_inventory_item_data;
-    std::function<std::unique_ptr<functions::ProcessOrderItemSource>(
+    std::function<userver::engine::TaskWithResult<
+        std::unique_ptr<functions::ProcessOrderItemSource>>(
         servicelib::Context, servicelib::IServiceEnvironment&,
         const servicelib::config::GrpcEndpointConfig&)> process_order_item_source;
   };
@@ -81,6 +84,8 @@ class ServiceGenerated
 
  private:
   void initMakers();
+  void initInfrastructure(servicelib::Context context,
+                          const config::Config& config);
   void initFunctions(servicelib::Context context, const config::Config& config);
   void initRuntime(servicelib::Context context);
   void initStreams(const config::Config& config);

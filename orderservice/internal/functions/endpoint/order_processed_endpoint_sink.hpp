@@ -2,6 +2,9 @@
 
 #include <memory>
 
+#include <userver/engine/task/task_with_result.hpp>
+#include <userver/utils/async.hpp>
+
 #include <exception>
 #include <stdexcept>
 #include <string>
@@ -49,11 +52,14 @@ struct OrderProcessedEndpointSink final {
       State&) const noexcept {}
 };
 
-inline std::unique_ptr<OrderProcessedEndpointSink> MakeOrderProcessedEndpointSink(
+inline userver::engine::TaskWithResult<std::unique_ptr<OrderProcessedEndpointSink>> MakeOrderProcessedEndpointSink(
     servicelib::Context context, servicelib::IServiceEnvironment& environment,
     const servicelib::config::KafkaEndpointConfig& config) {
+  return userver::utils::Async(
+      "maker-MakeOrderProcessedEndpointSink", [context = std::move(context), &environment, config]() mutable {
   (void)context; (void)environment; (void)config;
   return std::make_unique<OrderProcessedEndpointSink>();
+      });
 }
 
 }  // namespace example::order_service::functions

@@ -59,6 +59,25 @@ void ServiceGenerated::initMakers() {
   };
 }
 
+void ServiceGenerated::initInfrastructure(
+    servicelib::Context context, const config::Config& cfg) {
+  std::stop_source maker_cancellation;
+  std::mutex maker_error_mutex;
+  std::exception_ptr first_maker_error;
+  const auto maker_context = context.withExternalCancellation(
+      maker_cancellation.get_token());
+  std::vector<userver::engine::TaskWithResult<void>> maker_tasks;
+  for (auto& task : maker_tasks) {
+    try {
+      task.Get();
+    } catch (...) {
+      // The task recorded the first failure before requesting cancellation.
+    }
+  }
+  maker_cancellation.request_stop();
+  if (first_maker_error) std::rethrow_exception(first_maker_error);
+}
+
 void ServiceGenerated::initFunctions(
     servicelib::Context context, const config::Config& cfg) {
   if (!makers_.get_inventory_item_data) {
@@ -80,8 +99,9 @@ void ServiceGenerated::initFunctions(
                                             &maker_error_mutex,
                                             &first_maker_error] {
         try {
-          functions_.get_inventory_item_data = makers_.get_inventory_item_data(
+          auto maker_task = makers_.get_inventory_item_data(
               maker_context, *this, cfg.streams.getInventoryItemData);
+          functions_.get_inventory_item_data = maker_task.Get();
           if (!functions_.get_inventory_item_data) {
             throw std::logic_error("function maker GetInventoryItemData returned null");
           }
@@ -100,8 +120,9 @@ void ServiceGenerated::initFunctions(
                                             &maker_error_mutex,
                                             &first_maker_error] {
         try {
-          functions_.process_order_item_source = makers_.process_order_item_source(
+          auto maker_task = makers_.process_order_item_source(
               maker_context, *this, cfg.endpoints.processOrderItem);
+          functions_.process_order_item_source = maker_task.Get();
           if (!functions_.process_order_item_source) {
             throw std::logic_error("function maker ProcessOrderItemSource returned null");
           }
@@ -122,6 +143,7 @@ void ServiceGenerated::initFunctions(
       // The task recorded the first failure before requesting cancellation.
     }
   }
+  maker_cancellation.request_stop();
   if (first_maker_error) std::rethrow_exception(first_maker_error);
 }
 
@@ -136,6 +158,7 @@ void ServiceGenerated::initRuntime(servicelib::Context context) {
   if (!config_snapshot) {
     throw std::runtime_error("servicelib runtime config has unexpected type");
   }
+  initInfrastructure(context, *config_snapshot);
   initFunctions(context, *config_snapshot);
   customFunctionsInit(context);
   initStreams(*config_snapshot);

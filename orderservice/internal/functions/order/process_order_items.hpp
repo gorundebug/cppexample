@@ -2,6 +2,9 @@
 
 #include <memory>
 
+#include <userver/engine/task/task_with_result.hpp>
+#include <userver/utils/async.hpp>
+
 #include <chrono>
 #include <cstddef>
 #include <stdexcept>
@@ -34,11 +37,14 @@ struct ProcessOrderItems final {
   }
 };
 
-inline std::unique_ptr<ProcessOrderItems> MakeProcessOrderItems(
+inline userver::engine::TaskWithResult<std::unique_ptr<ProcessOrderItems>> MakeProcessOrderItems(
     servicelib::Context context, servicelib::IServiceEnvironment& environment,
     const servicelib::config::FlatMapStreamConfig& config) {
+  return userver::utils::Async(
+      "maker-MakeProcessOrderItems", [context = std::move(context), &environment, config]() mutable {
   (void)context; (void)environment; (void)config;
   return std::make_unique<ProcessOrderItems>();
+      });
 }
 
 }  // namespace example::order_service::functions

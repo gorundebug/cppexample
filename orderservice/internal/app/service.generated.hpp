@@ -12,6 +12,7 @@
 #include <userver/components/component_base.hpp>
 #include <userver/components/component_context.hpp>
 #include <userver/components/statistics_storage.hpp>
+#include <userver/engine/task/task_with_result.hpp>
 #include <userver/ugrpc/client/client_factory_component.hpp>
 #include <userver/ugrpc/client/client_settings.hpp>
 
@@ -75,30 +76,41 @@ class ServiceGenerated
 
  protected:
   struct ServiceMakers final {
-    std::function<std::unique_ptr<functions::MapOrderItemResultToOrderState>(
+    std::function<userver::engine::TaskWithResult<
+        std::unique_ptr<functions::MapOrderItemResultToOrderState>>(
         servicelib::Context, servicelib::IServiceEnvironment&,
         const servicelib::config::MapStreamConfig&)> map_order_item_result_to_order_state;
-    std::function<std::unique_ptr<functions::MapToOrderProcessed>(
+    std::function<userver::engine::TaskWithResult<
+        std::unique_ptr<functions::MapToOrderProcessed>>(
         servicelib::Context, servicelib::IServiceEnvironment&,
         const servicelib::config::MapStreamConfig&)> map_to_order_processed;
-    std::function<std::unique_ptr<functions::MapToOrderState>(
+    std::function<userver::engine::TaskWithResult<
+        std::unique_ptr<functions::MapToOrderState>>(
         servicelib::Context, servicelib::IServiceEnvironment&,
         const servicelib::config::MapStreamConfig&)> map_to_order_state;
-    std::function<std::unique_ptr<functions::OrderProcessedEndpointSink>(
+    std::function<userver::engine::TaskWithResult<
+        std::unique_ptr<functions::OrderProcessedEndpointSink>>(
         servicelib::Context, servicelib::IServiceEnvironment&,
         const servicelib::config::KafkaEndpointConfig&)> order_processed_endpoint_sink;
-    std::function<std::unique_ptr<functions::ProcessOrderItemSink>(
+    std::function<userver::engine::TaskWithResult<
+        std::unique_ptr<functions::ProcessOrderItemSink>>(
         servicelib::Context, servicelib::IServiceEnvironment&,
         const servicelib::config::GrpcEndpointConfig&)> process_order_item_sink;
-    std::function<std::unique_ptr<functions::ProcessOrderItems>(
+    std::function<userver::engine::TaskWithResult<
+        std::unique_ptr<functions::ProcessOrderItems>>(
         servicelib::Context, servicelib::IServiceEnvironment&,
         const servicelib::config::FlatMapStreamConfig&)> process_order_items;
-    std::function<std::unique_ptr<functions::ProcessOrderSource>(
+    std::function<userver::engine::TaskWithResult<
+        std::unique_ptr<functions::ProcessOrderSource>>(
         servicelib::Context, servicelib::IServiceEnvironment&,
         const servicelib::config::HttpEndpointConfig&)> process_order_source;
-    std::function<std::unique_ptr<functions::SoftDeadline>(
+    std::function<userver::engine::TaskWithResult<
+        std::unique_ptr<functions::SoftDeadline>>(
         servicelib::Context, servicelib::IServiceEnvironment&,
         const servicelib::config::DelayStreamConfig&)> soft_deadline;
+    std::function<userver::engine::TaskWithResult<inventoryserviceapi::InventoryServiceApiClient>(
+        servicelib::Context, servicelib::IServiceEnvironment&,
+        const servicelib::config::GrpcDataConnectorConfig&)> inventory_service_api_client;
   };
   struct ServiceFunctions final {
     std::unique_ptr<functions::MapOrderItemResultToOrderState> map_order_item_result_to_order_state;
@@ -122,6 +134,8 @@ class ServiceGenerated
 
  private:
   void initMakers();
+  void initInfrastructure(servicelib::Context context,
+                          const config::Config& config);
   void initFunctions(servicelib::Context context, const config::Config& config);
   void initRuntime(servicelib::Context context);
   void initStreams(const config::Config& config);

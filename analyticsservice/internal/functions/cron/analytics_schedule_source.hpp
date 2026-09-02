@@ -1,6 +1,9 @@
 #pragma once
 
 #include <memory>
+
+#include <userver/engine/task/task_with_result.hpp>
+#include <userver/utils/async.hpp>
 #include <utility>
 
 #include <servicelib/runtime/common.hpp>
@@ -23,13 +26,16 @@ struct AnalyticsScheduleSource final {
   }
 };
 
-inline std::unique_ptr<AnalyticsScheduleSource> MakeAnalyticsScheduleSource(
+inline userver::engine::TaskWithResult<std::unique_ptr<AnalyticsScheduleSource>> MakeAnalyticsScheduleSource(
     servicelib::Context context, servicelib::IServiceEnvironment& environment,
     const servicelib::config::CronEndpointConfig& config) {
+  return userver::utils::Async(
+      "maker-MakeAnalyticsScheduleSource", [context = std::move(context), &environment, config]() mutable {
   (void)context;
   (void)config;
   (void)environment;
   return std::make_unique<AnalyticsScheduleSource>();
+      });
 }
 
 }  // namespace example::analytics_service::functions

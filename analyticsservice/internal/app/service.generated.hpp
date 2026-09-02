@@ -12,6 +12,7 @@
 #include <userver/components/component_base.hpp>
 #include <userver/components/component_context.hpp>
 #include <userver/components/statistics_storage.hpp>
+#include <userver/engine/task/task_with_result.hpp>
 
 
 #include "analyticsservice/config/config.generated.hpp"
@@ -60,13 +61,16 @@ class ServiceGenerated
 
  protected:
   struct ServiceMakers final {
-    std::function<std::unique_ptr<functions::AnalyticsScheduleSource>(
+    std::function<userver::engine::TaskWithResult<
+        std::unique_ptr<functions::AnalyticsScheduleSource>>(
         servicelib::Context, servicelib::IServiceEnvironment&,
         const servicelib::config::CronEndpointConfig&)> analytics_schedule_source;
-    std::function<std::unique_ptr<functions::CountOrderProcessed>(
+    std::function<userver::engine::TaskWithResult<
+        std::unique_ptr<functions::CountOrderProcessed>>(
         servicelib::Context, servicelib::IServiceEnvironment&,
         const servicelib::config::ProcessStreamConfig&)> count_order_processed;
-    std::function<std::unique_ptr<functions::OrderProcessedEndpointSource>(
+    std::function<userver::engine::TaskWithResult<
+        std::unique_ptr<functions::OrderProcessedEndpointSource>>(
         servicelib::Context, servicelib::IServiceEnvironment&,
         const servicelib::config::KafkaEndpointConfig&)> order_processed_endpoint_source;
   };
@@ -87,6 +91,8 @@ class ServiceGenerated
 
  private:
   void initMakers();
+  void initInfrastructure(servicelib::Context context,
+                          const config::Config& config);
   void initFunctions(servicelib::Context context, const config::Config& config);
   void initRuntime(servicelib::Context context);
   void initStreams(const config::Config& config);

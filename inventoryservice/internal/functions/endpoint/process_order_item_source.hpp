@@ -2,6 +2,9 @@
 
 #include <memory>
 
+#include <userver/engine/task/task_with_result.hpp>
+#include <userver/utils/async.hpp>
+
 #include <exception>
 #include <stdexcept>
 #include <string>
@@ -75,11 +78,14 @@ struct ProcessOrderItemSource final {
                   State&) const noexcept {}
 };
 
-inline std::unique_ptr<ProcessOrderItemSource> MakeProcessOrderItemSource(
+inline userver::engine::TaskWithResult<std::unique_ptr<ProcessOrderItemSource>> MakeProcessOrderItemSource(
     servicelib::Context context, servicelib::IServiceEnvironment& environment,
     const servicelib::config::GrpcEndpointConfig& config) {
+  return userver::utils::Async(
+      "maker-MakeProcessOrderItemSource", [context = std::move(context), &environment, config]() mutable {
   (void)context; (void)environment; (void)config;
   return std::make_unique<ProcessOrderItemSource>();
+      });
 }
 
 }  // namespace example::inventory_service::functions

@@ -2,6 +2,9 @@
 
 #include <memory>
 
+#include <userver/engine/task/task_with_result.hpp>
+#include <userver/utils/async.hpp>
+
 #include <exception>
 #include <stdexcept>
 #include <string>
@@ -103,11 +106,14 @@ struct ProcessOrderItemSink final {
   }
 };
 
-inline std::unique_ptr<ProcessOrderItemSink> MakeProcessOrderItemSink(
+inline userver::engine::TaskWithResult<std::unique_ptr<ProcessOrderItemSink>> MakeProcessOrderItemSink(
     servicelib::Context context, servicelib::IServiceEnvironment& environment,
     const servicelib::config::GrpcEndpointConfig& config) {
+  return userver::utils::Async(
+      "maker-MakeProcessOrderItemSink", [context = std::move(context), &environment, config]() mutable {
   (void)context; (void)environment; (void)config;
   return std::make_unique<ProcessOrderItemSink>();
+      });
 }
 
 }  // namespace example::order_service::functions

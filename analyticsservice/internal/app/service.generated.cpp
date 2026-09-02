@@ -65,6 +65,25 @@ void ServiceGenerated::initMakers() {
   };
 }
 
+void ServiceGenerated::initInfrastructure(
+    servicelib::Context context, const config::Config& cfg) {
+  std::stop_source maker_cancellation;
+  std::mutex maker_error_mutex;
+  std::exception_ptr first_maker_error;
+  const auto maker_context = context.withExternalCancellation(
+      maker_cancellation.get_token());
+  std::vector<userver::engine::TaskWithResult<void>> maker_tasks;
+  for (auto& task : maker_tasks) {
+    try {
+      task.Get();
+    } catch (...) {
+      // The task recorded the first failure before requesting cancellation.
+    }
+  }
+  maker_cancellation.request_stop();
+  if (first_maker_error) std::rethrow_exception(first_maker_error);
+}
+
 void ServiceGenerated::initFunctions(
     servicelib::Context context, const config::Config& cfg) {
   if (!makers_.analytics_schedule_source) {
@@ -89,8 +108,9 @@ void ServiceGenerated::initFunctions(
                                             &maker_error_mutex,
                                             &first_maker_error] {
         try {
-          functions_.analytics_schedule_source = makers_.analytics_schedule_source(
+          auto maker_task = makers_.analytics_schedule_source(
               maker_context, *this, cfg.endpoints.analyticsSchedule);
+          functions_.analytics_schedule_source = maker_task.Get();
           if (!functions_.analytics_schedule_source) {
             throw std::logic_error("function maker AnalyticsScheduleSource returned null");
           }
@@ -109,8 +129,9 @@ void ServiceGenerated::initFunctions(
                                             &maker_error_mutex,
                                             &first_maker_error] {
         try {
-          functions_.count_order_processed = makers_.count_order_processed(
+          auto maker_task = makers_.count_order_processed(
               maker_context, *this, cfg.streams.countOrderProcessed);
+          functions_.count_order_processed = maker_task.Get();
           if (!functions_.count_order_processed) {
             throw std::logic_error("function maker CountOrderProcessed returned null");
           }
@@ -129,8 +150,9 @@ void ServiceGenerated::initFunctions(
                                             &maker_error_mutex,
                                             &first_maker_error] {
         try {
-          functions_.order_processed_endpoint_source = makers_.order_processed_endpoint_source(
+          auto maker_task = makers_.order_processed_endpoint_source(
               maker_context, *this, cfg.endpoints.orderProcessed);
+          functions_.order_processed_endpoint_source = maker_task.Get();
           if (!functions_.order_processed_endpoint_source) {
             throw std::logic_error("function maker OrderProcessedEndpointSource returned null");
           }
@@ -151,6 +173,7 @@ void ServiceGenerated::initFunctions(
       // The task recorded the first failure before requesting cancellation.
     }
   }
+  maker_cancellation.request_stop();
   if (first_maker_error) std::rethrow_exception(first_maker_error);
 }
 
@@ -165,6 +188,7 @@ void ServiceGenerated::initRuntime(servicelib::Context context) {
   if (!config_snapshot) {
     throw std::runtime_error("servicelib runtime config has unexpected type");
   }
+  initInfrastructure(context, *config_snapshot);
   initFunctions(context, *config_snapshot);
   customFunctionsInit(context);
   initStreams(*config_snapshot);
