@@ -10,9 +10,10 @@ variables:
     - docker:29.7.2-dind
   before_script:
     - apk add --no-cache bash git
-    - git clone "https://github.com/gorundebug/cppservicelib.git" .servicelib
-    - git -C .servicelib checkout "v0.2.79"
-    - git clone "https://github.com/userver-framework/userver.git" .userver
+    - . ./scripts/git-retry.generated.sh
+    - git_retry git clone "https://github.com/gorundebug/cppservicelib.git" .servicelib
+    - git -C .servicelib checkout "v0.2.80"
+    - git_retry git clone "https://github.com/userver-framework/userver.git" .userver
     - git -C .userver checkout "c9f77729c0edce7e423def2d4a4450aa7fc9d259"
 
 build-test:
