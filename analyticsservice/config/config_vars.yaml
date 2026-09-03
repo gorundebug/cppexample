@@ -1,4 +1,8 @@
 analyticsScheduleEnabled: true
+analyticsScheduleMissedRunPolicy: FireOnce
+analyticsScheduleOverlapPolicy: Skip
+analyticsScheduleSchedule: '*/5 * * * *'
+analyticsScheduleTimezone: UTC
 analyticsScheduleTracingEnabled: false
 analyticsServiceConfigOverridePath: config/overrides.yaml
 analyticsServiceDefaultGrpcTimeout: 0

@@ -302,6 +302,30 @@ inline void ApplyConfig(const userver::formats::yaml::Value& value,
   }
   {
     const auto object = value["endpoints"]["analyticsSchedule"];
+    if (const auto field = object["missedRunPolicy"]; !field.IsMissing()) {
+      config.endpoints.analyticsSchedule.missedRunPolicy = field.As<servicelib::api::ScheduleMissedRunPolicy>();
+    }
+  }
+  {
+    const auto object = value["endpoints"]["analyticsSchedule"];
+    if (const auto field = object["overlapPolicy"]; !field.IsMissing()) {
+      config.endpoints.analyticsSchedule.overlapPolicy = field.As<servicelib::api::ScheduleOverlapPolicy>();
+    }
+  }
+  {
+    const auto object = value["endpoints"]["analyticsSchedule"];
+    if (const auto field = object["schedule"]; !field.IsMissing()) {
+      config.endpoints.analyticsSchedule.schedule = field.As<std::string>();
+    }
+  }
+  {
+    const auto object = value["endpoints"]["analyticsSchedule"];
+    if (const auto field = object["timezone"]; !field.IsMissing()) {
+      config.endpoints.analyticsSchedule.timezone = field.As<std::string>();
+    }
+  }
+  {
+    const auto object = value["endpoints"]["analyticsSchedule"];
     if (const auto field = object["tracingEnabled"]; !field.IsMissing()) {
       config.endpoints.analyticsSchedule.tracingEnabled = field.As<bool>();
     }
@@ -423,6 +447,18 @@ inline void ApplyEnvironment(Config& config) {
       throw std::invalid_argument("invalid boolean in ANALYTICS_SCHEDULE_ENABLED");
     }
     config.endpoints.analyticsSchedule.enabled = parsed == "true";
+  }
+  if (const auto* value = std::getenv("ANALYTICS_SCHEDULE_MISSED_RUN_POLICY")) {
+    config.endpoints.analyticsSchedule.missedRunPolicy = value;
+  }
+  if (const auto* value = std::getenv("ANALYTICS_SCHEDULE_OVERLAP_POLICY")) {
+    config.endpoints.analyticsSchedule.overlapPolicy = value;
+  }
+  if (const auto* value = std::getenv("ANALYTICS_SCHEDULE_SCHEDULE")) {
+    config.endpoints.analyticsSchedule.schedule = value;
+  }
+  if (const auto* value = std::getenv("ANALYTICS_SCHEDULE_TIMEZONE")) {
+    config.endpoints.analyticsSchedule.timezone = value;
   }
   if (const auto* value = std::getenv("ANALYTICS_SCHEDULE_TRACING_ENABLED")) {
     const std::string_view parsed{value};

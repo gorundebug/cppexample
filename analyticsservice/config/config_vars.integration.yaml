@@ -1,5 +1,9 @@
 __integrationKafkaBrokers_orderEvents: redpanda:9092
 analyticsScheduleEnabled: true
+analyticsScheduleMissedRunPolicy: FireOnce
+analyticsScheduleOverlapPolicy: Skip
+analyticsScheduleSchedule: '*/5 * * * *'
+analyticsScheduleTimezone: UTC
 analyticsScheduleTracingEnabled: false
 analyticsServiceConfigOverridePath: config/overrides.integration.generated.yaml
 analyticsServiceDefaultGrpcTimeout: 0
