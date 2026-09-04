@@ -15,7 +15,7 @@ jobs:
         run: |
           . ./scripts/git-retry.generated.sh
           git_retry git clone "https://github.com/gorundebug/cppservicelib.git" .servicelib
-          git -C .servicelib checkout "v0.2.82"
+          git -C .servicelib checkout "v0.2.83"
 
       - name: Checkout pinned userver
         run: |
@@ -44,7 +44,7 @@ jobs:
         run: |
           . ./scripts/git-retry.generated.sh
           git_retry git clone "https://github.com/gorundebug/cppservicelib.git" .servicelib
-          git -C .servicelib checkout "v0.2.82"
+          git -C .servicelib checkout "v0.2.83"
 
       - name: Checkout pinned userver
         run: |
