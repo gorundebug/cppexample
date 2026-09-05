@@ -14,6 +14,8 @@
 #include <userver/engine/mutex.hpp>
 #include <userver/utils/async.hpp>
 
+#include <servicelib/runtime/environment_variable.hpp>
+
 #include "inventoryservice/internal/app/service.hpp"
 
 namespace example::inventory_service::app {
@@ -23,8 +25,9 @@ ServiceGenerated::ServiceGenerated(
     const userver::components::ComponentContext& component_context)
     : component_context_(component_context),
       metrics_(statistics_storage),
-      use_noop_metrics_(std::getenv("SERVICELIB_NOOP_METRICS") != nullptr),
-      use_noop_tracing_(std::getenv("SERVICELIB_NOOP_TRACING") != nullptr) {}
+      use_noop_logs_(servicelib::EnvironmentFlagEnabled("SERVICELIB_NOOP_LOGS")),
+      use_noop_metrics_(servicelib::EnvironmentFlagEnabled("SERVICELIB_NOOP_METRICS")),
+      use_noop_tracing_(servicelib::EnvironmentFlagEnabled("SERVICELIB_NOOP_TRACING")) {}
 
 ServiceGenerated::~ServiceGenerated() { stop(); }
 
@@ -227,7 +230,9 @@ void ServiceGenerated::releaseRuntime() noexcept {
 
 
 servicelib::log::Logger& ServiceGenerated::getLogger() {
-  return servicelib::telemetry::userver_adapter::UserverLogger::instance();
+  return use_noop_logs_
+             ? servicelib::log::NoopLogger::instance()
+             : servicelib::telemetry::userver_adapter::UserverLogger::instance();
 }
 
 servicelib::metrics::Metrics& ServiceGenerated::getMetrics() {
