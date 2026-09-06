@@ -1,34 +1,36 @@
-# Task 2/3: `AnalyticsScheduleSource`
+# Task 2/17: `JoinOrderPaymentAnalytics`
 
 > Rules: [`spec/rules.md`](../rules.md)
 
 | Field | Value |
 |-------|-------|
 | Language | `C++/userver` |
-| Kind | `schedule-source` |
-| File | `analyticsservice/internal/functions/cron/analytics_schedule_source.hpp` |
-| Test | `analyticsservice/internal/functions/cron/analytics_schedule_source_test.cpp` |
+| Kind | `join` |
+| File | `analyticsservice/internal/functions/joinanalytics/join_order_payment_analytics.hpp` |
+| Test | `analyticsservice/internal/functions/joinanalytics/join_order_payment_analytics_test.cpp` |
 | Service | `Analytics Service` |
 
 
 ## Behaviour
 
-Create an analytics job message identifying the local scheduled firing.
-
+Join matching order and payment analytics events and emit their combined total.
 
 
 
 
 ## Stream types
-- Input: `AutomationJob` — `model_cpp/include/example/model/types/automation_job.hpp`
+- Input: `AnalyticsEvent` — `analyticsservice/internal/types/analytics_event.hpp`
+- Output: `AnalyticsResult` — `analyticsservice/internal/types/analytics_result.hpp`
+- Key: `AnalyticsKey` — `analyticsservice/internal/types/analytics_key.hpp`
 
 ## Checklist
 
 - [ ] Read [`spec/rules.md`](../rules.md), especially the `C++/userver` section
-- [ ] Open `analyticsservice/internal/functions/cron/analytics_schedule_source.hpp` and preserve its generated contract
-- [ ] Inspect input type `AutomationJob` in `model_cpp/include/example/model/types/automation_job.hpp`
+- [ ] Open `analyticsservice/internal/functions/joinanalytics/join_order_payment_analytics.hpp` and preserve its generated contract
+- [ ] Inspect input type `AnalyticsEvent` in `analyticsservice/internal/types/analytics_event.hpp`
+- [ ] Inspect output type `AnalyticsResult` in `analyticsservice/internal/types/analytics_result.hpp`
 - [ ] Implement the C++ function object without retaining borrowed payload/context references
 - [ ] Run `./scripts/test.generated.sh`
-- [ ] Implement meaningful assertions in `analyticsservice/internal/functions/cron/analytics_schedule_source_test.cpp`
+- [ ] Implement meaningful assertions in `analyticsservice/internal/functions/joinanalytics/join_order_payment_analytics_test.cpp`
 - [ ] Re-read this checklist
-- [ ] Append to `spec/progress.md`: `- [x] analyticsservice/task2.md — AnalyticsScheduleSource — C++/userver — done`
+- [ ] Append to `spec/progress.md`: `- [x] analyticsservice/task2.md — JoinOrderPaymentAnalytics — C++/userver — done`

@@ -9,7 +9,7 @@ namespace example::order_service::app {
 
 class ProcessOrderHTTPHandler final
     : public servicelib::datasource::http::UserverHandlerComponentBase<
-          OrderServiceComponent, 5> {
+          OrderServiceComponent, 11> {
  public:
   static constexpr std::string_view kName = "handler-process-order";
 

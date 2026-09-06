@@ -1,38 +1,35 @@
-# Task 3/3: `OrderProcessedEndpointSource`
+# Task 3/17: `KeyOrdersForJoin`
 
 > Rules: [`spec/rules.md`](../rules.md)
 
 | Field | Value |
 |-------|-------|
 | Language | `C++/userver` |
-| Kind | `kafka-source` |
-| File | `analyticsservice/internal/functions/endpoint/order_processed_endpoint_source.hpp` |
-| Test | `analyticsservice/internal/functions/endpoint/order_processed_endpoint_source_test.cpp` |
+| Kind | `keyBy` |
+| File | `analyticsservice/internal/functions/joinanalytics/key_orders_for_join.hpp` |
+| Test | `analyticsservice/internal/functions/joinanalytics/key_orders_for_join_test.cpp` |
 | Service | `Analytics Service` |
 
 
 ## Behaviour
 
-Exchange OrderProcessed events keyed by order ID.
-Producers include the final status, processing time, total and confirmed item counts, and a failure reason for unsuccessful orders.
-Consumers decode the event and mark its Kafka message processed only after the pipeline handles it successfully.
-
+Key the order analytics event by correlation key.
 
 
 
 
 ## Stream types
-- Input: `OrderProcessed` — `model_cpp/include/example/model/types/order_processed.hpp`
-- Output: `OrderProcessed` — `model_cpp/include/example/model/types/order_processed.hpp`
+- Input: `AnalyticsEvent` — `analyticsservice/internal/types/analytics_event.hpp`
+- Output: `AnalyticsEvent` — `analyticsservice/internal/types/analytics_event.hpp`
 
 ## Checklist
 
 - [ ] Read [`spec/rules.md`](../rules.md), especially the `C++/userver` section
-- [ ] Open `analyticsservice/internal/functions/endpoint/order_processed_endpoint_source.hpp` and preserve its generated contract
-- [ ] Inspect input type `OrderProcessed` in `model_cpp/include/example/model/types/order_processed.hpp`
-- [ ] Inspect output type `OrderProcessed` in `model_cpp/include/example/model/types/order_processed.hpp`
+- [ ] Open `analyticsservice/internal/functions/joinanalytics/key_orders_for_join.hpp` and preserve its generated contract
+- [ ] Inspect input type `AnalyticsEvent` in `analyticsservice/internal/types/analytics_event.hpp`
+- [ ] Inspect output type `AnalyticsEvent` in `analyticsservice/internal/types/analytics_event.hpp`
 - [ ] Implement the C++ function object without retaining borrowed payload/context references
 - [ ] Run `./scripts/test.generated.sh`
-- [ ] Implement meaningful assertions in `analyticsservice/internal/functions/endpoint/order_processed_endpoint_source_test.cpp`
+- [ ] Implement meaningful assertions in `analyticsservice/internal/functions/joinanalytics/key_orders_for_join_test.cpp`
 - [ ] Re-read this checklist
-- [ ] Append to `spec/progress.md`: `- [x] analyticsservice/task3.md — OrderProcessedEndpointSource — C++/userver — done`
+- [ ] Append to `spec/progress.md`: `- [x] analyticsservice/task3.md — KeyOrdersForJoin — C++/userver — done`

@@ -49,10 +49,28 @@ void ServiceGenerated::start() {
 }
 
 void ServiceGenerated::initMakers() {
+  makers_.analytics_orders_source = [](
+      servicelib::Context context, servicelib::IServiceEnvironment& environment,
+      const servicelib::config::CustomEndpointConfig& config) {
+    return functions::MakeAnalyticsOrdersSource(
+        std::move(context), environment, config);
+  };
+  makers_.analytics_payments_source = [](
+      servicelib::Context context, servicelib::IServiceEnvironment& environment,
+      const servicelib::config::CustomEndpointConfig& config) {
+    return functions::MakeAnalyticsPaymentsSource(
+        std::move(context), environment, config);
+  };
   makers_.analytics_schedule_source = [](
       servicelib::Context context, servicelib::IServiceEnvironment& environment,
       const servicelib::config::CronEndpointConfig& config) {
     return functions::MakeAnalyticsScheduleSource(
+        std::move(context), environment, config);
+  };
+  makers_.analytics_shipments_source = [](
+      servicelib::Context context, servicelib::IServiceEnvironment& environment,
+      const servicelib::config::CustomEndpointConfig& config) {
+    return functions::MakeAnalyticsShipmentsSource(
         std::move(context), environment, config);
   };
   makers_.count_order_processed = [](
@@ -61,10 +79,76 @@ void ServiceGenerated::initMakers() {
     return functions::MakeCountOrderProcessed(
         std::move(context), environment, config);
   };
+  makers_.high_value_analytics_sink = [](
+      servicelib::Context context, servicelib::IServiceEnvironment& environment,
+      const servicelib::config::CustomEndpointConfig& config) {
+    return functions::MakeHighValueAnalyticsSink(
+        std::move(context), environment, config);
+  };
+  makers_.join_order_payment_analytics = [](
+      servicelib::Context context, servicelib::IServiceEnvironment& environment,
+      const servicelib::config::JoinStreamConfig& config) {
+    return functions::MakeJoinOrderPaymentAnalytics(
+        std::move(context), environment, config);
+  };
+  makers_.joined_analytics_sink = [](
+      servicelib::Context context, servicelib::IServiceEnvironment& environment,
+      const servicelib::config::CustomEndpointConfig& config) {
+    return functions::MakeJoinedAnalyticsSink(
+        std::move(context), environment, config);
+  };
+  makers_.key_orders_for_join = [](
+      servicelib::Context context, servicelib::IServiceEnvironment& environment,
+      const servicelib::config::KeyByStreamConfig& config) {
+    return functions::MakeKeyOrdersForJoin(
+        std::move(context), environment, config);
+  };
+  makers_.key_orders_for_multi_join = [](
+      servicelib::Context context, servicelib::IServiceEnvironment& environment,
+      const servicelib::config::KeyByStreamConfig& config) {
+    return functions::MakeKeyOrdersForMultiJoin(
+        std::move(context), environment, config);
+  };
+  makers_.key_payments_for_join = [](
+      servicelib::Context context, servicelib::IServiceEnvironment& environment,
+      const servicelib::config::KeyByStreamConfig& config) {
+    return functions::MakeKeyPaymentsForJoin(
+        std::move(context), environment, config);
+  };
+  makers_.key_payments_for_multi_join = [](
+      servicelib::Context context, servicelib::IServiceEnvironment& environment,
+      const servicelib::config::KeyByStreamConfig& config) {
+    return functions::MakeKeyPaymentsForMultiJoin(
+        std::move(context), environment, config);
+  };
+  makers_.key_shipments_for_multi_join = [](
+      servicelib::Context context, servicelib::IServiceEnvironment& environment,
+      const servicelib::config::KeyByStreamConfig& config) {
+    return functions::MakeKeyShipmentsForMultiJoin(
+        std::move(context), environment, config);
+  };
+  makers_.multi_join_analytics_events = [](
+      servicelib::Context context, servicelib::IServiceEnvironment& environment,
+      const servicelib::config::MultiJoinStreamConfig& config) {
+    return functions::MakeMultiJoinAnalyticsEvents(
+        std::move(context), environment, config);
+  };
   makers_.order_processed_endpoint_source = [](
       servicelib::Context context, servicelib::IServiceEnvironment& environment,
       const servicelib::config::KafkaEndpointConfig& config) {
     return functions::MakeOrderProcessedEndpointSource(
+        std::move(context), environment, config);
+  };
+  makers_.route_analytics_result = [](
+      servicelib::Context context, servicelib::IServiceEnvironment& environment,
+      const servicelib::config::CaseStreamConfig& config) {
+    return functions::MakeRouteAnalyticsResult(
+        std::move(context), environment, config);
+  };
+  makers_.standard_analytics_sink = [](
+      servicelib::Context context, servicelib::IServiceEnvironment& environment,
+      const servicelib::config::CustomEndpointConfig& config) {
+    return functions::MakeStandardAnalyticsSink(
         std::move(context), environment, config);
   };
 }
@@ -77,14 +161,56 @@ void ServiceGenerated::initInfrastructure(
 
 void ServiceGenerated::initFunctions(
     servicelib::Context context, const config::Config& cfg) {
+  if (!makers_.analytics_orders_source) {
+    throw std::logic_error("function maker AnalyticsOrdersSource is not configured");
+  }
+  if (!makers_.analytics_payments_source) {
+    throw std::logic_error("function maker AnalyticsPaymentsSource is not configured");
+  }
   if (!makers_.analytics_schedule_source) {
     throw std::logic_error("function maker AnalyticsScheduleSource is not configured");
+  }
+  if (!makers_.analytics_shipments_source) {
+    throw std::logic_error("function maker AnalyticsShipmentsSource is not configured");
   }
   if (!makers_.count_order_processed) {
     throw std::logic_error("function maker CountOrderProcessed is not configured");
   }
+  if (!makers_.high_value_analytics_sink) {
+    throw std::logic_error("function maker HighValueAnalyticsSink is not configured");
+  }
+  if (!makers_.join_order_payment_analytics) {
+    throw std::logic_error("function maker JoinOrderPaymentAnalytics is not configured");
+  }
+  if (!makers_.joined_analytics_sink) {
+    throw std::logic_error("function maker JoinedAnalyticsSink is not configured");
+  }
+  if (!makers_.key_orders_for_join) {
+    throw std::logic_error("function maker KeyOrdersForJoin is not configured");
+  }
+  if (!makers_.key_orders_for_multi_join) {
+    throw std::logic_error("function maker KeyOrdersForMultiJoin is not configured");
+  }
+  if (!makers_.key_payments_for_join) {
+    throw std::logic_error("function maker KeyPaymentsForJoin is not configured");
+  }
+  if (!makers_.key_payments_for_multi_join) {
+    throw std::logic_error("function maker KeyPaymentsForMultiJoin is not configured");
+  }
+  if (!makers_.key_shipments_for_multi_join) {
+    throw std::logic_error("function maker KeyShipmentsForMultiJoin is not configured");
+  }
+  if (!makers_.multi_join_analytics_events) {
+    throw std::logic_error("function maker MultiJoinAnalyticsEvents is not configured");
+  }
   if (!makers_.order_processed_endpoint_source) {
     throw std::logic_error("function maker OrderProcessedEndpointSource is not configured");
+  }
+  if (!makers_.route_analytics_result) {
+    throw std::logic_error("function maker RouteAnalyticsResult is not configured");
+  }
+  if (!makers_.standard_analytics_sink) {
+    throw std::logic_error("function maker StandardAnalyticsSink is not configured");
   }
   std::stop_source maker_cancellation;
   userver::engine::Mutex maker_error_mutex;
@@ -92,7 +218,49 @@ void ServiceGenerated::initFunctions(
   const auto maker_context = context.withExternalCancellation(
       maker_cancellation.get_token());
   std::vector<userver::engine::TaskWithResult<void>> maker_tasks;
-  maker_tasks.reserve(3);
+  maker_tasks.reserve(17);
+  maker_tasks.push_back(userver::utils::Async(
+      "service-function-maker-analytics_orders_source", [this, &cfg, maker_context,
+                                            &maker_cancellation,
+                                            &maker_error_mutex,
+                                            &first_maker_error] {
+        try {
+          auto maker_task = makers_.analytics_orders_source(
+              maker_context, *this, cfg.endpoints.analyticsOrders);
+          functions_.analytics_orders_source = maker_task.Get();
+          if (!functions_.analytics_orders_source) {
+            throw std::logic_error("function maker AnalyticsOrdersSource returned null");
+          }
+        } catch (...) {
+          maker_cancellation.request_stop();
+          const std::lock_guard lock(maker_error_mutex);
+          if (!first_maker_error) {
+            first_maker_error = std::current_exception();
+          }
+          throw;
+        }
+      }));
+  maker_tasks.push_back(userver::utils::Async(
+      "service-function-maker-analytics_payments_source", [this, &cfg, maker_context,
+                                            &maker_cancellation,
+                                            &maker_error_mutex,
+                                            &first_maker_error] {
+        try {
+          auto maker_task = makers_.analytics_payments_source(
+              maker_context, *this, cfg.endpoints.analyticsPayments);
+          functions_.analytics_payments_source = maker_task.Get();
+          if (!functions_.analytics_payments_source) {
+            throw std::logic_error("function maker AnalyticsPaymentsSource returned null");
+          }
+        } catch (...) {
+          maker_cancellation.request_stop();
+          const std::lock_guard lock(maker_error_mutex);
+          if (!first_maker_error) {
+            first_maker_error = std::current_exception();
+          }
+          throw;
+        }
+      }));
   maker_tasks.push_back(userver::utils::Async(
       "service-function-maker-analytics_schedule_source", [this, &cfg, maker_context,
                                             &maker_cancellation,
@@ -104,6 +272,27 @@ void ServiceGenerated::initFunctions(
           functions_.analytics_schedule_source = maker_task.Get();
           if (!functions_.analytics_schedule_source) {
             throw std::logic_error("function maker AnalyticsScheduleSource returned null");
+          }
+        } catch (...) {
+          maker_cancellation.request_stop();
+          const std::lock_guard lock(maker_error_mutex);
+          if (!first_maker_error) {
+            first_maker_error = std::current_exception();
+          }
+          throw;
+        }
+      }));
+  maker_tasks.push_back(userver::utils::Async(
+      "service-function-maker-analytics_shipments_source", [this, &cfg, maker_context,
+                                            &maker_cancellation,
+                                            &maker_error_mutex,
+                                            &first_maker_error] {
+        try {
+          auto maker_task = makers_.analytics_shipments_source(
+              maker_context, *this, cfg.endpoints.analyticsShipments);
+          functions_.analytics_shipments_source = maker_task.Get();
+          if (!functions_.analytics_shipments_source) {
+            throw std::logic_error("function maker AnalyticsShipmentsSource returned null");
           }
         } catch (...) {
           maker_cancellation.request_stop();
@@ -136,6 +325,195 @@ void ServiceGenerated::initFunctions(
         }
       }));
   maker_tasks.push_back(userver::utils::Async(
+      "service-function-maker-high_value_analytics_sink", [this, &cfg, maker_context,
+                                            &maker_cancellation,
+                                            &maker_error_mutex,
+                                            &first_maker_error] {
+        try {
+          auto maker_task = makers_.high_value_analytics_sink(
+              maker_context, *this, cfg.endpoints.highValueAnalytics);
+          functions_.high_value_analytics_sink = maker_task.Get();
+          if (!functions_.high_value_analytics_sink) {
+            throw std::logic_error("function maker HighValueAnalyticsSink returned null");
+          }
+        } catch (...) {
+          maker_cancellation.request_stop();
+          const std::lock_guard lock(maker_error_mutex);
+          if (!first_maker_error) {
+            first_maker_error = std::current_exception();
+          }
+          throw;
+        }
+      }));
+  maker_tasks.push_back(userver::utils::Async(
+      "service-function-maker-join_order_payment_analytics", [this, &cfg, maker_context,
+                                            &maker_cancellation,
+                                            &maker_error_mutex,
+                                            &first_maker_error] {
+        try {
+          auto maker_task = makers_.join_order_payment_analytics(
+              maker_context, *this, cfg.streams.joinOrderPaymentAnalytics);
+          functions_.join_order_payment_analytics = maker_task.Get();
+          if (!functions_.join_order_payment_analytics) {
+            throw std::logic_error("function maker JoinOrderPaymentAnalytics returned null");
+          }
+        } catch (...) {
+          maker_cancellation.request_stop();
+          const std::lock_guard lock(maker_error_mutex);
+          if (!first_maker_error) {
+            first_maker_error = std::current_exception();
+          }
+          throw;
+        }
+      }));
+  maker_tasks.push_back(userver::utils::Async(
+      "service-function-maker-joined_analytics_sink", [this, &cfg, maker_context,
+                                            &maker_cancellation,
+                                            &maker_error_mutex,
+                                            &first_maker_error] {
+        try {
+          auto maker_task = makers_.joined_analytics_sink(
+              maker_context, *this, cfg.endpoints.joinedAnalytics);
+          functions_.joined_analytics_sink = maker_task.Get();
+          if (!functions_.joined_analytics_sink) {
+            throw std::logic_error("function maker JoinedAnalyticsSink returned null");
+          }
+        } catch (...) {
+          maker_cancellation.request_stop();
+          const std::lock_guard lock(maker_error_mutex);
+          if (!first_maker_error) {
+            first_maker_error = std::current_exception();
+          }
+          throw;
+        }
+      }));
+  maker_tasks.push_back(userver::utils::Async(
+      "service-function-maker-key_orders_for_join", [this, &cfg, maker_context,
+                                            &maker_cancellation,
+                                            &maker_error_mutex,
+                                            &first_maker_error] {
+        try {
+          auto maker_task = makers_.key_orders_for_join(
+              maker_context, *this, cfg.streams.keyOrdersForJoin);
+          functions_.key_orders_for_join = maker_task.Get();
+          if (!functions_.key_orders_for_join) {
+            throw std::logic_error("function maker KeyOrdersForJoin returned null");
+          }
+        } catch (...) {
+          maker_cancellation.request_stop();
+          const std::lock_guard lock(maker_error_mutex);
+          if (!first_maker_error) {
+            first_maker_error = std::current_exception();
+          }
+          throw;
+        }
+      }));
+  maker_tasks.push_back(userver::utils::Async(
+      "service-function-maker-key_orders_for_multi_join", [this, &cfg, maker_context,
+                                            &maker_cancellation,
+                                            &maker_error_mutex,
+                                            &first_maker_error] {
+        try {
+          auto maker_task = makers_.key_orders_for_multi_join(
+              maker_context, *this, cfg.streams.keyOrdersForMultiJoin);
+          functions_.key_orders_for_multi_join = maker_task.Get();
+          if (!functions_.key_orders_for_multi_join) {
+            throw std::logic_error("function maker KeyOrdersForMultiJoin returned null");
+          }
+        } catch (...) {
+          maker_cancellation.request_stop();
+          const std::lock_guard lock(maker_error_mutex);
+          if (!first_maker_error) {
+            first_maker_error = std::current_exception();
+          }
+          throw;
+        }
+      }));
+  maker_tasks.push_back(userver::utils::Async(
+      "service-function-maker-key_payments_for_join", [this, &cfg, maker_context,
+                                            &maker_cancellation,
+                                            &maker_error_mutex,
+                                            &first_maker_error] {
+        try {
+          auto maker_task = makers_.key_payments_for_join(
+              maker_context, *this, cfg.streams.keyPaymentsForJoin);
+          functions_.key_payments_for_join = maker_task.Get();
+          if (!functions_.key_payments_for_join) {
+            throw std::logic_error("function maker KeyPaymentsForJoin returned null");
+          }
+        } catch (...) {
+          maker_cancellation.request_stop();
+          const std::lock_guard lock(maker_error_mutex);
+          if (!first_maker_error) {
+            first_maker_error = std::current_exception();
+          }
+          throw;
+        }
+      }));
+  maker_tasks.push_back(userver::utils::Async(
+      "service-function-maker-key_payments_for_multi_join", [this, &cfg, maker_context,
+                                            &maker_cancellation,
+                                            &maker_error_mutex,
+                                            &first_maker_error] {
+        try {
+          auto maker_task = makers_.key_payments_for_multi_join(
+              maker_context, *this, cfg.streams.keyPaymentsForMultiJoin);
+          functions_.key_payments_for_multi_join = maker_task.Get();
+          if (!functions_.key_payments_for_multi_join) {
+            throw std::logic_error("function maker KeyPaymentsForMultiJoin returned null");
+          }
+        } catch (...) {
+          maker_cancellation.request_stop();
+          const std::lock_guard lock(maker_error_mutex);
+          if (!first_maker_error) {
+            first_maker_error = std::current_exception();
+          }
+          throw;
+        }
+      }));
+  maker_tasks.push_back(userver::utils::Async(
+      "service-function-maker-key_shipments_for_multi_join", [this, &cfg, maker_context,
+                                            &maker_cancellation,
+                                            &maker_error_mutex,
+                                            &first_maker_error] {
+        try {
+          auto maker_task = makers_.key_shipments_for_multi_join(
+              maker_context, *this, cfg.streams.keyShipmentsForMultiJoin);
+          functions_.key_shipments_for_multi_join = maker_task.Get();
+          if (!functions_.key_shipments_for_multi_join) {
+            throw std::logic_error("function maker KeyShipmentsForMultiJoin returned null");
+          }
+        } catch (...) {
+          maker_cancellation.request_stop();
+          const std::lock_guard lock(maker_error_mutex);
+          if (!first_maker_error) {
+            first_maker_error = std::current_exception();
+          }
+          throw;
+        }
+      }));
+  maker_tasks.push_back(userver::utils::Async(
+      "service-function-maker-multi_join_analytics_events", [this, &cfg, maker_context,
+                                            &maker_cancellation,
+                                            &maker_error_mutex,
+                                            &first_maker_error] {
+        try {
+          auto maker_task = makers_.multi_join_analytics_events(
+              maker_context, *this, cfg.streams.multiJoinAnalyticsEvents);
+          functions_.multi_join_analytics_events = maker_task.Get();
+          if (!functions_.multi_join_analytics_events) {
+            throw std::logic_error("function maker MultiJoinAnalyticsEvents returned null");
+          }
+        } catch (...) {
+          maker_cancellation.request_stop();
+          const std::lock_guard lock(maker_error_mutex);
+          if (!first_maker_error) {
+            first_maker_error = std::current_exception();
+          }
+          throw;
+        }
+      }));
+  maker_tasks.push_back(userver::utils::Async(
       "service-function-maker-order_processed_endpoint_source", [this, &cfg, maker_context,
                                             &maker_cancellation,
                                             &maker_error_mutex,
@@ -146,6 +524,48 @@ void ServiceGenerated::initFunctions(
           functions_.order_processed_endpoint_source = maker_task.Get();
           if (!functions_.order_processed_endpoint_source) {
             throw std::logic_error("function maker OrderProcessedEndpointSource returned null");
+          }
+        } catch (...) {
+          maker_cancellation.request_stop();
+          const std::lock_guard lock(maker_error_mutex);
+          if (!first_maker_error) {
+            first_maker_error = std::current_exception();
+          }
+          throw;
+        }
+      }));
+  maker_tasks.push_back(userver::utils::Async(
+      "service-function-maker-route_analytics_result", [this, &cfg, maker_context,
+                                            &maker_cancellation,
+                                            &maker_error_mutex,
+                                            &first_maker_error] {
+        try {
+          auto maker_task = makers_.route_analytics_result(
+              maker_context, *this, cfg.streams.routeAnalyticsResult);
+          functions_.route_analytics_result = maker_task.Get();
+          if (!functions_.route_analytics_result) {
+            throw std::logic_error("function maker RouteAnalyticsResult returned null");
+          }
+        } catch (...) {
+          maker_cancellation.request_stop();
+          const std::lock_guard lock(maker_error_mutex);
+          if (!first_maker_error) {
+            first_maker_error = std::current_exception();
+          }
+          throw;
+        }
+      }));
+  maker_tasks.push_back(userver::utils::Async(
+      "service-function-maker-standard_analytics_sink", [this, &cfg, maker_context,
+                                            &maker_cancellation,
+                                            &maker_error_mutex,
+                                            &first_maker_error] {
+        try {
+          auto maker_task = makers_.standard_analytics_sink(
+              maker_context, *this, cfg.endpoints.standardAnalytics);
+          functions_.standard_analytics_sink = maker_task.Get();
+          if (!functions_.standard_analytics_sink) {
+            throw std::logic_error("function maker StandardAnalyticsSink returned null");
           }
         } catch (...) {
           maker_cancellation.request_stop();
@@ -183,6 +603,7 @@ void ServiceGenerated::initRuntime(servicelib::Context context) {
   initFunctions(context, *config_snapshot);
   customFunctionsInit(context);
   initStreams(*config_snapshot);
+  initDataSinks(*config_snapshot);
   initDataSources(*config_snapshot);
 
 }
@@ -192,7 +613,80 @@ void ServiceGenerated::initStreams(const config::Config& cfg) {
   streams_.consume_order_processed = &servicelib::makeInputStreamRef<example::model::types::OrderProcessed, example::model::types::OrderProcessed, std::exception_ptr, ServiceGenerated>(cfg.streams.consumeOrderProcessed, nullptr, *this);
   auto& count_order_processed = (*streams_.consume_order_processed).process(cfg.streams.countOrderProcessed, servicelib::StreamType<example::model::types::OrderProcessed>{}, servicelib::StreamType<std::exception_ptr>{}, servicelib::StreamFunction(std::ref(*functions_.count_order_processed)));
   streams_.count_order_processed = std::addressof(count_order_processed);
+  streams_.analytics_orders = &servicelib::makeInputStreamRef<example::analytics_service::types::AnalyticsEvent, std::monostate, std::exception_ptr, ServiceGenerated>(cfg.streams.analyticsOrders, nullptr, *this);
+  streams_.analytics_payments = &servicelib::makeInputStreamRef<example::analytics_service::types::AnalyticsEvent, std::monostate, std::exception_ptr, ServiceGenerated>(cfg.streams.analyticsPayments, nullptr, *this);
+  streams_.analytics_shipments = &servicelib::makeInputStreamRef<example::analytics_service::types::AnalyticsEvent, std::monostate, std::exception_ptr, ServiceGenerated>(cfg.streams.analyticsShipments, nullptr, *this);
+  auto& split_analytics_orders = (*streams_.analytics_orders).template split<2>(cfg.streams.splitAnalyticsOrders);
+  streams_.split_analytics_orders = std::addressof(split_analytics_orders);
+  auto& split_analytics_payments = (*streams_.analytics_payments).template split<2>(cfg.streams.splitAnalyticsPayments);
+  streams_.split_analytics_payments = std::addressof(split_analytics_payments);
+  auto& key_orders_for_join = split_analytics_orders.template get<0>().template keyBy<std::string, example::analytics_service::types::AnalyticsEvent>(cfg.streams.keyOrdersForJoin, servicelib::StreamFunction(std::ref(*functions_.key_orders_for_join)));
+  streams_.key_orders_for_join = std::addressof(key_orders_for_join);
+  auto& key_payments_for_join = split_analytics_payments.template get<0>().template keyBy<std::string, example::analytics_service::types::AnalyticsEvent>(cfg.streams.keyPaymentsForJoin, servicelib::StreamFunction(std::ref(*functions_.key_payments_for_join)));
+  streams_.key_payments_for_join = std::addressof(key_payments_for_join);
+  auto& join_order_payment_analytics = key_orders_for_join.join(cfg.streams.joinOrderPaymentAnalytics, key_payments_for_join, servicelib::StreamType<example::analytics_service::types::AnalyticsResult>{}, servicelib::Inner{}, servicelib::InMemory_Strategy{}, servicelib::StreamFunction(std::ref(*functions_.join_order_payment_analytics)));
+  streams_.join_order_payment_analytics = std::addressof(join_order_payment_analytics);
+  [[maybe_unused]] auto& write_joined_analytics = join_order_payment_analytics.sink(cfg.streams.writeJoinedAnalytics, servicelib::StreamType<std::exception_ptr>{}, servicelib::StreamFunction(WriteJoinedAnalyticsSinkBinding::Function{&bindings_.write_joined_analytics}));
+  streams_.write_joined_analytics = write_joined_analytics;
+  auto& key_orders_for_multi_join = split_analytics_orders.template get<1>().template keyBy<std::string, example::analytics_service::types::AnalyticsEvent>(cfg.streams.keyOrdersForMultiJoin, servicelib::StreamFunction(std::ref(*functions_.key_orders_for_multi_join)));
+  streams_.key_orders_for_multi_join = std::addressof(key_orders_for_multi_join);
+  auto& key_payments_for_multi_join = split_analytics_payments.template get<1>().template keyBy<std::string, example::analytics_service::types::AnalyticsEvent>(cfg.streams.keyPaymentsForMultiJoin, servicelib::StreamFunction(std::ref(*functions_.key_payments_for_multi_join)));
+  streams_.key_payments_for_multi_join = std::addressof(key_payments_for_multi_join);
+  auto& key_shipments_for_multi_join = (*streams_.analytics_shipments).template keyBy<std::string, example::analytics_service::types::AnalyticsEvent>(cfg.streams.keyShipmentsForMultiJoin, servicelib::StreamFunction(std::ref(*functions_.key_shipments_for_multi_join)));
+  streams_.key_shipments_for_multi_join = std::addressof(key_shipments_for_multi_join);
+  auto& multi_join_analytics_events = key_orders_for_multi_join.multiJoin(cfg.streams.multiJoinAnalyticsEvents, servicelib::StreamType<example::analytics_service::types::AnalyticsResult>{}, servicelib::InMemory_Strategy{}, servicelib::StreamFunction(std::ref(*functions_.multi_join_analytics_events)), key_payments_for_multi_join, key_shipments_for_multi_join);
+  streams_.multi_join_analytics_events = std::addressof(multi_join_analytics_events);
+  auto& route_analytics_result = multi_join_analytics_events.template case_<2>(cfg.streams.routeAnalyticsResult, servicelib::StreamFunction(std::ref(*functions_.route_analytics_result)));
+  streams_.route_analytics_result = std::addressof(route_analytics_result);
+  route_analytics_result.template get<0>().configure(cfg.streams.highValueAnalytics, nullptr, this);
+  streams_.high_value_analytics = std::addressof(route_analytics_result.template get<0>());
+  route_analytics_result.template get<1>().configure(cfg.streams.standardAnalytics, nullptr, this);
+  streams_.standard_analytics = std::addressof(route_analytics_result.template get<1>());
+  [[maybe_unused]] auto& write_high_value_analytics = route_analytics_result.template get<0>().sink(cfg.streams.writeHighValueAnalytics, servicelib::StreamType<std::exception_ptr>{}, servicelib::StreamFunction(WriteHighValueAnalyticsSinkBinding::Function{&bindings_.write_high_value_analytics}));
+  streams_.write_high_value_analytics = write_high_value_analytics;
+  [[maybe_unused]] auto& write_standard_analytics = route_analytics_result.template get<1>().sink(cfg.streams.writeStandardAnalytics, servicelib::StreamType<std::exception_ptr>{}, servicelib::StreamFunction(WriteStandardAnalyticsSinkBinding::Function{&bindings_.write_standard_analytics}));
+  streams_.write_standard_analytics = write_standard_analytics;
   streams_.consume_order_processed->setSource(count_order_processed);
+}
+
+void ServiceGenerated::initDataSinks(const config::Config& cfg) {
+  (void)cfg;
+
+
+
+  endpoints_.write_joined_analytics =
+      std::make_shared<WriteJoinedAnalyticsCustomSinkEndpoint>(
+          streams_.write_joined_analytics.get(),
+          *functions_.joined_analytics_sink);
+  bindings_.write_joined_analytics.consume =
+      [endpoint = endpoints_.write_joined_analytics.get()](
+          servicelib::MessageContext context, const example::analytics_service::types::AnalyticsResult& value) {
+        endpoint->consume(std::move(context),
+                          servicelib::Payload<example::analytics_service::types::AnalyticsResult>::make(value));
+      };
+  registerDataSink(endpoints_.write_joined_analytics);
+  endpoints_.write_high_value_analytics =
+      std::make_shared<WriteHighValueAnalyticsCustomSinkEndpoint>(
+          streams_.write_high_value_analytics.get(),
+          *functions_.high_value_analytics_sink);
+  bindings_.write_high_value_analytics.consume =
+      [endpoint = endpoints_.write_high_value_analytics.get()](
+          servicelib::MessageContext context, const example::analytics_service::types::AnalyticsResult& value) {
+        endpoint->consume(std::move(context),
+                          servicelib::Payload<example::analytics_service::types::AnalyticsResult>::make(value));
+      };
+  registerDataSink(endpoints_.write_high_value_analytics);
+  endpoints_.write_standard_analytics =
+      std::make_shared<WriteStandardAnalyticsCustomSinkEndpoint>(
+          streams_.write_standard_analytics.get(),
+          *functions_.standard_analytics_sink);
+  bindings_.write_standard_analytics.consume =
+      [endpoint = endpoints_.write_standard_analytics.get()](
+          servicelib::MessageContext context, const example::analytics_service::types::AnalyticsResult& value) {
+        endpoint->consume(std::move(context),
+                          servicelib::Payload<example::analytics_service::types::AnalyticsResult>::make(value));
+      };
+  registerDataSink(endpoints_.write_standard_analytics);
 }
 
 void ServiceGenerated::initDataSources(
@@ -211,6 +705,21 @@ void ServiceGenerated::initDataSources(
       *functions_.order_processed_endpoint_source);
   registerDataSource(endpoints_.consume_order_processed);
 
+  endpoints_.analytics_orders = AnalyticsOrdersCustomSourceEndpoint::make(
+      *this, *streams_.analytics_orders,
+      *functions_.analytics_orders_source,
+      *functions_.analytics_orders_source);
+  registerDataSource(endpoints_.analytics_orders);
+  endpoints_.analytics_payments = AnalyticsPaymentsCustomSourceEndpoint::make(
+      *this, *streams_.analytics_payments,
+      *functions_.analytics_payments_source,
+      *functions_.analytics_payments_source);
+  registerDataSource(endpoints_.analytics_payments);
+  endpoints_.analytics_shipments = AnalyticsShipmentsCustomSourceEndpoint::make(
+      *this, *streams_.analytics_shipments,
+      *functions_.analytics_shipments_source,
+      *functions_.analytics_shipments_source);
+  registerDataSource(endpoints_.analytics_shipments);
   connectors_.local_cron_cron_source =
       servicelib::datasource::cron::LibcronDataSource::make(
           *this, cfg.dataConnectors.localCron.id);
