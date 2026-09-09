@@ -7,9 +7,11 @@
 #include <exception>
 #include <memory>
 
+#include <userver/engine/mutex.hpp>
 #include <userver/engine/task/task_with_result.hpp>
 #include <userver/utils/async.hpp>
 #include <mutex>
+#include <optional>
 #include <stdexcept>
 #include <string>
 #include <string_view>
@@ -43,8 +45,8 @@ struct ProcessOrderSource final {
   using Response = handlers::order_service_api::processorder::Response;
 
   struct SharedState final {
-    std::mutex mutex;
-    example::order_service::types::Order order;
+    userver::engine::Mutex mutex;
+    std::optional<servicelib::Payload<example::order_service::types::Order>> order;
     std::size_t expectedItems{};
     std::vector<example::model::types::OrderItemResult> results;
     bool responseSent{};
@@ -63,6 +65,7 @@ struct ProcessOrderSource final {
       servicelib::datasource::http::HandlerData& data) const {
     try {
       auto shared = std::make_shared<SharedState>();
+      example::order_service::types::Order order;
       const auto json =
           userver::formats::json::FromString(data.request.RequestBody());
       const auto itemsJson = json["items"];
@@ -76,12 +79,12 @@ struct ProcessOrderSource final {
         orderId = userver::utils::generators::GenerateUuidV7();
       }
 
-      shared->order.id = std::move(orderId);
-      shared->order.customer_id =
+      order.id = std::move(orderId);
+      order.customer_id =
           stringField(json, "customer_id", "customerId", "");
-      shared->order.trace_id = data.request.GetHeader("X-Trace");
-      shared->order.created_at = nowString();
-      shared->order.items.reserve(itemsJson.GetSize());
+      order.trace_id = data.request.GetHeader("X-Trace");
+      order.created_at = nowString();
+      order.items.reserve(itemsJson.GetSize());
 
       for (const auto& itemJson : itemsJson) {
         const auto quantity = intField(itemJson, "quantity");
@@ -90,18 +93,22 @@ struct ProcessOrderSource final {
         }
         const auto unitPrice =
             doubleField(itemJson, "unit_price", "unitPrice", 0.0);
-        shared->order.items.push_back(
+        order.items.push_back(
             example::model::types::OrderItem{
-                shared->order.id,
+                order.id,
                 stringField(itemJson, "item_id", "itemId"),
                 stringField(itemJson, "sku", "sku"),
                 quantity,
                 unitPrice,
             });
-        shared->order.total_amount +=
+        order.total_amount +=
             static_cast<double>(quantity) * unitPrice;
       }
-      shared->expectedItems = shared->order.items.size();
+      shared->expectedItems = order.items.size();
+
+      shared->results.reserve(shared->expectedItems);
+      shared->order.emplace(servicelib::Payload<
+          example::order_service::types::Order>::make(std::move(order)));
 
       const auto deadline = std::chrono::steady_clock::now() + timeout_;
       if (!context.deadline() || deadline < *context.deadline()) {
@@ -124,7 +131,7 @@ struct ProcessOrderSource final {
       servicelib::datasource::http::HandlerData&, auto resultContext) const {
     const auto shared = state.shared;
     resultContext.setResultCallback(
-        shared->order.id,
+        shared->order->get().id,
         [resultContext, shared](
             servicelib::MessageContext, auto&, State&,
             const example::order_service::types::OrderState& value,
@@ -158,7 +165,7 @@ struct ProcessOrderSource final {
                 item.unit_price * static_cast<double>(item.requested_qty);
           }
           if (shared->results.empty()) {
-            totalAmount = shared->order.total_amount;
+            totalAmount = shared->order->get().total_amount;
           }
 
           data.response.SetStatus(userver::server::http::HttpStatus::kOk);
@@ -166,13 +173,15 @@ struct ProcessOrderSource final {
               std::string_view{"Content-Type"},
               std::string{"application/json"});
           data.setResponseBody(makeResponse(
-              shared->order.id, status, shared->results, totalAmount));
+              shared->order->get().id, status, shared->results, totalAmount));
           shared->responseSent = true;
           resultContext.done();
           return true;
         });
 
-    streamContext.collect(std::move(context), shared->order);
+    // Share immutable order storage with the graph. The response callback
+    // retains the same payload, so its identifiers and totals stay available.
+    streamContext.collect(std::move(context), *shared->order);
   }
 
   std::string getMessageId(
