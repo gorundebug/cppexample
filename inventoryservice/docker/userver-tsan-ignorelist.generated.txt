@@ -1,6 +1,6 @@
 # Project-side additions to userver's upstream TSan ignorelist.
 #
-# userver v3.1 reports its Awaiter bookkeeping during orderly component
+# userver v3.2 reports its Awaiter bookkeeping during orderly component
 # shutdown as a race between Awaiter construction and WaitListLight wake-up.
 # Keep this rule source-scoped: the rest of userver and all application code
 # remain instrumented by ThreadSanitizer.

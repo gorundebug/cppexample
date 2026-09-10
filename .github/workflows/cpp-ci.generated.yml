@@ -21,7 +21,7 @@ jobs:
         run: |
           . ./scripts/git-retry.generated.sh
           git_retry git clone "https://github.com/userver-framework/userver.git" .userver
-          git -C .userver checkout "c9f77729c0edce7e423def2d4a4450aa7fc9d259"
+          git -C .userver checkout "19472cc41deda3fb1c7aa7d13d53235a0161a224"
 
       - name: Build and test
         env:
@@ -50,7 +50,7 @@ jobs:
         run: |
           . ./scripts/git-retry.generated.sh
           git_retry git clone "https://github.com/userver-framework/userver.git" .userver
-          git -C .userver checkout "c9f77729c0edce7e423def2d4a4450aa7fc9d259"
+          git -C .userver checkout "19472cc41deda3fb1c7aa7d13d53235a0161a224"
 
       - name: Lint
         env:

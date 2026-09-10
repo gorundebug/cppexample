@@ -11,6 +11,7 @@ components_manager:
   default_task_processor: main-task-processor
   components:
     servicelib-disabled-server-middlewares:
+    servicelib-noop-tracing-manager:
     logging:
       fs-task-processor: fs-task-processor
       loggers:

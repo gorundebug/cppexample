@@ -28,7 +28,7 @@ endif
 
 ifneq ($(strip $(DEPENDENCY_PROXY_DIR)),)
 export SERVICELIB_SOURCE_CONTEXT ?= $(DEPENDENCY_GIT_MIRROR_DOCKER_BASE)/github.com/gorundebug/cppservicelib.git\#v0.2.111
-export USERVER_SOURCE_CONTEXT ?= $(DEPENDENCY_GIT_MIRROR_DOCKER_BASE)/github.com/userver-framework/userver.git\#c9f77729c0edce7e423def2d4a4450aa7fc9d259
+export USERVER_SOURCE_CONTEXT ?= $(DEPENDENCY_GIT_MIRROR_DOCKER_BASE)/github.com/userver-framework/userver.git\#19472cc41deda3fb1c7aa7d13d53235a0161a224
 endif
 
 .PHONY: cpp-tools build test release-build release-test asan-build asan-start asan-up asan-down asan-test \

@@ -5,6 +5,7 @@
 #include <userver/components/minimal_server_component_list.hpp>
 #include <userver/server/middlewares/configuration.hpp>
 #include <userver/testsuite/testsuite_support.hpp>
+#include <userver/tracing/manager_component.hpp>
 #ifdef ENABLE_OTLP_TRACING
 #include <userver/otlp/logs/component.hpp>
 #include <userver/ugrpc/client/client_factory_component.hpp>
@@ -40,12 +41,39 @@ class DisabledServerMiddlewarePipeline final
   }
 };
 
+// Selected only by benchmark static config. Keeping the component in the
+// generated binary lets benchmarks remove userver trace-context work without
+// changing the normal service configuration or runtime semantics.
+class NoopTracingManager final
+    : public userver::tracing::TracingManagerComponentBase {
+ public:
+  static constexpr std::string_view kName =
+      "servicelib-noop-tracing-manager";
+  using TracingManagerComponentBase::TracingManagerComponentBase;
+
+ protected:
+  bool TryFillSpanBuilderFromRequest(
+      const userver::server::http::HttpRequest&,
+      userver::tracing::SpanBuilder&) const final {
+    return true;
+  }
+
+  void FillRequestWithTracingContext(
+      const userver::tracing::Span&,
+      userver::clients::http::MiddlewareRequest) const final {}
+
+  void FillResponseWithTracingContext(
+      const userver::tracing::Span&,
+      userver::server::http::HttpResponse&) const final {}
+};
+
 }  // namespace
 
 int main(int argc, char* argv[]) {
   auto components =
       userver::components::MinimalServerComponentList()
           .Append<DisabledServerMiddlewarePipeline>()
+          .Append<NoopTracingManager>()
           .Append<userver::components::TestsuiteSupport>()
 #ifdef ENABLE_OTLP_TRACING
           .Append<userver::ugrpc::client::ClientFactoryComponent>(
