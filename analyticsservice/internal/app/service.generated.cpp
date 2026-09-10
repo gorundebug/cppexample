@@ -49,6 +49,12 @@ void ServiceGenerated::start() {
 }
 
 void ServiceGenerated::initMakers() {
+  makers_.advance_cycle_analytics = [](
+      servicelib::Context context, servicelib::IServiceEnvironment& environment,
+      const servicelib::config::MapStreamConfig& config) {
+    return functions::MakeAdvanceCycleAnalytics(
+        std::move(context), environment, config);
+  };
   makers_.analytics_orders_source = [](
       servicelib::Context context, servicelib::IServiceEnvironment& environment,
       const servicelib::config::CustomEndpointConfig& config) {
@@ -73,10 +79,34 @@ void ServiceGenerated::initMakers() {
     return functions::MakeAnalyticsShipmentsSource(
         std::move(context), environment, config);
   };
+  makers_.complete_cycle_analytics = [](
+      servicelib::Context context, servicelib::IServiceEnvironment& environment,
+      const servicelib::config::FilterStreamConfig& config) {
+    return functions::MakeCompleteCycleAnalytics(
+        std::move(context), environment, config);
+  };
+  makers_.continue_cycle_analytics = [](
+      servicelib::Context context, servicelib::IServiceEnvironment& environment,
+      const servicelib::config::FilterStreamConfig& config) {
+    return functions::MakeContinueCycleAnalytics(
+        std::move(context), environment, config);
+  };
   makers_.count_order_processed = [](
       servicelib::Context context, servicelib::IServiceEnvironment& environment,
       const servicelib::config::ProcessStreamConfig& config) {
     return functions::MakeCountOrderProcessed(
+        std::move(context), environment, config);
+  };
+  makers_.cycle_analytics_input_source = [](
+      servicelib::Context context, servicelib::IServiceEnvironment& environment,
+      const servicelib::config::CustomEndpointConfig& config) {
+    return functions::MakeCycleAnalyticsInputSource(
+        std::move(context), environment, config);
+  };
+  makers_.cycle_analytics_result_sink = [](
+      servicelib::Context context, servicelib::IServiceEnvironment& environment,
+      const servicelib::config::CustomEndpointConfig& config) {
+    return functions::MakeCycleAnalyticsResultSink(
         std::move(context), environment, config);
   };
   makers_.high_value_analytics_sink = [](
@@ -161,6 +191,9 @@ void ServiceGenerated::initInfrastructure(
 
 void ServiceGenerated::initFunctions(
     servicelib::Context context, const config::Config& cfg) {
+  if (!makers_.advance_cycle_analytics) {
+    throw std::logic_error("function maker AdvanceCycleAnalytics is not configured");
+  }
   if (!makers_.analytics_orders_source) {
     throw std::logic_error("function maker AnalyticsOrdersSource is not configured");
   }
@@ -173,8 +206,20 @@ void ServiceGenerated::initFunctions(
   if (!makers_.analytics_shipments_source) {
     throw std::logic_error("function maker AnalyticsShipmentsSource is not configured");
   }
+  if (!makers_.complete_cycle_analytics) {
+    throw std::logic_error("function maker CompleteCycleAnalytics is not configured");
+  }
+  if (!makers_.continue_cycle_analytics) {
+    throw std::logic_error("function maker ContinueCycleAnalytics is not configured");
+  }
   if (!makers_.count_order_processed) {
     throw std::logic_error("function maker CountOrderProcessed is not configured");
+  }
+  if (!makers_.cycle_analytics_input_source) {
+    throw std::logic_error("function maker CycleAnalyticsInputSource is not configured");
+  }
+  if (!makers_.cycle_analytics_result_sink) {
+    throw std::logic_error("function maker CycleAnalyticsResultSink is not configured");
   }
   if (!makers_.high_value_analytics_sink) {
     throw std::logic_error("function maker HighValueAnalyticsSink is not configured");
@@ -218,7 +263,28 @@ void ServiceGenerated::initFunctions(
   const auto maker_context = context.withExternalCancellation(
       maker_cancellation.get_token());
   std::vector<userver::engine::TaskWithResult<void>> maker_tasks;
-  maker_tasks.reserve(17);
+  maker_tasks.reserve(22);
+  maker_tasks.push_back(userver::utils::Async(
+      "service-function-maker-advance_cycle_analytics", [this, &cfg, maker_context,
+                                            &maker_cancellation,
+                                            &maker_error_mutex,
+                                            &first_maker_error] {
+        try {
+          auto maker_task = makers_.advance_cycle_analytics(
+              maker_context, *this, cfg.streams.advanceCycleAnalytics);
+          functions_.advance_cycle_analytics = maker_task.Get();
+          if (!functions_.advance_cycle_analytics) {
+            throw std::logic_error("function maker AdvanceCycleAnalytics returned null");
+          }
+        } catch (...) {
+          maker_cancellation.request_stop();
+          const std::lock_guard lock(maker_error_mutex);
+          if (!first_maker_error) {
+            first_maker_error = std::current_exception();
+          }
+          throw;
+        }
+      }));
   maker_tasks.push_back(userver::utils::Async(
       "service-function-maker-analytics_orders_source", [this, &cfg, maker_context,
                                             &maker_cancellation,
@@ -304,6 +370,48 @@ void ServiceGenerated::initFunctions(
         }
       }));
   maker_tasks.push_back(userver::utils::Async(
+      "service-function-maker-complete_cycle_analytics", [this, &cfg, maker_context,
+                                            &maker_cancellation,
+                                            &maker_error_mutex,
+                                            &first_maker_error] {
+        try {
+          auto maker_task = makers_.complete_cycle_analytics(
+              maker_context, *this, cfg.streams.completeCycleAnalytics);
+          functions_.complete_cycle_analytics = maker_task.Get();
+          if (!functions_.complete_cycle_analytics) {
+            throw std::logic_error("function maker CompleteCycleAnalytics returned null");
+          }
+        } catch (...) {
+          maker_cancellation.request_stop();
+          const std::lock_guard lock(maker_error_mutex);
+          if (!first_maker_error) {
+            first_maker_error = std::current_exception();
+          }
+          throw;
+        }
+      }));
+  maker_tasks.push_back(userver::utils::Async(
+      "service-function-maker-continue_cycle_analytics", [this, &cfg, maker_context,
+                                            &maker_cancellation,
+                                            &maker_error_mutex,
+                                            &first_maker_error] {
+        try {
+          auto maker_task = makers_.continue_cycle_analytics(
+              maker_context, *this, cfg.streams.continueCycleAnalytics);
+          functions_.continue_cycle_analytics = maker_task.Get();
+          if (!functions_.continue_cycle_analytics) {
+            throw std::logic_error("function maker ContinueCycleAnalytics returned null");
+          }
+        } catch (...) {
+          maker_cancellation.request_stop();
+          const std::lock_guard lock(maker_error_mutex);
+          if (!first_maker_error) {
+            first_maker_error = std::current_exception();
+          }
+          throw;
+        }
+      }));
+  maker_tasks.push_back(userver::utils::Async(
       "service-function-maker-count_order_processed", [this, &cfg, maker_context,
                                             &maker_cancellation,
                                             &maker_error_mutex,
@@ -314,6 +422,48 @@ void ServiceGenerated::initFunctions(
           functions_.count_order_processed = maker_task.Get();
           if (!functions_.count_order_processed) {
             throw std::logic_error("function maker CountOrderProcessed returned null");
+          }
+        } catch (...) {
+          maker_cancellation.request_stop();
+          const std::lock_guard lock(maker_error_mutex);
+          if (!first_maker_error) {
+            first_maker_error = std::current_exception();
+          }
+          throw;
+        }
+      }));
+  maker_tasks.push_back(userver::utils::Async(
+      "service-function-maker-cycle_analytics_input_source", [this, &cfg, maker_context,
+                                            &maker_cancellation,
+                                            &maker_error_mutex,
+                                            &first_maker_error] {
+        try {
+          auto maker_task = makers_.cycle_analytics_input_source(
+              maker_context, *this, cfg.endpoints.cycleAnalyticsInput);
+          functions_.cycle_analytics_input_source = maker_task.Get();
+          if (!functions_.cycle_analytics_input_source) {
+            throw std::logic_error("function maker CycleAnalyticsInputSource returned null");
+          }
+        } catch (...) {
+          maker_cancellation.request_stop();
+          const std::lock_guard lock(maker_error_mutex);
+          if (!first_maker_error) {
+            first_maker_error = std::current_exception();
+          }
+          throw;
+        }
+      }));
+  maker_tasks.push_back(userver::utils::Async(
+      "service-function-maker-cycle_analytics_result_sink", [this, &cfg, maker_context,
+                                            &maker_cancellation,
+                                            &maker_error_mutex,
+                                            &first_maker_error] {
+        try {
+          auto maker_task = makers_.cycle_analytics_result_sink(
+              maker_context, *this, cfg.endpoints.cycleAnalyticsResult);
+          functions_.cycle_analytics_result_sink = maker_task.Get();
+          if (!functions_.cycle_analytics_result_sink) {
+            throw std::logic_error("function maker CycleAnalyticsResultSink returned null");
           }
         } catch (...) {
           maker_cancellation.request_stop();
@@ -609,6 +759,7 @@ void ServiceGenerated::initRuntime(servicelib::Context context) {
 }
 
 void ServiceGenerated::initStreams(const config::Config& cfg) {
+  streams_.cycle_analytics_link = &servicelib::makeCycleLinkStreamRef<example::analytics_service::types::AnalyticsEvent, ServiceGenerated>(cfg.streams.cycleAnalyticsLink, nullptr, *this);
   streams_.analytics_schedule = &servicelib::makeInputStreamRef<std::string, std::monostate, std::exception_ptr, ServiceGenerated>(cfg.streams.analyticsSchedule, nullptr, *this);
   streams_.consume_order_processed = &servicelib::makeInputStreamRef<example::model::types::OrderProcessed, example::model::types::OrderProcessed, std::exception_ptr, ServiceGenerated>(cfg.streams.consumeOrderProcessed, nullptr, *this);
   auto& count_order_processed = (*streams_.consume_order_processed).process(cfg.streams.countOrderProcessed, servicelib::StreamType<example::model::types::OrderProcessed>{}, servicelib::StreamType<std::exception_ptr>{}, servicelib::StreamFunction(std::ref(*functions_.count_order_processed)));
@@ -620,6 +771,19 @@ void ServiceGenerated::initStreams(const config::Config& cfg) {
   streams_.split_analytics_orders = std::addressof(split_analytics_orders);
   auto& split_analytics_payments = (*streams_.analytics_payments).template split<2>(cfg.streams.splitAnalyticsPayments);
   streams_.split_analytics_payments = std::addressof(split_analytics_payments);
+  streams_.cycle_analytics_input = &servicelib::makeInputStreamRef<example::analytics_service::types::AnalyticsEvent, std::monostate, std::exception_ptr, ServiceGenerated>(cfg.streams.cycleAnalyticsInput, nullptr, *this);
+  auto& merge_cycle_analytics = (*streams_.cycle_analytics_input).merge(cfg.streams.mergeCycleAnalytics, (*streams_.cycle_analytics_link));
+  streams_.merge_cycle_analytics = std::addressof(merge_cycle_analytics);
+  auto& advance_cycle_analytics = merge_cycle_analytics.map(cfg.streams.advanceCycleAnalytics, servicelib::StreamType<example::analytics_service::types::AnalyticsEvent>{}, servicelib::StreamFunction(std::ref(*functions_.advance_cycle_analytics)));
+  streams_.advance_cycle_analytics = std::addressof(advance_cycle_analytics);
+  auto& split_cycle_analytics = advance_cycle_analytics.template split<2>(cfg.streams.splitCycleAnalytics);
+  streams_.split_cycle_analytics = std::addressof(split_cycle_analytics);
+  auto& complete_cycle_analytics = split_cycle_analytics.template get<0>().filter(cfg.streams.completeCycleAnalytics, servicelib::StreamFunction(std::ref(*functions_.complete_cycle_analytics)));
+  streams_.complete_cycle_analytics = std::addressof(complete_cycle_analytics);
+  auto& continue_cycle_analytics = split_cycle_analytics.template get<1>().filter(cfg.streams.continueCycleAnalytics, servicelib::StreamFunction(std::ref(*functions_.continue_cycle_analytics)));
+  streams_.continue_cycle_analytics = std::addressof(continue_cycle_analytics);
+  [[maybe_unused]] auto& write_cycle_analytics = complete_cycle_analytics.sink(cfg.streams.writeCycleAnalytics, servicelib::StreamType<std::exception_ptr>{}, servicelib::StreamFunction(WriteCycleAnalyticsSinkBinding::Function{&bindings_.write_cycle_analytics}));
+  streams_.write_cycle_analytics = write_cycle_analytics;
   auto& key_orders_for_join = split_analytics_orders.template get<0>().template keyBy<std::string, example::analytics_service::types::AnalyticsEvent>(cfg.streams.keyOrdersForJoin, servicelib::StreamFunction(std::ref(*functions_.key_orders_for_join)));
   streams_.key_orders_for_join = std::addressof(key_orders_for_join);
   auto& key_payments_for_join = split_analytics_payments.template get<0>().template keyBy<std::string, example::analytics_service::types::AnalyticsEvent>(cfg.streams.keyPaymentsForJoin, servicelib::StreamFunction(std::ref(*functions_.key_payments_for_join)));
@@ -647,6 +811,7 @@ void ServiceGenerated::initStreams(const config::Config& cfg) {
   [[maybe_unused]] auto& write_standard_analytics = route_analytics_result.template get<1>().sink(cfg.streams.writeStandardAnalytics, servicelib::StreamType<std::exception_ptr>{}, servicelib::StreamFunction(WriteStandardAnalyticsSinkBinding::Function{&bindings_.write_standard_analytics}));
   streams_.write_standard_analytics = write_standard_analytics;
   streams_.consume_order_processed->setSource(count_order_processed);
+  streams_.cycle_analytics_link->setSource(continue_cycle_analytics);
 }
 
 void ServiceGenerated::initDataSinks(const config::Config& cfg) {
@@ -654,6 +819,17 @@ void ServiceGenerated::initDataSinks(const config::Config& cfg) {
 
 
 
+  endpoints_.write_cycle_analytics =
+      std::make_shared<WriteCycleAnalyticsCustomSinkEndpoint>(
+          streams_.write_cycle_analytics.get(),
+          *functions_.cycle_analytics_result_sink);
+  bindings_.write_cycle_analytics.consume =
+      [endpoint = endpoints_.write_cycle_analytics.get()](
+          servicelib::MessageContext context, const example::analytics_service::types::AnalyticsEvent& value) {
+        endpoint->consume(std::move(context),
+                          servicelib::Payload<example::analytics_service::types::AnalyticsEvent>::make(value));
+      };
+  registerDataSink(endpoints_.write_cycle_analytics);
   endpoints_.write_joined_analytics =
       std::make_shared<WriteJoinedAnalyticsCustomSinkEndpoint>(
           streams_.write_joined_analytics.get(),
@@ -720,6 +896,11 @@ void ServiceGenerated::initDataSources(
       *functions_.analytics_shipments_source,
       *functions_.analytics_shipments_source);
   registerDataSource(endpoints_.analytics_shipments);
+  endpoints_.cycle_analytics_input = CycleAnalyticsInputCustomSourceEndpoint::make(
+      *this, *streams_.cycle_analytics_input,
+      *functions_.cycle_analytics_input_source,
+      *functions_.cycle_analytics_input_source);
+  registerDataSource(endpoints_.cycle_analytics_input);
   connectors_.local_cron_cron_source =
       servicelib::datasource::cron::LibcronDataSource::make(
           *this, cfg.dataConnectors.localCron.id);
