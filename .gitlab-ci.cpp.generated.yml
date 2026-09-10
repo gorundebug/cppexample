@@ -12,7 +12,7 @@ variables:
     - apk add --no-cache bash git
     - . ./scripts/git-retry.generated.sh
     - git_retry git clone "https://github.com/gorundebug/cppservicelib.git" .servicelib
-    - git -C .servicelib checkout "v0.2.113"
+    - git -C .servicelib checkout "v0.2.114"
     - git_retry git clone "https://github.com/userver-framework/userver.git" .userver
     - git -C .userver checkout "19472cc41deda3fb1c7aa7d13d53235a0161a224"
 
