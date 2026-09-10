@@ -26,7 +26,7 @@ export MODULE_MODEL_CPP_SOURCE_CONTEXT := ../model_cpp
 endif
 
 ifneq ($(strip $(DEPENDENCY_PROXY_DIR)),)
-export SERVICELIB_SOURCE_CONTEXT ?= $(DEPENDENCY_GIT_MIRROR_DOCKER_BASE)/github.com/gorundebug/cppservicelib.git\#v0.2.112
+export SERVICELIB_SOURCE_CONTEXT ?= $(DEPENDENCY_GIT_MIRROR_DOCKER_BASE)/github.com/gorundebug/cppservicelib.git\#v0.2.113
 export USERVER_SOURCE_CONTEXT ?= $(DEPENDENCY_GIT_MIRROR_DOCKER_BASE)/github.com/userver-framework/userver.git\#19472cc41deda3fb1c7aa7d13d53235a0161a224
 endif
 

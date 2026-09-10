@@ -22,6 +22,6 @@ if [[ -n "${DEPENDENCY_PROXY_DIR:-}" ]]; then
   export DEPENDENCY_APT_UBUNTU_ARCHIVE_URL="${dependency_proxy_base}/apt-ubuntu-archive"
   export DEPENDENCY_APT_UBUNTU_SECURITY_URL="${dependency_proxy_base}/apt-ubuntu-security"
   export DEPENDENCY_APT_UBUNTU_PORTS_URL="${dependency_proxy_base}/apt-ubuntu-ports"
-  export SERVICELIB_SOURCE_CONTEXT="${SERVICELIB_SOURCE_CONTEXT:-${dependency_git_mirror_base}/github.com/gorundebug/cppservicelib.git#v0.2.112}"
+  export SERVICELIB_SOURCE_CONTEXT="${SERVICELIB_SOURCE_CONTEXT:-${dependency_git_mirror_base}/github.com/gorundebug/cppservicelib.git#v0.2.113}"
   export USERVER_SOURCE_CONTEXT="${USERVER_SOURCE_CONTEXT:-${dependency_git_mirror_base}/github.com/userver-framework/userver.git#19472cc41deda3fb1c7aa7d13d53235a0161a224}"
 fi
