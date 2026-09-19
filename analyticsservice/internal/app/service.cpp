@@ -4,8 +4,16 @@ namespace example::analytics_service::app {
 
 void Service::customMakersInit(servicelib::Context context) {
   (void)context;
-  // Add only explicit user overrides here. Generated defaults stay in the
-  // generated service and may change freely when the graph is regenerated.
+  makers_.invoke_analytics_substream = [substream =
+      getAnalyzeAnalyticsSubstreamSubStream()](
+      servicelib::Context, servicelib::IServiceEnvironment&,
+      const servicelib::config::MapStreamConfig&) {
+    return userver::utils::Async(
+        "make-invoke-analytics-substream",
+        [substream] {
+          return std::make_unique<functions::InvokeAnalyticsSubstream>(substream);
+        });
+  };
 }
 
 void Service::customFunctionsInit(servicelib::Context context) {

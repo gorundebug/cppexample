@@ -22,8 +22,9 @@ namespace example::inventory_service::config {
 inline constexpr int kInventoryServiceServiceId = 3;
 inline constexpr int kGetInventoryItemDataStreamId = 73;
 inline constexpr int kGetInventoryItemErrorStreamId = 74;
-inline constexpr int kMergeInventoryResultStreamId = 75;
-inline constexpr int kProcessInventoryItemStreamId = 76;
+inline constexpr int kMapInventoryItemErrorStreamId = 75;
+inline constexpr int kMergeInventoryResultStreamId = 76;
+inline constexpr int kProcessInventoryItemStreamId = 77;
 inline constexpr int kProcessOrderItemEndpointId = 11;
 inline constexpr int kInventoryServiceApiConnectorId = 2;
 
@@ -35,6 +36,7 @@ class Config final : public servicelib::config::IConfig {
 
   struct Streams final {
     servicelib::config::ProcessStreamConfig getInventoryItemData;
+    servicelib::config::MapStreamConfig mapInventoryItemError;
     servicelib::config::MergeStreamConfig mergeInventoryResult;
     servicelib::config::InputStreamConfig processInventoryItem;
   } streams;
@@ -63,6 +65,7 @@ class Config final : public servicelib::config::IConfig {
   } modules;
 
   struct Types final {
+    servicelib::config::TypeConfig inventoryFailure;
     servicelib::config::TypeConfig orderItem;
     servicelib::config::TypeConfig orderItemResult;
   } types;
@@ -76,7 +79,7 @@ class Config final : public servicelib::config::IConfig {
 
   std::vector<servicelib::config::StreamConfigRef> GetStreams()
       const override {
-    return { streams.getInventoryItemData, streams.mergeInventoryResult, streams.processInventoryItem,  };
+    return { streams.getInventoryItemData, streams.mapInventoryItemError, streams.mergeInventoryResult, streams.processInventoryItem,  };
   }
 
   std::vector<servicelib::config::DataConnectorConfigRef> GetDataConnectors()
@@ -106,7 +109,7 @@ class Config final : public servicelib::config::IConfig {
 
   std::vector<const servicelib::config::TypeConfig*> GetTypes()
       const override {
-    return { &types.orderItem, &types.orderItemResult,  };
+    return { &types.inventoryFailure, &types.orderItem, &types.orderItemResult,  };
   }
 };
 
@@ -154,13 +157,30 @@ inline Config MakeConfig() {
     value.functionModule = "";
     return value;
   }();
+  cfg.streams.mapInventoryItemError = [] {
+    MapStreamConfig value{};
+    value.id = kMapInventoryItemErrorStreamId;
+    value.name = "Map Inventory Item Error";
+    value.pipeline = "inventoryItem";
+    value.idService = kInventoryServiceServiceId;
+    value.idSource = kGetInventoryItemErrorStreamId;
+    value.xPos = 733;
+    value.yPos = -263;
+    value.valueType = "OrderItemResult";
+    value.functionPackage = "inventoryItem";
+    value.functionName = "GetInventoryItemError";
+    value.functionDescription = "When inventory processing fails, return an OUT_OF_STOCK result with no available quantity.\nPreserve the order and item identity and requested quantity, and record the failure.\n";
+    value.functionInitializerGroup = "";
+    value.functionModule = "";
+    return value;
+  }();
   cfg.streams.mergeInventoryResult = [] {
     MergeStreamConfig value{};
     value.id = kMergeInventoryResultStreamId;
     value.name = "Merge Inventory Result";
     value.pipeline = "inventoryItem";
     value.idService = kInventoryServiceServiceId;
-    value.idSources = { kGetInventoryItemDataStreamId, kGetInventoryItemErrorStreamId };
+    value.idSources = { kGetInventoryItemDataStreamId, kMapInventoryItemErrorStreamId };
     value.xPos = 542;
     value.yPos = 33;
     return value;
@@ -212,14 +232,14 @@ inline Config MakeConfig() {
     LinkConfig value{};
     value.from = kGetInventoryItemDataStreamId;
     value.to = kMergeInventoryResultStreamId;
-    value.callSemantics = MakeCallSemanticsGroup(CallSemantics::kFunctionCall, "", 0, false);
+    value.callSemantics = MakeCallSemanticsGroup(CallSemantics::kParallelCall, "", 0, false);
     return value;
   }();
   cfg.links.processInventoryItemToGetInventoryItemData = [] {
     LinkConfig value{};
     value.from = kProcessInventoryItemStreamId;
     value.to = kGetInventoryItemDataStreamId;
-    value.callSemantics = MakeCallSemanticsGroup(CallSemantics::kFunctionCall, "Inventory Priority Workers", 10, false);
+    value.callSemantics = MakeCallSemanticsGroup(CallSemantics::kPriorityTaskPool, "Inventory Priority Workers", 10, false);
     return value;
   }();
   cfg.modules.inventoryServiceApi = [] {
@@ -238,6 +258,14 @@ inline Config MakeConfig() {
     ModuleConfig value{};
     value.name = "order_service_api";
     value.path = "github.com/gorundebug/cppexample-order-service-api";
+    return value;
+  }();
+  cfg.types.inventoryFailure = [] {
+    TypeConfig value{};
+    value.name = "InventoryFailure";
+    value.type = DataType::kError;
+    value.publicType = false;
+    value.useAlias = false;
     return value;
   }();
   cfg.types.orderItem = [] {
@@ -337,6 +365,7 @@ inline void ApplyConfig(const userver::formats::yaml::Value& value,
   }
   ApplyCustomProperties(value["services"]["inventoryService"], config.services.inventoryService);
   ApplyCustomProperties(value["streams"]["getInventoryItemData"], config.streams.getInventoryItemData);
+  ApplyCustomProperties(value["streams"]["mapInventoryItemError"], config.streams.mapInventoryItemError);
   ApplyCustomProperties(value["streams"]["mergeInventoryResult"], config.streams.mergeInventoryResult);
   ApplyCustomProperties(value["streams"]["processInventoryItem"], config.streams.processInventoryItem);
   ApplyCustomProperties(value["dataConnectors"]["inventoryServiceApi"], config.dataConnectors.inventoryServiceApi);
@@ -347,6 +376,7 @@ inline void ApplyConfig(const userver::formats::yaml::Value& value,
   ApplyCustomProperties(value["modules"]["inventoryServiceApi"], config.modules.inventoryServiceApi);
   ApplyCustomProperties(value["modules"]["model"], config.modules.model);
   ApplyCustomProperties(value["modules"]["orderServiceApi"], config.modules.orderServiceApi);
+  ApplyCustomProperties(value["types"]["inventoryFailure"], config.types.inventoryFailure);
   ApplyCustomProperties(value["types"]["orderItem"], config.types.orderItem);
   ApplyCustomProperties(value["types"]["orderItemResult"], config.types.orderItemResult);
   ApplyConfig(value, config.custom);

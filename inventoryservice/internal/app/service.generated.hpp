@@ -28,9 +28,13 @@
 
 #include <inventoryservice/internal/functions/endpoint/process_order_item_source.hpp>
 #include <inventoryservice/internal/functions/inventory_item/get_inventory_item_data.hpp>
+#include <inventoryservice/internal/functions/inventory_item/get_inventory_item_error.hpp>
+#include <inventoryservice/internal/types/inventory_failure.hpp>
 #include <model_cpp/include/example/model/types/order_item.hpp>
 #include <model_cpp/include/example/model/types/order_item_result.hpp>
 #include <proto/inventoryserviceapi/processorderitem/processorderitem.pb.h>
+
+#include "inventoryservice/internal/app/pipelines/inventory_item.generated.hpp"
 
 
 namespace example::inventory_service::app {
@@ -62,20 +66,9 @@ class ServiceGenerated
 
 
  protected:
-  struct ServiceMakers final {
-    std::function<userver::engine::TaskWithResult<
-        std::unique_ptr<functions::GetInventoryItemData>>(
-        servicelib::Context, servicelib::IServiceEnvironment&,
-        const servicelib::config::ProcessStreamConfig&)> get_inventory_item_data;
-    std::function<userver::engine::TaskWithResult<
-        std::unique_ptr<functions::ProcessOrderItemSource>>(
-        servicelib::Context, servicelib::IServiceEnvironment&,
-        const servicelib::config::GrpcEndpointConfig&)> process_order_item_source;
+  struct ServiceMakers final : InventoryItemPipelineMakers {
   };
-  struct ServiceFunctions final {
-    std::unique_ptr<functions::GetInventoryItemData> get_inventory_item_data;
-    std::unique_ptr<functions::ProcessOrderItemSource> process_order_item_source;
-  };
+  struct ServiceFunctions final : InventoryItemPipelineFunctions {};
 
   ServiceMakers makers_;
   ServiceFunctions functions_;
@@ -102,14 +95,7 @@ class ServiceGenerated
                               ServiceGenerated>;
 
 
-  struct ServiceStreams final {
-
-    ProcessInventoryItemInput* process_inventory_item{};
-    servicelib::StreamBase* get_inventory_item_data{nullptr};
-
-    servicelib::StreamBase* merge_inventory_result{nullptr};
-
-  };
+  struct ServiceStreams final : InventoryItemPipelineStreams {};
   ServiceStreams streams_;
 
 
