@@ -27,7 +27,9 @@ struct AnalyticsScheduleSource final {
 };
 
 inline userver::engine::TaskWithResult<std::unique_ptr<AnalyticsScheduleSource>> MakeAnalyticsScheduleSource(
-    servicelib::Context context, servicelib::IServiceEnvironment& environment) {
+    servicelib::Context context, servicelib::IServiceEnvironment& environment,
+    const auto& config) {
+  (void)config;
   return userver::utils::Async(
       "maker-MakeAnalyticsScheduleSource", [context = std::move(context), &environment]() mutable {
   (void)context;

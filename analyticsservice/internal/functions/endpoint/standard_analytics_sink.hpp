@@ -47,7 +47,9 @@ struct StandardAnalyticsSink final
 };
 
 inline userver::engine::TaskWithResult<std::unique_ptr<StandardAnalyticsSink>> MakeStandardAnalyticsSink(
-    servicelib::Context context, servicelib::IServiceEnvironment& environment) {
+    servicelib::Context context, servicelib::IServiceEnvironment& environment,
+    const auto& config) {
+  (void)config;
   return userver::utils::Async(
       "make-standard_analytics_sink", [context = std::move(context), &environment]() mutable {
         (void)context;

@@ -63,7 +63,9 @@ struct OrderProcessedEndpointSource final {
 };
 
 inline userver::engine::TaskWithResult<std::unique_ptr<OrderProcessedEndpointSource>> MakeOrderProcessedEndpointSource(
-    servicelib::Context context, servicelib::IServiceEnvironment& environment) {
+    servicelib::Context context, servicelib::IServiceEnvironment& environment,
+    const auto& config) {
+  (void)config;
   return userver::utils::Async(
       "maker-MakeOrderProcessedEndpointSource", [context = std::move(context), &environment]() mutable {
   (void)context; (void)environment;

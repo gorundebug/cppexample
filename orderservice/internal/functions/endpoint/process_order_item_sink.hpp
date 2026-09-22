@@ -107,7 +107,9 @@ struct ProcessOrderItemSink final {
 };
 
 inline userver::engine::TaskWithResult<std::unique_ptr<ProcessOrderItemSink>> MakeProcessOrderItemSink(
-    servicelib::Context context, servicelib::IServiceEnvironment& environment) {
+    servicelib::Context context, servicelib::IServiceEnvironment& environment,
+    const auto& config) {
+  (void)config;
   return userver::utils::Async(
       "maker-MakeProcessOrderItemSink", [context = std::move(context), &environment]() mutable {
   (void)context; (void)environment;

@@ -285,7 +285,9 @@ struct ProcessOrderSource final {
 };
 
 inline userver::engine::TaskWithResult<std::unique_ptr<ProcessOrderSource>> MakeProcessOrderSource(
-    servicelib::Context context, servicelib::IServiceEnvironment& environment) {
+    servicelib::Context context, servicelib::IServiceEnvironment& environment,
+    const auto& config) {
+  (void)config;
   return userver::utils::Async(
       "maker-MakeProcessOrderSource", [context = std::move(context), &environment]() mutable {
   (void)context; (void)environment;

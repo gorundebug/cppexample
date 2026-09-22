@@ -48,7 +48,9 @@ struct JoinedAnalyticsSink final
 };
 
 inline userver::engine::TaskWithResult<std::unique_ptr<JoinedAnalyticsSink>> MakeJoinedAnalyticsSink(
-    servicelib::Context context, servicelib::IServiceEnvironment& environment) {
+    servicelib::Context context, servicelib::IServiceEnvironment& environment,
+    const auto& config) {
+  (void)config;
   return userver::utils::Async(
       "make-joined_analytics_sink", [context = std::move(context), &environment]() mutable {
         (void)context;

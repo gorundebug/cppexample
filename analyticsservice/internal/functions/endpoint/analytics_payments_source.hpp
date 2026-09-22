@@ -63,7 +63,9 @@ struct AnalyticsPaymentsSource final
 };
 
 inline userver::engine::TaskWithResult<std::unique_ptr<AnalyticsPaymentsSource>> MakeAnalyticsPaymentsSource(
-    servicelib::Context context, servicelib::IServiceEnvironment& environment) {
+    servicelib::Context context, servicelib::IServiceEnvironment& environment,
+    const auto& config) {
+  (void)config;
   return userver::utils::Async(
       "make-analytics_payments_source", [context = std::move(context), &environment]() mutable {
         (void)context;
