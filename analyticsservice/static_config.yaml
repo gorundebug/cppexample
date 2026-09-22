@@ -89,4 +89,4 @@ components_manager:
       config-path: config/config.yaml
       override-path: $analyticsServiceConfigOverridePath
       fs-task-processor: fs-task-processor
-    analytics-service: {}
+    service-analytics-service: {}

@@ -37,14 +37,12 @@ struct KeyOrdersForJoin final {
 };
 
 inline userver::engine::TaskWithResult<std::unique_ptr<KeyOrdersForJoin>> MakeKeyOrdersForJoin(
-    servicelib::Context context, servicelib::IServiceEnvironment& environment,
-    const servicelib::config::KeyByStreamConfig& config) {
+    servicelib::Context context, servicelib::IServiceEnvironment& environment) {
   return userver::utils::Async(
-      "make-key_orders_for_join", [context = std::move(context), &environment,
-                             config]() mutable {
+      "make-key_orders_for_join", [context = std::move(context), &environment]() mutable {
         (void)context;
         (void)environment;
-        (void)config;
+
         return std::make_unique<KeyOrdersForJoin>();
       });
 }

@@ -33,8 +33,8 @@
 #include <servicelib/runtime/environment/environment.hpp>
 #include <handlers/order_service_api/processorder/requests.hpp>
 #include <handlers/order_service_api/processorder/responses.hpp>
-#include <model_cpp/include/example/model/types/order_item.hpp>
-#include <model_cpp/include/example/model/types/order_item_result.hpp>
+#include <example/model/types/order_item.hpp>
+#include <example/model/types/order_item_result.hpp>
 #include <orderservice/internal/types/order.hpp>
 #include <orderservice/internal/types/order_state.hpp>
 
@@ -285,11 +285,10 @@ struct ProcessOrderSource final {
 };
 
 inline userver::engine::TaskWithResult<std::unique_ptr<ProcessOrderSource>> MakeProcessOrderSource(
-    servicelib::Context context, servicelib::IServiceEnvironment& environment,
-    const servicelib::config::HttpEndpointConfig& config) {
+    servicelib::Context context, servicelib::IServiceEnvironment& environment) {
   return userver::utils::Async(
-      "maker-MakeProcessOrderSource", [context = std::move(context), &environment, config]() mutable {
-  (void)context; (void)environment; (void)config;
+      "maker-MakeProcessOrderSource", [context = std::move(context), &environment]() mutable {
+  (void)context; (void)environment;
   return std::make_unique<ProcessOrderSource>();
       });
 }

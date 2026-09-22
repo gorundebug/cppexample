@@ -47,13 +47,11 @@ struct HighValueAnalyticsSink final
 };
 
 inline userver::engine::TaskWithResult<std::unique_ptr<HighValueAnalyticsSink>> MakeHighValueAnalyticsSink(
-    servicelib::Context context, servicelib::IServiceEnvironment& environment,
-    const servicelib::config::CustomEndpointConfig& config) {
+    servicelib::Context context, servicelib::IServiceEnvironment& environment) {
   return userver::utils::Async(
-      "make-high_value_analytics_sink", [context = std::move(context), &environment,
-                             config]() mutable {
+      "make-high_value_analytics_sink", [context = std::move(context), &environment]() mutable {
         (void)context;
-        (void)config;
+
         (void)environment;
         return std::make_unique<HighValueAnalyticsSink>();
       });

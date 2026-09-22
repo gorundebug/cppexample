@@ -7,6 +7,14 @@
 
 namespace example::order_service::functions {
 
+TEST(SoftDeadline, DefaultRequiresStreamConfiguration) {
+  SoftDeadline function;
+  test::Stream stream;
+  EXPECT_THROW(function(servicelib::MessageContext{}, stream,
+                        example::order_service::types::Order{}),
+               std::logic_error);
+}
+
 TEST(SoftDeadline, UsesConfiguredMarginWithoutRequestDeadline) {
   using namespace std::chrono_literals;
   SoftDeadline function{125ms};

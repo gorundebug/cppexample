@@ -9,7 +9,7 @@
 
 #include <servicelib/runtime/serde/serde.hpp>
 
-#include <model_cpp/include/example/model/types/order_item_result.hpp>
+#include <example/model/types/order_item_result.hpp>
 
 namespace example::model::types::serde {
 

@@ -225,10 +225,19 @@ if(NOT EXISTS
       SYMBOLIC COPY_ON_ERROR)
 endif()
 
+
 add_executable(example_order_service
     cmd/service/main.cpp
     internal/app/service.generated.cpp
     internal/app/service.cpp
+    internal/app/endpoints.generated.cpp
+    internal/app/clients.generated.cpp
+    internal/app/connectors.generated.cpp
+    internal/app/substreams.generated.cpp
+    internal/app/makers.generated.cpp
+    internal/app/functions.generated.cpp
+    internal/app/streams.generated.cpp
+
     internal/functions/order/map_order_item_result_to_order_state.cpp
     internal/functions/order/map_to_order_processed.cpp
     internal/functions/order/map_to_order_state.cpp

@@ -9,12 +9,12 @@ namespace example::inventory_service::app {
 InventoryServiceApiGrpcService::InventoryServiceApiGrpcService(
     const userver::components::ComponentConfig& config,
     const userver::components::ComponentContext& context)
-    : inventoryserviceapi::InventoryServiceApiBase::Component(config, context),
+    : ::inventoryserviceapi::InventoryServiceApiBase::Component(config, context),
       service_component_(context.FindComponent<InventoryServiceComponent>()) {}
 
 InventoryServiceApiGrpcService::ProcessOrderItemResult InventoryServiceApiGrpcService::ProcessOrderItem(
     CallContext& context,
-    processorderitem::ProcessOrderItemRequest&& request) {
+    ::inventoryserviceapi::processorderitem::ProcessOrderItemRequest&& request) {
   const auto endpoint = service_component_.service().grpcSourceEndpointProcessInventoryItem();
   if (!endpoint) {
     throw std::runtime_error("gRPC datasource endpoint is not started");

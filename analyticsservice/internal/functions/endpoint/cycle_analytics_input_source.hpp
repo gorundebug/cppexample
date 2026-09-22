@@ -61,13 +61,11 @@ struct CycleAnalyticsInputSource final
 };
 
 inline userver::engine::TaskWithResult<std::unique_ptr<CycleAnalyticsInputSource>> MakeCycleAnalyticsInputSource(
-    servicelib::Context context, servicelib::IServiceEnvironment& environment,
-    const servicelib::config::CustomEndpointConfig& config) {
+    servicelib::Context context, servicelib::IServiceEnvironment& environment) {
   return userver::utils::Async(
-      "make-cycle_analytics_input_source", [context = std::move(context), &environment,
-                             config]() mutable {
+      "make-cycle_analytics_input_source", [context = std::move(context), &environment]() mutable {
         (void)context;
-        (void)config;
+
         (void)environment;
         return std::make_unique<CycleAnalyticsInputSource>();
       });

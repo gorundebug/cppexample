@@ -14,8 +14,8 @@
 #include <servicelib/runtime/common.hpp>
 #include <servicelib/runtime/config/endpoint_types.hpp>
 #include <servicelib/runtime/environment/environment.hpp>
-#include <model_cpp/include/example/model/types/order_item.hpp>
-#include <model_cpp/include/example/model/types/order_item_result.hpp>
+#include <example/model/types/order_item.hpp>
+#include <example/model/types/order_item_result.hpp>
 #include <proto/inventoryserviceapi/processorderitem/processorderitem.pb.h>
 
 
@@ -50,7 +50,7 @@ struct ProcessOrderItemSink final {
     state.requested_qty = value.quantity;
     state.unit_price = value.unit_price;
 
-    processorderitem::ProcessOrderItemRequest request;
+    inventoryserviceapi::processorderitem::ProcessOrderItemRequest request;
     request.set_order_id(value.order_id);
     request.set_item_id(value.item_id);
     request.set_sku(value.sku);
@@ -60,7 +60,7 @@ struct ProcessOrderItemSink final {
 
   void handleResponse(
       servicelib::MessageContext context, auto& stream_context, State& state,
-      const processorderitem::ProcessOrderItemResponse& response) const {
+      const inventoryserviceapi::processorderitem::ProcessOrderItemResponse& response) const {
     stream_context.collect(
         std::move(context),
         example::model::types::OrderItemResult{
@@ -107,11 +107,10 @@ struct ProcessOrderItemSink final {
 };
 
 inline userver::engine::TaskWithResult<std::unique_ptr<ProcessOrderItemSink>> MakeProcessOrderItemSink(
-    servicelib::Context context, servicelib::IServiceEnvironment& environment,
-    const servicelib::config::GrpcEndpointConfig& config) {
+    servicelib::Context context, servicelib::IServiceEnvironment& environment) {
   return userver::utils::Async(
-      "maker-MakeProcessOrderItemSink", [context = std::move(context), &environment, config]() mutable {
-  (void)context; (void)environment; (void)config;
+      "maker-MakeProcessOrderItemSink", [context = std::move(context), &environment]() mutable {
+  (void)context; (void)environment;
   return std::make_unique<ProcessOrderItemSink>();
       });
 }

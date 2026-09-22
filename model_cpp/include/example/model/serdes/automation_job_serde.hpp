@@ -9,7 +9,7 @@
 
 #include <servicelib/runtime/serde/serde.hpp>
 
-#include <model_cpp/include/example/model/types/automation_job.hpp>
+#include <example/model/types/automation_job.hpp>
 
 namespace example::model::types::serde {
 

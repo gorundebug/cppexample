@@ -19,7 +19,7 @@
 #include <servicelib/runtime/context.hpp>
 #include <servicelib/runtime/config/stream_types.hpp>
 #include <servicelib/runtime/environment/environment.hpp>
-#include <model_cpp/include/example/model/types/order_item_result.hpp>
+#include <example/model/types/order_item_result.hpp>
 #include <orderservice/internal/types/order_state.hpp>
 
 
@@ -62,11 +62,10 @@ struct MapOrderItemResultToOrderState final {
 };
 
 inline userver::engine::TaskWithResult<std::unique_ptr<MapOrderItemResultToOrderState>> MakeMapOrderItemResultToOrderState(
-    servicelib::Context context, servicelib::IServiceEnvironment& environment,
-    const servicelib::config::MapStreamConfig& config) {
+    servicelib::Context context, servicelib::IServiceEnvironment& environment) {
   return userver::utils::Async(
-      "maker-MakeMapOrderItemResultToOrderState", [context = std::move(context), &environment, config]() mutable {
-  (void)context; (void)environment; (void)config;
+      "maker-MakeMapOrderItemResultToOrderState", [context = std::move(context), &environment]() mutable {
+  (void)context; (void)environment;
   return std::make_unique<MapOrderItemResultToOrderState>();
       });
 }

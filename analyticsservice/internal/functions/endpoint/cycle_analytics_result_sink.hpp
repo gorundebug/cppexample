@@ -46,13 +46,11 @@ struct CycleAnalyticsResultSink final
 };
 
 inline userver::engine::TaskWithResult<std::unique_ptr<CycleAnalyticsResultSink>> MakeCycleAnalyticsResultSink(
-    servicelib::Context context, servicelib::IServiceEnvironment& environment,
-    const servicelib::config::CustomEndpointConfig& config) {
+    servicelib::Context context, servicelib::IServiceEnvironment& environment) {
   return userver::utils::Async(
-      "make-cycle_analytics_result_sink", [context = std::move(context), &environment,
-                             config]() mutable {
+      "make-cycle_analytics_result_sink", [context = std::move(context), &environment]() mutable {
         (void)context;
-        (void)config;
+
         (void)environment;
         return std::make_unique<CycleAnalyticsResultSink>();
       });

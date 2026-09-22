@@ -8,9 +8,9 @@
 namespace example::inventory_service::app {
 
 class InventoryServiceApiGrpcService final
-    : public inventoryserviceapi::InventoryServiceApiBase::Component {
+    : public ::inventoryserviceapi::InventoryServiceApiBase::Component {
  public:
-  static constexpr std::string_view kName = "inventory-service-api";
+  static constexpr std::string_view kName = "grpc-service-inventory-service-api";
 
   InventoryServiceApiGrpcService(
       const userver::components::ComponentConfig& config,
@@ -18,7 +18,7 @@ class InventoryServiceApiGrpcService final
 
   ProcessOrderItemResult ProcessOrderItem(
       CallContext& context,
-      processorderitem::ProcessOrderItemRequest&& request) override;
+      ::inventoryserviceapi::processorderitem::ProcessOrderItemRequest&& request) override;
 
  private:
   InventoryServiceComponent& service_component_;

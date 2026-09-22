@@ -36,14 +36,12 @@ struct AdvanceCycleAnalytics final {
 };
 
 inline userver::engine::TaskWithResult<std::unique_ptr<AdvanceCycleAnalytics>> MakeAdvanceCycleAnalytics(
-    servicelib::Context context, servicelib::IServiceEnvironment& environment,
-    const servicelib::config::MapStreamConfig& config) {
+    servicelib::Context context, servicelib::IServiceEnvironment& environment) {
   return userver::utils::Async(
-      "make-advance_cycle_analytics", [context = std::move(context), &environment,
-                             config]() mutable {
+      "make-advance_cycle_analytics", [context = std::move(context), &environment]() mutable {
         (void)context;
         (void)environment;
-        (void)config;
+
         return std::make_unique<AdvanceCycleAnalytics>();
       });
 }

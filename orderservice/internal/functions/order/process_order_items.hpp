@@ -15,7 +15,7 @@
 #include <servicelib/runtime/context.hpp>
 #include <servicelib/runtime/config/stream_types.hpp>
 #include <servicelib/runtime/environment/environment.hpp>
-#include <model_cpp/include/example/model/types/order_item.hpp>
+#include <example/model/types/order_item.hpp>
 #include <orderservice/internal/types/order.hpp>
 
 
@@ -38,11 +38,10 @@ struct ProcessOrderItems final {
 };
 
 inline userver::engine::TaskWithResult<std::unique_ptr<ProcessOrderItems>> MakeProcessOrderItems(
-    servicelib::Context context, servicelib::IServiceEnvironment& environment,
-    const servicelib::config::FlatMapStreamConfig& config) {
+    servicelib::Context context, servicelib::IServiceEnvironment& environment) {
   return userver::utils::Async(
-      "maker-MakeProcessOrderItems", [context = std::move(context), &environment, config]() mutable {
-  (void)context; (void)environment; (void)config;
+      "maker-MakeProcessOrderItems", [context = std::move(context), &environment]() mutable {
+  (void)context; (void)environment;
   return std::make_unique<ProcessOrderItems>();
       });
 }

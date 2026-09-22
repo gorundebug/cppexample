@@ -37,14 +37,12 @@ struct KeyPaymentsForJoin final {
 };
 
 inline userver::engine::TaskWithResult<std::unique_ptr<KeyPaymentsForJoin>> MakeKeyPaymentsForJoin(
-    servicelib::Context context, servicelib::IServiceEnvironment& environment,
-    const servicelib::config::KeyByStreamConfig& config) {
+    servicelib::Context context, servicelib::IServiceEnvironment& environment) {
   return userver::utils::Async(
-      "make-key_payments_for_join", [context = std::move(context), &environment,
-                             config]() mutable {
+      "make-key_payments_for_join", [context = std::move(context), &environment]() mutable {
         (void)context;
         (void)environment;
-        (void)config;
+
         return std::make_unique<KeyPaymentsForJoin>();
       });
 }

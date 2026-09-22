@@ -53,14 +53,12 @@ struct InvokeAnalyticsSubstream final {
 };
 
 inline userver::engine::TaskWithResult<std::unique_ptr<InvokeAnalyticsSubstream>> MakeInvokeAnalyticsSubstream(
-    servicelib::Context context, servicelib::IServiceEnvironment& environment,
-    const servicelib::config::MapStreamConfig& config) {
+    servicelib::Context context, servicelib::IServiceEnvironment& environment) {
   return userver::utils::Async(
-      "make-invoke_analytics_substream", [context = std::move(context), &environment,
-                             config]() mutable {
+      "make-invoke_analytics_substream", [context = std::move(context), &environment]() mutable {
         (void)context;
         (void)environment;
-        (void)config;
+
         throw std::logic_error(
             "InvokeAnalyticsSubstream must be constructed by "
             "Service::customMakersInit with the analyzeAnalyticsSubstream "

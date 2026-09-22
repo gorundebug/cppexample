@@ -140,6 +140,7 @@ COPY . /workspace/source
 WORKDIR /workspace/source
 
 FROM development AS debug-builder
+ARG CMAKE_BUILD_PARALLEL_LEVEL
 
 COPY . /workspace
 RUN --mount=type=cache,id=cppexample-debug-build-v2-${TARGETARCH},target=/workspace/build,sharing=locked \
@@ -154,7 +155,7 @@ RUN --mount=type=cache,id=cppexample-debug-build-v2-${TARGETARCH},target=/worksp
       -DCMAKE_TOOLCHAIN_FILE="${conan_toolchain}" \
       -DFETCH_CPP_DEPENDENCIES=OFF \
       -DUSERVER_LTO=OFF \
-    && ./scripts/run_with_progress.generated.sh "Debug build" cmake --build --preset docker-debug --parallel
+    && ./scripts/run_with_progress.generated.sh "Debug build" cmake --build --preset docker-debug --parallel ${CMAKE_BUILD_PARALLEL_LEVEL:+"$CMAKE_BUILD_PARALLEL_LEVEL"}
 
 FROM debug-builder AS test-builder
 RUN --mount=type=cache,id=cppexample-debug-build-v2-${TARGETARCH},target=/workspace/build,sharing=locked \
@@ -163,6 +164,7 @@ RUN --mount=type=cache,id=cppexample-debug-build-v2-${TARGETARCH},target=/worksp
       ctest --test-dir /workspace/build --output-on-failure --no-tests=error
 
 FROM development AS runtime-builder
+ARG CMAKE_BUILD_PARALLEL_LEVEL
 
 ARG USERVER_LTO=ON
 ARG RUNTIME_STRIP=ON
@@ -185,7 +187,7 @@ RUN --mount=type=cache,id=cppexample-runtime-build-v2-${TARGETARCH}-${EXAMPLE_PR
       -DUSERVER_FEATURE_TESTSUITE=OFF \
       -DUSERVER_LTO="${USERVER_LTO}" \
     && ./scripts/run_with_progress.generated.sh "Release build" cmake --build --preset docker-release \
-      --target example_inventory_service --parallel \
+      --target example_inventory_service --parallel ${CMAKE_BUILD_PARALLEL_LEVEL:+"$CMAKE_BUILD_PARALLEL_LEVEL"} \
     && mkdir -p /opt/service-bin /opt/runtime-libs \
     && mkdir -p /opt/runtime-libs/inventoryservice \
     && cp /workspace/build/example_inventory_service /opt/service-bin/example_inventory_service \

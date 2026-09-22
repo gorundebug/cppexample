@@ -16,7 +16,7 @@
 #include <servicelib/runtime/context.hpp>
 #include <servicelib/runtime/config/stream_types.hpp>
 #include <servicelib/runtime/environment/environment.hpp>
-#include <model_cpp/include/example/model/types/order_processed.hpp>
+#include <example/model/types/order_processed.hpp>
 
 
 namespace example::analytics_service::functions {
@@ -49,11 +49,10 @@ struct CountOrderProcessed final {
 };
 
 inline userver::engine::TaskWithResult<std::unique_ptr<CountOrderProcessed>> MakeCountOrderProcessed(
-    servicelib::Context context, servicelib::IServiceEnvironment& environment,
-    const servicelib::config::ProcessStreamConfig& config) {
+    servicelib::Context context, servicelib::IServiceEnvironment& environment) {
   return userver::utils::Async(
-      "maker-MakeCountOrderProcessed", [context = std::move(context), &environment, config]() mutable {
-  (void)context; (void)environment; (void)config;
+      "maker-MakeCountOrderProcessed", [context = std::move(context), &environment]() mutable {
+  (void)context; (void)environment;
   return std::make_unique<CountOrderProcessed>();
       });
 }

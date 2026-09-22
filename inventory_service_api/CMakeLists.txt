@@ -21,5 +21,8 @@ userver_add_grpc_library(example_inventory_service_api
       proto/inventoryserviceapi/inventoryserviceapi.generated.proto
       proto/inventoryserviceapi/processorderitem/processorderitem.proto)
 
+target_include_directories(example_inventory_service_api PUBLIC
+    "${CMAKE_CURRENT_SOURCE_DIR}/include")
+
 set(example_inventory_service_api_GENERATED_DIR "${_GENERATED_DIR}"
     CACHE INTERNAL "Generated protobuf/gRPC sources for inventory_service_api")

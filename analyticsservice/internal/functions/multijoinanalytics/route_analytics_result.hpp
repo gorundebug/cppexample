@@ -32,14 +32,12 @@ struct RouteAnalyticsResult final {
 };
 
 inline userver::engine::TaskWithResult<std::unique_ptr<RouteAnalyticsResult>> MakeRouteAnalyticsResult(
-    servicelib::Context context, servicelib::IServiceEnvironment& environment,
-    const servicelib::config::CaseStreamConfig& config) {
+    servicelib::Context context, servicelib::IServiceEnvironment& environment) {
   return userver::utils::Async(
-      "make-route_analytics_result", [context = std::move(context), &environment,
-                             config]() mutable {
+      "make-route_analytics_result", [context = std::move(context), &environment]() mutable {
         (void)context;
         (void)environment;
-        (void)config;
+
         return std::make_unique<RouteAnalyticsResult>();
       });
 }

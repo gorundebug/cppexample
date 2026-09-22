@@ -63,13 +63,11 @@ struct AnalyticsOrdersSource final
 };
 
 inline userver::engine::TaskWithResult<std::unique_ptr<AnalyticsOrdersSource>> MakeAnalyticsOrdersSource(
-    servicelib::Context context, servicelib::IServiceEnvironment& environment,
-    const servicelib::config::CustomEndpointConfig& config) {
+    servicelib::Context context, servicelib::IServiceEnvironment& environment) {
   return userver::utils::Async(
-      "make-analytics_orders_source", [context = std::move(context), &environment,
-                             config]() mutable {
+      "make-analytics_orders_source", [context = std::move(context), &environment]() mutable {
         (void)context;
-        (void)config;
+
         (void)environment;
         return std::make_unique<AnalyticsOrdersSource>();
       });

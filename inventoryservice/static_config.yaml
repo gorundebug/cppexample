@@ -72,7 +72,7 @@ components_manager:
       config-path: config/config.yaml
       override-path: $inventoryServiceConfigOverridePath
       fs-task-processor: fs-task-processor
-    inventory-service: {}
-    inventory-service-api:
+    service-inventory-service: {}
+    grpc-service-inventory-service-api:
       task-processor: main-task-processor
       disable-all-pipeline-middlewares: true

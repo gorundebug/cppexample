@@ -17,7 +17,7 @@
 #include <userver/engine/task/task_with_result.hpp>
 #include <userver/utils/async.hpp>
 #include <inventoryservice/internal/types/inventory_failure.hpp>
-#include <model_cpp/include/example/model/types/order_item_result.hpp>
+#include <example/model/types/order_item_result.hpp>
 #include "inventoryservice/internal/functions/inventory_item/get_inventory_item_data.hpp"
 
 
@@ -48,14 +48,12 @@ struct GetInventoryItemError final {
 };
 
 inline userver::engine::TaskWithResult<std::unique_ptr<GetInventoryItemError>> MakeGetInventoryItemError(
-    servicelib::Context context, servicelib::IServiceEnvironment& environment,
-    const servicelib::config::MapStreamConfig& config) {
+    servicelib::Context context, servicelib::IServiceEnvironment& environment) {
   return userver::utils::Async(
-      "make-get_inventory_item_error", [context = std::move(context), &environment,
-                             config]() mutable {
+      "make-get_inventory_item_error", [context = std::move(context), &environment]() mutable {
         (void)context;
         (void)environment;
-        (void)config;
+
         return std::make_unique<GetInventoryItemError>();
       });
 }

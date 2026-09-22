@@ -38,14 +38,12 @@ struct BuildSubstreamAnalyticsResult final {
 };
 
 inline userver::engine::TaskWithResult<std::unique_ptr<BuildSubstreamAnalyticsResult>> MakeBuildSubstreamAnalyticsResult(
-    servicelib::Context context, servicelib::IServiceEnvironment& environment,
-    const servicelib::config::MapStreamConfig& config) {
+    servicelib::Context context, servicelib::IServiceEnvironment& environment) {
   return userver::utils::Async(
-      "make-build_substream_analytics_result", [context = std::move(context), &environment,
-                             config]() mutable {
+      "make-build_substream_analytics_result", [context = std::move(context), &environment]() mutable {
         (void)context;
         (void)environment;
-        (void)config;
+
         return std::make_unique<BuildSubstreamAnalyticsResult>();
       });
 }

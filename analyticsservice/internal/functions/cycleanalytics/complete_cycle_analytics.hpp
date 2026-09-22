@@ -33,14 +33,12 @@ struct CompleteCycleAnalytics final {
 };
 
 inline userver::engine::TaskWithResult<std::unique_ptr<CompleteCycleAnalytics>> MakeCompleteCycleAnalytics(
-    servicelib::Context context, servicelib::IServiceEnvironment& environment,
-    const servicelib::config::FilterStreamConfig& config) {
+    servicelib::Context context, servicelib::IServiceEnvironment& environment) {
   return userver::utils::Async(
-      "make-complete_cycle_analytics", [context = std::move(context), &environment,
-                             config]() mutable {
+      "make-complete_cycle_analytics", [context = std::move(context), &environment]() mutable {
         (void)context;
         (void)environment;
-        (void)config;
+
         return std::make_unique<CompleteCycleAnalytics>();
       });
 }

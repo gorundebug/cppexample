@@ -18,7 +18,7 @@
 #include <servicelib/runtime/config/endpoint_types.hpp>
 #include <servicelib/runtime/environment/environment.hpp>
 #include <servicelib/datasink/kafka/userver.hpp>
-#include <model_cpp/include/example/model/types/order_processed.hpp>
+#include <example/model/types/order_processed.hpp>
 
 
 namespace example::order_service::functions {
@@ -53,11 +53,10 @@ struct OrderProcessedEndpointSink final {
 };
 
 inline userver::engine::TaskWithResult<std::unique_ptr<OrderProcessedEndpointSink>> MakeOrderProcessedEndpointSink(
-    servicelib::Context context, servicelib::IServiceEnvironment& environment,
-    const servicelib::config::KafkaEndpointConfig& config) {
+    servicelib::Context context, servicelib::IServiceEnvironment& environment) {
   return userver::utils::Async(
-      "maker-MakeOrderProcessedEndpointSink", [context = std::move(context), &environment, config]() mutable {
-  (void)context; (void)environment; (void)config;
+      "maker-MakeOrderProcessedEndpointSink", [context = std::move(context), &environment]() mutable {
+  (void)context; (void)environment;
   return std::make_unique<OrderProcessedEndpointSink>();
       });
 }

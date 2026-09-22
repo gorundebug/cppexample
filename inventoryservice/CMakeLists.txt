@@ -192,11 +192,20 @@ if(NOT EXISTS
       SYMBOLIC COPY_ON_ERROR)
 endif()
 
+
 add_executable(example_inventory_service
     cmd/service/main.cpp
     internal/app/service.generated.cpp
     internal/app/grpc_service.generated.cpp
     internal/app/service.cpp
+    internal/app/endpoints.generated.cpp
+    internal/app/clients.generated.cpp
+    internal/app/connectors.generated.cpp
+    internal/app/substreams.generated.cpp
+    internal/app/makers.generated.cpp
+    internal/app/functions.generated.cpp
+    internal/app/streams.generated.cpp
+
     internal/functions/inventory_item/get_inventory_item_data.cpp
     internal/functions/inventory_item/get_inventory_item_error.cpp
 )

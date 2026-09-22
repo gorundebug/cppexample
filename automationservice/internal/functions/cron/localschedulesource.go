@@ -5,7 +5,7 @@ import (
 
 	"github.com/gorundebug/servicelib/datasource"
 	"github.com/gorundebug/servicelib/runtime"
-	runtimecfg "github.com/gorundebug/servicelib/runtime/config"
+
 	"github.com/gorundebug/servicelib/runtime/environment"
 )
 
@@ -38,7 +38,7 @@ func (f *LocalScheduleSource) OnTrigger(
 func MakeLocalScheduleSource(
 	_ context.Context,
 	_ environment.ServiceEnvironment,
-	_ *runtimecfg.CronEndpointConfig,
+
 ) (*LocalScheduleSource, error) {
 	return &LocalScheduleSource{}, nil
 }

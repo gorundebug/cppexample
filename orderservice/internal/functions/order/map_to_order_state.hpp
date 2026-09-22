@@ -43,11 +43,10 @@ struct MapToOrderState final {
 };
 
 inline userver::engine::TaskWithResult<std::unique_ptr<MapToOrderState>> MakeMapToOrderState(
-    servicelib::Context context, servicelib::IServiceEnvironment& environment,
-    const servicelib::config::MapStreamConfig& config) {
+    servicelib::Context context, servicelib::IServiceEnvironment& environment) {
   return userver::utils::Async(
-      "maker-MakeMapToOrderState", [context = std::move(context), &environment, config]() mutable {
-  (void)context; (void)environment; (void)config;
+      "maker-MakeMapToOrderState", [context = std::move(context), &environment]() mutable {
+  (void)context; (void)environment;
   return std::make_unique<MapToOrderState>();
       });
 }

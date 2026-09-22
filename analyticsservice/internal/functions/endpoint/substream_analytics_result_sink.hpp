@@ -47,13 +47,11 @@ struct SubstreamAnalyticsResultSink final
 };
 
 inline userver::engine::TaskWithResult<std::unique_ptr<SubstreamAnalyticsResultSink>> MakeSubstreamAnalyticsResultSink(
-    servicelib::Context context, servicelib::IServiceEnvironment& environment,
-    const servicelib::config::CustomEndpointConfig& config) {
+    servicelib::Context context, servicelib::IServiceEnvironment& environment) {
   return userver::utils::Async(
-      "make-substream_analytics_result_sink", [context = std::move(context), &environment,
-                             config]() mutable {
+      "make-substream_analytics_result_sink", [context = std::move(context), &environment]() mutable {
         (void)context;
-        (void)config;
+
         (void)environment;
         return std::make_unique<SubstreamAnalyticsResultSink>();
       });

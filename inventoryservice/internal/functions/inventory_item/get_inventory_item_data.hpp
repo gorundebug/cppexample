@@ -16,8 +16,8 @@
 #include <servicelib/runtime/context.hpp>
 #include <servicelib/runtime/config/stream_types.hpp>
 #include <servicelib/runtime/environment/environment.hpp>
-#include <model_cpp/include/example/model/types/order_item.hpp>
-#include <model_cpp/include/example/model/types/order_item_result.hpp>
+#include <example/model/types/order_item.hpp>
+#include <example/model/types/order_item_result.hpp>
 
 
 namespace example::inventory_service::functions {
@@ -102,11 +102,10 @@ struct GetInventoryItemData final {
 };
 
 inline userver::engine::TaskWithResult<std::unique_ptr<GetInventoryItemData>> MakeGetInventoryItemData(
-    servicelib::Context context, servicelib::IServiceEnvironment& environment,
-    const servicelib::config::ProcessStreamConfig& config) {
+    servicelib::Context context, servicelib::IServiceEnvironment& environment) {
   return userver::utils::Async(
-      "maker-MakeGetInventoryItemData", [context = std::move(context), &environment, config]() mutable {
-  (void)context; (void)environment; (void)config;
+      "maker-MakeGetInventoryItemData", [context = std::move(context), &environment]() mutable {
+  (void)context; (void)environment;
   return std::make_unique<GetInventoryItemData>();
       });
 }

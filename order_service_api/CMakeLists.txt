@@ -27,6 +27,8 @@ set_source_files_properties(
     PROPERTIES HEADER_FILE_ONLY TRUE)
 
 add_library(example_order_service_api INTERFACE)
+target_include_directories(example_order_service_api INTERFACE
+    "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_link_libraries(example_order_service_api INTERFACE
     example_order_service_api_order_service_api)
 

@@ -46,14 +46,12 @@ struct MultiJoinAnalyticsEvents final {
 };
 
 inline userver::engine::TaskWithResult<std::unique_ptr<MultiJoinAnalyticsEvents>> MakeMultiJoinAnalyticsEvents(
-    servicelib::Context context, servicelib::IServiceEnvironment& environment,
-    const servicelib::config::MultiJoinStreamConfig& config) {
+    servicelib::Context context, servicelib::IServiceEnvironment& environment) {
   return userver::utils::Async(
-      "make-multi_join_analytics_events", [context = std::move(context), &environment,
-                             config]() mutable {
+      "make-multi_join_analytics_events", [context = std::move(context), &environment]() mutable {
         (void)context;
         (void)environment;
-        (void)config;
+
         return std::make_unique<MultiJoinAnalyticsEvents>();
       });
 }

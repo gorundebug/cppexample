@@ -43,14 +43,12 @@ struct JoinOrderPaymentAnalytics final {
 };
 
 inline userver::engine::TaskWithResult<std::unique_ptr<JoinOrderPaymentAnalytics>> MakeJoinOrderPaymentAnalytics(
-    servicelib::Context context, servicelib::IServiceEnvironment& environment,
-    const servicelib::config::JoinStreamConfig& config) {
+    servicelib::Context context, servicelib::IServiceEnvironment& environment) {
   return userver::utils::Async(
-      "make-join_order_payment_analytics", [context = std::move(context), &environment,
-                             config]() mutable {
+      "make-join_order_payment_analytics", [context = std::move(context), &environment]() mutable {
         (void)context;
         (void)environment;
-        (void)config;
+
         return std::make_unique<JoinOrderPaymentAnalytics>();
       });
 }
