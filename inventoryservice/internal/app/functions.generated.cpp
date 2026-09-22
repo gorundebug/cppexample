@@ -18,7 +18,7 @@ ServiceFunctions::~ServiceFunctions() = default;
 ServiceFunctions::ServiceFunctions(ServiceFunctions&&) noexcept = default;
 ServiceFunctions& ServiceFunctions::operator=(ServiceFunctions&&) noexcept = default;
 
-void ServiceFunctions::initFunctions(servicelib::Context context, servicelib::IServiceEnvironment& environment, ServiceMakers& makers) {
+void ServiceFunctions::initFunctions(servicelib::Context context, const config::Config& cfg, servicelib::IServiceEnvironment& environment, ServiceMakers& makers) {
   auto& functions_ = *this;
   auto& makers_ = makers;
   (void)functions_;
@@ -44,7 +44,7 @@ void ServiceFunctions::initFunctions(servicelib::Context context, servicelib::IS
   maker_tasks.reserve(3);
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-get_inventory_item_data",
-        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
             auto maker_task = makers_.get_inventory_item_data(maker_context, environment);
             functions_.get_inventory_item_data = maker_task.Get();
@@ -58,7 +58,7 @@ void ServiceFunctions::initFunctions(servicelib::Context context, servicelib::IS
         }));
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-get_inventory_item_error",
-        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
             auto maker_task = makers_.get_inventory_item_error(maker_context, environment);
             functions_.get_inventory_item_error = maker_task.Get();
@@ -72,9 +72,9 @@ void ServiceFunctions::initFunctions(servicelib::Context context, servicelib::IS
         }));
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-process_order_item_source",
-        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
-            auto maker_task = makers_.process_order_item_source(maker_context, environment);
+            auto maker_task = makers_.process_order_item_source(maker_context, environment, cfg.endpoints.processOrderItem);
             functions_.process_order_item_source = maker_task.Get();
             if (!functions_.process_order_item_source) throw std::logic_error("function maker ProcessOrderItemSource returned null");
           } catch (...) {

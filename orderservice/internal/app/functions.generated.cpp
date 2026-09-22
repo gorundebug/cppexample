@@ -23,7 +23,7 @@ ServiceFunctions::~ServiceFunctions() = default;
 ServiceFunctions::ServiceFunctions(ServiceFunctions&&) noexcept = default;
 ServiceFunctions& ServiceFunctions::operator=(ServiceFunctions&&) noexcept = default;
 
-void ServiceFunctions::initFunctions(servicelib::Context context, servicelib::IServiceEnvironment& environment, ServiceMakers& makers) {
+void ServiceFunctions::initFunctions(servicelib::Context context, const config::Config& cfg, servicelib::IServiceEnvironment& environment, ServiceMakers& makers) {
   auto& functions_ = *this;
   auto& makers_ = makers;
   (void)functions_;
@@ -64,7 +64,7 @@ void ServiceFunctions::initFunctions(servicelib::Context context, servicelib::IS
   maker_tasks.reserve(8);
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-map_order_item_result_to_order_state",
-        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
             auto maker_task = makers_.map_order_item_result_to_order_state(maker_context, environment);
             functions_.map_order_item_result_to_order_state = maker_task.Get();
@@ -78,7 +78,7 @@ void ServiceFunctions::initFunctions(servicelib::Context context, servicelib::IS
         }));
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-map_to_order_processed",
-        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
             auto maker_task = makers_.map_to_order_processed(maker_context, environment);
             functions_.map_to_order_processed = maker_task.Get();
@@ -92,7 +92,7 @@ void ServiceFunctions::initFunctions(servicelib::Context context, servicelib::IS
         }));
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-map_to_order_state",
-        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
             auto maker_task = makers_.map_to_order_state(maker_context, environment);
             functions_.map_to_order_state = maker_task.Get();
@@ -106,9 +106,9 @@ void ServiceFunctions::initFunctions(servicelib::Context context, servicelib::IS
         }));
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-order_processed_endpoint_sink",
-        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
-            auto maker_task = makers_.order_processed_endpoint_sink(maker_context, environment);
+            auto maker_task = makers_.order_processed_endpoint_sink(maker_context, environment, cfg.endpoints.orderProcessed);
             functions_.order_processed_endpoint_sink = maker_task.Get();
             if (!functions_.order_processed_endpoint_sink) throw std::logic_error("function maker OrderProcessedEndpointSink returned null");
           } catch (...) {
@@ -120,9 +120,9 @@ void ServiceFunctions::initFunctions(servicelib::Context context, servicelib::IS
         }));
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-process_order_item_sink",
-        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
-            auto maker_task = makers_.process_order_item_sink(maker_context, environment);
+            auto maker_task = makers_.process_order_item_sink(maker_context, environment, cfg.endpoints.processOrderItem);
             functions_.process_order_item_sink = maker_task.Get();
             if (!functions_.process_order_item_sink) throw std::logic_error("function maker ProcessOrderItemSink returned null");
           } catch (...) {
@@ -134,7 +134,7 @@ void ServiceFunctions::initFunctions(servicelib::Context context, servicelib::IS
         }));
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-process_order_items",
-        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
             auto maker_task = makers_.process_order_items(maker_context, environment);
             functions_.process_order_items = maker_task.Get();
@@ -148,9 +148,9 @@ void ServiceFunctions::initFunctions(servicelib::Context context, servicelib::IS
         }));
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-process_order_source",
-        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
-            auto maker_task = makers_.process_order_source(maker_context, environment);
+            auto maker_task = makers_.process_order_source(maker_context, environment, cfg.endpoints.processOrder);
             functions_.process_order_source = maker_task.Get();
             if (!functions_.process_order_source) throw std::logic_error("function maker ProcessOrderSource returned null");
           } catch (...) {
@@ -162,7 +162,7 @@ void ServiceFunctions::initFunctions(servicelib::Context context, servicelib::IS
         }));
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-soft_deadline",
-        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
             auto maker_task = makers_.soft_deadline(maker_context, environment);
             functions_.soft_deadline = maker_task.Get();

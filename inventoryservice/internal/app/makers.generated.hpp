@@ -22,7 +22,7 @@ struct ServiceMakers final {
   void initMakers(const userver::components::ComponentContext& components);
   std::function<userver::engine::TaskWithResult<std::unique_ptr<functions::GetInventoryItemData>>(servicelib::Context, servicelib::IServiceEnvironment&)> get_inventory_item_data;
   std::function<userver::engine::TaskWithResult<std::unique_ptr<functions::GetInventoryItemError>>(servicelib::Context, servicelib::IServiceEnvironment&)> get_inventory_item_error;
-  std::function<userver::engine::TaskWithResult<std::unique_ptr<functions::ProcessOrderItemSource>>(servicelib::Context, servicelib::IServiceEnvironment&)> process_order_item_source;
+  std::function<userver::engine::TaskWithResult<std::unique_ptr<functions::ProcessOrderItemSource>>(servicelib::Context, servicelib::IServiceEnvironment&, const servicelib::config::GrpcEndpointConfig&)> process_order_item_source;
   
 };
 

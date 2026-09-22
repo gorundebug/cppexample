@@ -41,7 +41,7 @@ ServiceFunctions::~ServiceFunctions() = default;
 ServiceFunctions::ServiceFunctions(ServiceFunctions&&) noexcept = default;
 ServiceFunctions& ServiceFunctions::operator=(ServiceFunctions&&) noexcept = default;
 
-void ServiceFunctions::initFunctions(servicelib::Context context, servicelib::IServiceEnvironment& environment, ServiceMakers& makers) {
+void ServiceFunctions::initFunctions(servicelib::Context context, const config::Config& cfg, servicelib::IServiceEnvironment& environment, ServiceMakers& makers) {
   auto& functions_ = *this;
   auto& makers_ = makers;
   (void)functions_;
@@ -136,7 +136,7 @@ void ServiceFunctions::initFunctions(servicelib::Context context, servicelib::IS
   maker_tasks.reserve(26);
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-advance_cycle_analytics",
-        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
             auto maker_task = makers_.advance_cycle_analytics(maker_context, environment);
             functions_.advance_cycle_analytics = maker_task.Get();
@@ -150,9 +150,9 @@ void ServiceFunctions::initFunctions(servicelib::Context context, servicelib::IS
         }));
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-analytics_orders_source",
-        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
-            auto maker_task = makers_.analytics_orders_source(maker_context, environment);
+            auto maker_task = makers_.analytics_orders_source(maker_context, environment, cfg.endpoints.analyticsOrders);
             functions_.analytics_orders_source = maker_task.Get();
             if (!functions_.analytics_orders_source) throw std::logic_error("function maker AnalyticsOrdersSource returned null");
           } catch (...) {
@@ -164,9 +164,9 @@ void ServiceFunctions::initFunctions(servicelib::Context context, servicelib::IS
         }));
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-analytics_payments_source",
-        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
-            auto maker_task = makers_.analytics_payments_source(maker_context, environment);
+            auto maker_task = makers_.analytics_payments_source(maker_context, environment, cfg.endpoints.analyticsPayments);
             functions_.analytics_payments_source = maker_task.Get();
             if (!functions_.analytics_payments_source) throw std::logic_error("function maker AnalyticsPaymentsSource returned null");
           } catch (...) {
@@ -178,9 +178,9 @@ void ServiceFunctions::initFunctions(servicelib::Context context, servicelib::IS
         }));
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-analytics_schedule_source",
-        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
-            auto maker_task = makers_.analytics_schedule_source(maker_context, environment);
+            auto maker_task = makers_.analytics_schedule_source(maker_context, environment, cfg.endpoints.analyticsSchedule);
             functions_.analytics_schedule_source = maker_task.Get();
             if (!functions_.analytics_schedule_source) throw std::logic_error("function maker AnalyticsScheduleSource returned null");
           } catch (...) {
@@ -192,9 +192,9 @@ void ServiceFunctions::initFunctions(servicelib::Context context, servicelib::IS
         }));
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-analytics_shipments_source",
-        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
-            auto maker_task = makers_.analytics_shipments_source(maker_context, environment);
+            auto maker_task = makers_.analytics_shipments_source(maker_context, environment, cfg.endpoints.analyticsShipments);
             functions_.analytics_shipments_source = maker_task.Get();
             if (!functions_.analytics_shipments_source) throw std::logic_error("function maker AnalyticsShipmentsSource returned null");
           } catch (...) {
@@ -206,7 +206,7 @@ void ServiceFunctions::initFunctions(servicelib::Context context, servicelib::IS
         }));
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-build_substream_analytics_result",
-        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
             auto maker_task = makers_.build_substream_analytics_result(maker_context, environment);
             functions_.build_substream_analytics_result = maker_task.Get();
@@ -220,7 +220,7 @@ void ServiceFunctions::initFunctions(servicelib::Context context, servicelib::IS
         }));
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-complete_cycle_analytics",
-        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
             auto maker_task = makers_.complete_cycle_analytics(maker_context, environment);
             functions_.complete_cycle_analytics = maker_task.Get();
@@ -234,7 +234,7 @@ void ServiceFunctions::initFunctions(servicelib::Context context, servicelib::IS
         }));
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-continue_cycle_analytics",
-        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
             auto maker_task = makers_.continue_cycle_analytics(maker_context, environment);
             functions_.continue_cycle_analytics = maker_task.Get();
@@ -248,7 +248,7 @@ void ServiceFunctions::initFunctions(servicelib::Context context, servicelib::IS
         }));
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-count_order_processed",
-        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
             auto maker_task = makers_.count_order_processed(maker_context, environment);
             functions_.count_order_processed = maker_task.Get();
@@ -262,9 +262,9 @@ void ServiceFunctions::initFunctions(servicelib::Context context, servicelib::IS
         }));
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-cycle_analytics_input_source",
-        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
-            auto maker_task = makers_.cycle_analytics_input_source(maker_context, environment);
+            auto maker_task = makers_.cycle_analytics_input_source(maker_context, environment, cfg.endpoints.cycleAnalyticsInput);
             functions_.cycle_analytics_input_source = maker_task.Get();
             if (!functions_.cycle_analytics_input_source) throw std::logic_error("function maker CycleAnalyticsInputSource returned null");
           } catch (...) {
@@ -276,9 +276,9 @@ void ServiceFunctions::initFunctions(servicelib::Context context, servicelib::IS
         }));
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-cycle_analytics_result_sink",
-        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
-            auto maker_task = makers_.cycle_analytics_result_sink(maker_context, environment);
+            auto maker_task = makers_.cycle_analytics_result_sink(maker_context, environment, cfg.endpoints.cycleAnalyticsResult);
             functions_.cycle_analytics_result_sink = maker_task.Get();
             if (!functions_.cycle_analytics_result_sink) throw std::logic_error("function maker CycleAnalyticsResultSink returned null");
           } catch (...) {
@@ -290,9 +290,9 @@ void ServiceFunctions::initFunctions(servicelib::Context context, servicelib::IS
         }));
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-high_value_analytics_sink",
-        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
-            auto maker_task = makers_.high_value_analytics_sink(maker_context, environment);
+            auto maker_task = makers_.high_value_analytics_sink(maker_context, environment, cfg.endpoints.highValueAnalytics);
             functions_.high_value_analytics_sink = maker_task.Get();
             if (!functions_.high_value_analytics_sink) throw std::logic_error("function maker HighValueAnalyticsSink returned null");
           } catch (...) {
@@ -304,7 +304,7 @@ void ServiceFunctions::initFunctions(servicelib::Context context, servicelib::IS
         }));
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-invoke_analytics_substream",
-        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
             auto maker_task = makers_.invoke_analytics_substream(maker_context, environment);
             functions_.invoke_analytics_substream = maker_task.Get();
@@ -318,7 +318,7 @@ void ServiceFunctions::initFunctions(servicelib::Context context, servicelib::IS
         }));
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-join_order_payment_analytics",
-        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
             auto maker_task = makers_.join_order_payment_analytics(maker_context, environment);
             functions_.join_order_payment_analytics = maker_task.Get();
@@ -332,9 +332,9 @@ void ServiceFunctions::initFunctions(servicelib::Context context, servicelib::IS
         }));
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-joined_analytics_sink",
-        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
-            auto maker_task = makers_.joined_analytics_sink(maker_context, environment);
+            auto maker_task = makers_.joined_analytics_sink(maker_context, environment, cfg.endpoints.joinedAnalytics);
             functions_.joined_analytics_sink = maker_task.Get();
             if (!functions_.joined_analytics_sink) throw std::logic_error("function maker JoinedAnalyticsSink returned null");
           } catch (...) {
@@ -346,7 +346,7 @@ void ServiceFunctions::initFunctions(servicelib::Context context, servicelib::IS
         }));
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-key_orders_for_join",
-        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
             auto maker_task = makers_.key_orders_for_join(maker_context, environment);
             functions_.key_orders_for_join = maker_task.Get();
@@ -360,7 +360,7 @@ void ServiceFunctions::initFunctions(servicelib::Context context, servicelib::IS
         }));
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-key_orders_for_multi_join",
-        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
             auto maker_task = makers_.key_orders_for_multi_join(maker_context, environment);
             functions_.key_orders_for_multi_join = maker_task.Get();
@@ -374,7 +374,7 @@ void ServiceFunctions::initFunctions(servicelib::Context context, servicelib::IS
         }));
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-key_payments_for_join",
-        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
             auto maker_task = makers_.key_payments_for_join(maker_context, environment);
             functions_.key_payments_for_join = maker_task.Get();
@@ -388,7 +388,7 @@ void ServiceFunctions::initFunctions(servicelib::Context context, servicelib::IS
         }));
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-key_payments_for_multi_join",
-        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
             auto maker_task = makers_.key_payments_for_multi_join(maker_context, environment);
             functions_.key_payments_for_multi_join = maker_task.Get();
@@ -402,7 +402,7 @@ void ServiceFunctions::initFunctions(servicelib::Context context, servicelib::IS
         }));
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-key_shipments_for_multi_join",
-        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
             auto maker_task = makers_.key_shipments_for_multi_join(maker_context, environment);
             functions_.key_shipments_for_multi_join = maker_task.Get();
@@ -416,7 +416,7 @@ void ServiceFunctions::initFunctions(servicelib::Context context, servicelib::IS
         }));
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-multi_join_analytics_events",
-        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
             auto maker_task = makers_.multi_join_analytics_events(maker_context, environment);
             functions_.multi_join_analytics_events = maker_task.Get();
@@ -430,9 +430,9 @@ void ServiceFunctions::initFunctions(servicelib::Context context, servicelib::IS
         }));
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-order_processed_endpoint_source",
-        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
-            auto maker_task = makers_.order_processed_endpoint_source(maker_context, environment);
+            auto maker_task = makers_.order_processed_endpoint_source(maker_context, environment, cfg.endpoints.orderProcessed);
             functions_.order_processed_endpoint_source = maker_task.Get();
             if (!functions_.order_processed_endpoint_source) throw std::logic_error("function maker OrderProcessedEndpointSource returned null");
           } catch (...) {
@@ -444,7 +444,7 @@ void ServiceFunctions::initFunctions(servicelib::Context context, servicelib::IS
         }));
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-route_analytics_result",
-        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
             auto maker_task = makers_.route_analytics_result(maker_context, environment);
             functions_.route_analytics_result = maker_task.Get();
@@ -458,9 +458,9 @@ void ServiceFunctions::initFunctions(servicelib::Context context, servicelib::IS
         }));
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-standard_analytics_sink",
-        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
-            auto maker_task = makers_.standard_analytics_sink(maker_context, environment);
+            auto maker_task = makers_.standard_analytics_sink(maker_context, environment, cfg.endpoints.standardAnalytics);
             functions_.standard_analytics_sink = maker_task.Get();
             if (!functions_.standard_analytics_sink) throw std::logic_error("function maker StandardAnalyticsSink returned null");
           } catch (...) {
@@ -472,9 +472,9 @@ void ServiceFunctions::initFunctions(servicelib::Context context, servicelib::IS
         }));
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-substream_analytics_input_source",
-        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
-            auto maker_task = makers_.substream_analytics_input_source(maker_context, environment);
+            auto maker_task = makers_.substream_analytics_input_source(maker_context, environment, cfg.endpoints.substreamAnalyticsInput);
             functions_.substream_analytics_input_source = maker_task.Get();
             if (!functions_.substream_analytics_input_source) throw std::logic_error("function maker SubstreamAnalyticsInputSource returned null");
           } catch (...) {
@@ -486,9 +486,9 @@ void ServiceFunctions::initFunctions(servicelib::Context context, servicelib::IS
         }));
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-substream_analytics_result_sink",
-        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
-            auto maker_task = makers_.substream_analytics_result_sink(maker_context, environment);
+            auto maker_task = makers_.substream_analytics_result_sink(maker_context, environment, cfg.endpoints.substreamAnalyticsResult);
             functions_.substream_analytics_result_sink = maker_task.Get();
             if (!functions_.substream_analytics_result_sink) throw std::logic_error("function maker SubstreamAnalyticsResultSink returned null");
           } catch (...) {

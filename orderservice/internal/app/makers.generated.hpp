@@ -33,10 +33,10 @@ struct ServiceMakers final {
   std::function<userver::engine::TaskWithResult<std::unique_ptr<functions::MapOrderItemResultToOrderState>>(servicelib::Context, servicelib::IServiceEnvironment&)> map_order_item_result_to_order_state;
   std::function<userver::engine::TaskWithResult<std::unique_ptr<functions::MapToOrderProcessed>>(servicelib::Context, servicelib::IServiceEnvironment&)> map_to_order_processed;
   std::function<userver::engine::TaskWithResult<std::unique_ptr<functions::MapToOrderState>>(servicelib::Context, servicelib::IServiceEnvironment&)> map_to_order_state;
-  std::function<userver::engine::TaskWithResult<std::unique_ptr<functions::OrderProcessedEndpointSink>>(servicelib::Context, servicelib::IServiceEnvironment&)> order_processed_endpoint_sink;
-  std::function<userver::engine::TaskWithResult<std::unique_ptr<functions::ProcessOrderItemSink>>(servicelib::Context, servicelib::IServiceEnvironment&)> process_order_item_sink;
+  std::function<userver::engine::TaskWithResult<std::unique_ptr<functions::OrderProcessedEndpointSink>>(servicelib::Context, servicelib::IServiceEnvironment&, const servicelib::config::KafkaEndpointConfig&)> order_processed_endpoint_sink;
+  std::function<userver::engine::TaskWithResult<std::unique_ptr<functions::ProcessOrderItemSink>>(servicelib::Context, servicelib::IServiceEnvironment&, const servicelib::config::GrpcEndpointConfig&)> process_order_item_sink;
   std::function<userver::engine::TaskWithResult<std::unique_ptr<functions::ProcessOrderItems>>(servicelib::Context, servicelib::IServiceEnvironment&)> process_order_items;
-  std::function<userver::engine::TaskWithResult<std::unique_ptr<functions::ProcessOrderSource>>(servicelib::Context, servicelib::IServiceEnvironment&)> process_order_source;
+  std::function<userver::engine::TaskWithResult<std::unique_ptr<functions::ProcessOrderSource>>(servicelib::Context, servicelib::IServiceEnvironment&, const servicelib::config::HttpEndpointConfig&)> process_order_source;
   std::function<userver::engine::TaskWithResult<std::unique_ptr<functions::SoftDeadline>>(servicelib::Context, servicelib::IServiceEnvironment&)> soft_deadline;
     std::function<userver::engine::TaskWithResult<::inventoryserviceapi::InventoryServiceApiClient>(
         servicelib::Context, servicelib::IServiceEnvironment&,

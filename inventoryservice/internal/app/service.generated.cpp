@@ -58,8 +58,7 @@ void ServiceGenerated::initInfrastructure(servicelib::Context context, const con
 }
 
 void ServiceGenerated::initFunctions(servicelib::Context context, const config::Config& cfg) {
-  (void)cfg;
-  functions_.initFunctions(context, *this, makers_);
+  functions_.initFunctions(context, cfg, *this, makers_);
 }
 
 void ServiceGenerated::initRuntime(servicelib::Context context) {

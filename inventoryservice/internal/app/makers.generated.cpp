@@ -17,8 +17,8 @@ void ServiceMakers::initMakers(const userver::components::ComponentContext& comp
   get_inventory_item_error = [](servicelib::Context context, servicelib::IServiceEnvironment& environment) {
     return functions::MakeGetInventoryItemError(std::move(context), environment);
   };
-  process_order_item_source = [](servicelib::Context context, servicelib::IServiceEnvironment& environment) {
-    return functions::MakeProcessOrderItemSource(std::move(context), environment);
+  process_order_item_source = [](servicelib::Context context, servicelib::IServiceEnvironment& environment, const servicelib::config::GrpcEndpointConfig& config) {
+    return functions::MakeProcessOrderItemSource(std::move(context), environment, config);
   };
 
 }

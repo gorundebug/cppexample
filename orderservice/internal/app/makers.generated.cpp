@@ -27,17 +27,17 @@ void ServiceMakers::initMakers(const userver::components::ComponentContext& comp
   map_to_order_state = [](servicelib::Context context, servicelib::IServiceEnvironment& environment) {
     return functions::MakeMapToOrderState(std::move(context), environment);
   };
-  order_processed_endpoint_sink = [](servicelib::Context context, servicelib::IServiceEnvironment& environment) {
-    return functions::MakeOrderProcessedEndpointSink(std::move(context), environment);
+  order_processed_endpoint_sink = [](servicelib::Context context, servicelib::IServiceEnvironment& environment, const servicelib::config::KafkaEndpointConfig& config) {
+    return functions::MakeOrderProcessedEndpointSink(std::move(context), environment, config);
   };
-  process_order_item_sink = [](servicelib::Context context, servicelib::IServiceEnvironment& environment) {
-    return functions::MakeProcessOrderItemSink(std::move(context), environment);
+  process_order_item_sink = [](servicelib::Context context, servicelib::IServiceEnvironment& environment, const servicelib::config::GrpcEndpointConfig& config) {
+    return functions::MakeProcessOrderItemSink(std::move(context), environment, config);
   };
   process_order_items = [](servicelib::Context context, servicelib::IServiceEnvironment& environment) {
     return functions::MakeProcessOrderItems(std::move(context), environment);
   };
-  process_order_source = [](servicelib::Context context, servicelib::IServiceEnvironment& environment) {
-    return functions::MakeProcessOrderSource(std::move(context), environment);
+  process_order_source = [](servicelib::Context context, servicelib::IServiceEnvironment& environment, const servicelib::config::HttpEndpointConfig& config) {
+    return functions::MakeProcessOrderSource(std::move(context), environment, config);
   };
   soft_deadline = [](servicelib::Context context, servicelib::IServiceEnvironment& environment) {
     return functions::MakeSoftDeadline(std::move(context), environment);

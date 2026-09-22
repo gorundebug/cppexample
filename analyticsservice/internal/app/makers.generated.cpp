@@ -37,17 +37,17 @@ void ServiceMakers::initMakers(const userver::components::ComponentContext& comp
   advance_cycle_analytics = [](servicelib::Context context, servicelib::IServiceEnvironment& environment) {
     return functions::MakeAdvanceCycleAnalytics(std::move(context), environment);
   };
-  analytics_orders_source = [](servicelib::Context context, servicelib::IServiceEnvironment& environment) {
-    return functions::MakeAnalyticsOrdersSource(std::move(context), environment);
+  analytics_orders_source = [](servicelib::Context context, servicelib::IServiceEnvironment& environment, const servicelib::config::CustomEndpointConfig& config) {
+    return functions::MakeAnalyticsOrdersSource(std::move(context), environment, config);
   };
-  analytics_payments_source = [](servicelib::Context context, servicelib::IServiceEnvironment& environment) {
-    return functions::MakeAnalyticsPaymentsSource(std::move(context), environment);
+  analytics_payments_source = [](servicelib::Context context, servicelib::IServiceEnvironment& environment, const servicelib::config::CustomEndpointConfig& config) {
+    return functions::MakeAnalyticsPaymentsSource(std::move(context), environment, config);
   };
-  analytics_schedule_source = [](servicelib::Context context, servicelib::IServiceEnvironment& environment) {
-    return functions::MakeAnalyticsScheduleSource(std::move(context), environment);
+  analytics_schedule_source = [](servicelib::Context context, servicelib::IServiceEnvironment& environment, const servicelib::config::CronEndpointConfig& config) {
+    return functions::MakeAnalyticsScheduleSource(std::move(context), environment, config);
   };
-  analytics_shipments_source = [](servicelib::Context context, servicelib::IServiceEnvironment& environment) {
-    return functions::MakeAnalyticsShipmentsSource(std::move(context), environment);
+  analytics_shipments_source = [](servicelib::Context context, servicelib::IServiceEnvironment& environment, const servicelib::config::CustomEndpointConfig& config) {
+    return functions::MakeAnalyticsShipmentsSource(std::move(context), environment, config);
   };
   build_substream_analytics_result = [](servicelib::Context context, servicelib::IServiceEnvironment& environment) {
     return functions::MakeBuildSubstreamAnalyticsResult(std::move(context), environment);
@@ -61,14 +61,14 @@ void ServiceMakers::initMakers(const userver::components::ComponentContext& comp
   count_order_processed = [](servicelib::Context context, servicelib::IServiceEnvironment& environment) {
     return functions::MakeCountOrderProcessed(std::move(context), environment);
   };
-  cycle_analytics_input_source = [](servicelib::Context context, servicelib::IServiceEnvironment& environment) {
-    return functions::MakeCycleAnalyticsInputSource(std::move(context), environment);
+  cycle_analytics_input_source = [](servicelib::Context context, servicelib::IServiceEnvironment& environment, const servicelib::config::CustomEndpointConfig& config) {
+    return functions::MakeCycleAnalyticsInputSource(std::move(context), environment, config);
   };
-  cycle_analytics_result_sink = [](servicelib::Context context, servicelib::IServiceEnvironment& environment) {
-    return functions::MakeCycleAnalyticsResultSink(std::move(context), environment);
+  cycle_analytics_result_sink = [](servicelib::Context context, servicelib::IServiceEnvironment& environment, const servicelib::config::CustomEndpointConfig& config) {
+    return functions::MakeCycleAnalyticsResultSink(std::move(context), environment, config);
   };
-  high_value_analytics_sink = [](servicelib::Context context, servicelib::IServiceEnvironment& environment) {
-    return functions::MakeHighValueAnalyticsSink(std::move(context), environment);
+  high_value_analytics_sink = [](servicelib::Context context, servicelib::IServiceEnvironment& environment, const servicelib::config::CustomEndpointConfig& config) {
+    return functions::MakeHighValueAnalyticsSink(std::move(context), environment, config);
   };
   invoke_analytics_substream = [](servicelib::Context context, servicelib::IServiceEnvironment& environment) {
     return functions::MakeInvokeAnalyticsSubstream(std::move(context), environment);
@@ -76,8 +76,8 @@ void ServiceMakers::initMakers(const userver::components::ComponentContext& comp
   join_order_payment_analytics = [](servicelib::Context context, servicelib::IServiceEnvironment& environment) {
     return functions::MakeJoinOrderPaymentAnalytics(std::move(context), environment);
   };
-  joined_analytics_sink = [](servicelib::Context context, servicelib::IServiceEnvironment& environment) {
-    return functions::MakeJoinedAnalyticsSink(std::move(context), environment);
+  joined_analytics_sink = [](servicelib::Context context, servicelib::IServiceEnvironment& environment, const servicelib::config::CustomEndpointConfig& config) {
+    return functions::MakeJoinedAnalyticsSink(std::move(context), environment, config);
   };
   key_orders_for_join = [](servicelib::Context context, servicelib::IServiceEnvironment& environment) {
     return functions::MakeKeyOrdersForJoin(std::move(context), environment);
@@ -97,20 +97,20 @@ void ServiceMakers::initMakers(const userver::components::ComponentContext& comp
   multi_join_analytics_events = [](servicelib::Context context, servicelib::IServiceEnvironment& environment) {
     return functions::MakeMultiJoinAnalyticsEvents(std::move(context), environment);
   };
-  order_processed_endpoint_source = [](servicelib::Context context, servicelib::IServiceEnvironment& environment) {
-    return functions::MakeOrderProcessedEndpointSource(std::move(context), environment);
+  order_processed_endpoint_source = [](servicelib::Context context, servicelib::IServiceEnvironment& environment, const servicelib::config::KafkaEndpointConfig& config) {
+    return functions::MakeOrderProcessedEndpointSource(std::move(context), environment, config);
   };
   route_analytics_result = [](servicelib::Context context, servicelib::IServiceEnvironment& environment) {
     return functions::MakeRouteAnalyticsResult(std::move(context), environment);
   };
-  standard_analytics_sink = [](servicelib::Context context, servicelib::IServiceEnvironment& environment) {
-    return functions::MakeStandardAnalyticsSink(std::move(context), environment);
+  standard_analytics_sink = [](servicelib::Context context, servicelib::IServiceEnvironment& environment, const servicelib::config::CustomEndpointConfig& config) {
+    return functions::MakeStandardAnalyticsSink(std::move(context), environment, config);
   };
-  substream_analytics_input_source = [](servicelib::Context context, servicelib::IServiceEnvironment& environment) {
-    return functions::MakeSubstreamAnalyticsInputSource(std::move(context), environment);
+  substream_analytics_input_source = [](servicelib::Context context, servicelib::IServiceEnvironment& environment, const servicelib::config::CustomEndpointConfig& config) {
+    return functions::MakeSubstreamAnalyticsInputSource(std::move(context), environment, config);
   };
-  substream_analytics_result_sink = [](servicelib::Context context, servicelib::IServiceEnvironment& environment) {
-    return functions::MakeSubstreamAnalyticsResultSink(std::move(context), environment);
+  substream_analytics_result_sink = [](servicelib::Context context, servicelib::IServiceEnvironment& environment, const servicelib::config::CustomEndpointConfig& config) {
+    return functions::MakeSubstreamAnalyticsResultSink(std::move(context), environment, config);
   };
 
 }
