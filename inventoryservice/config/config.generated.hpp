@@ -272,6 +272,7 @@ inline Config MakeConfig() {
     TypeConfig value{};
     value.name = "OrderItem";
     value.type = DataType::kStruct;
+    value.package = "";
     value.module = "model";
     value.definitionFormat = TypeDefinitionFormat::kNative;
     value.publicType = false;
@@ -282,6 +283,7 @@ inline Config MakeConfig() {
     TypeConfig value{};
     value.name = "OrderItemResult";
     value.type = DataType::kStruct;
+    value.package = "";
     value.module = "model";
     value.definitionFormat = TypeDefinitionFormat::kNative;
     value.publicType = false;
