@@ -73,9 +73,10 @@ class ServiceGenerated;
           example::model::types::OrderProcessed, example::model::types::OrderProcessed, functions::OrderProcessedEndpointSource, std::exception_ptr>;
   struct ConsumeOrderProcessedKafkaConsumerOwner final {
     ConsumeOrderProcessedKafkaConsumerOwner(
-        userver::kafka::ConsumerComponent& component, std::string topic)
+        userver::kafka::ConsumerComponent& component, std::string topic,
+        bool tracingEnabled)
         : scope(component.GetConsumer()),
-          client(scope, std::move(topic)) {}
+          client(scope, std::move(topic), tracingEnabled) {}
 
     userver::kafka::ConsumerScope scope;
     servicelib::datasource::kafka::UserverConsumerClient client;

@@ -420,21 +420,21 @@ inline Config MakeConfig() {
     LinkConfig value{};
     value.from = kProcessOrderStreamId;
     value.to = kSplitPipelineStreamId;
-    value.callSemantics = MakeCallSemanticsGroup(CallSemantics::kTaskPool, "Default Pool", 1, false);
+    value.callSemantics = MakeCallSemanticsGroup(CallSemantics::kFunctionCall, "Default Pool", 1, false);
     return value;
   }();
   cfg.links.splitPipelineToProcessOrderItems = [] {
     LinkConfig value{};
     value.from = kSplitPipelineStreamId;
     value.to = kProcessOrderItemsStreamId;
-    value.callSemantics = MakeCallSemanticsGroup(CallSemantics::kParallelCall, "", 0, false);
+    value.callSemantics = MakeCallSemanticsGroup(CallSemantics::kFunctionCall, "", 0, false);
     return value;
   }();
   cfg.links.splitPipelineToSoftDeadline = [] {
     LinkConfig value{};
     value.from = kSplitPipelineStreamId;
     value.to = kSoftDeadlineStreamId;
-    value.callSemantics = MakeCallSemanticsGroup(CallSemantics::kParallelCall, "", 0, false);
+    value.callSemantics = MakeCallSemanticsGroup(CallSemantics::kFunctionCall, "", 0, false);
     return value;
   }();
   cfg.modules.inventoryServiceApi = [] {
@@ -459,7 +459,6 @@ inline Config MakeConfig() {
     TypeConfig value{};
     value.name = "Order";
     value.type = DataType::kStruct;
-    value.package = "";
     value.definitionFormat = TypeDefinitionFormat::kNative;
     value.publicType = false;
     value.transferByValue = false;
@@ -469,7 +468,6 @@ inline Config MakeConfig() {
     TypeConfig value{};
     value.name = "OrderItem";
     value.type = DataType::kStruct;
-    value.package = "";
     value.module = "model";
     value.definitionFormat = TypeDefinitionFormat::kNative;
     value.publicType = false;
@@ -480,7 +478,6 @@ inline Config MakeConfig() {
     TypeConfig value{};
     value.name = "OrderItemResult";
     value.type = DataType::kStruct;
-    value.package = "";
     value.module = "model";
     value.definitionFormat = TypeDefinitionFormat::kNative;
     value.publicType = false;
@@ -491,7 +488,6 @@ inline Config MakeConfig() {
     TypeConfig value{};
     value.name = "OrderProcessed";
     value.type = DataType::kStruct;
-    value.package = "";
     value.module = "model";
     value.definitionFormat = TypeDefinitionFormat::kNative;
     value.publicType = false;
@@ -502,7 +498,6 @@ inline Config MakeConfig() {
     TypeConfig value{};
     value.name = "OrderState";
     value.type = DataType::kStruct;
-    value.package = "";
     value.definitionFormat = TypeDefinitionFormat::kNative;
     value.publicType = false;
     value.transferByValue = false;

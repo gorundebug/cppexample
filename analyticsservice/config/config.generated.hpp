@@ -926,7 +926,6 @@ inline Config MakeConfig() {
     TypeConfig value{};
     value.name = "AnalyticsEvent";
     value.type = DataType::kStruct;
-    value.package = "";
     value.definitionFormat = TypeDefinitionFormat::kNative;
     value.publicType = false;
     value.transferByValue = false;
@@ -936,7 +935,6 @@ inline Config MakeConfig() {
     TypeConfig value{};
     value.name = "AnalyticsKey";
     value.type = DataType::kString;
-    value.package = "";
     value.publicType = false;
     value.useAlias = false;
     return value;
@@ -945,7 +943,6 @@ inline Config MakeConfig() {
     TypeConfig value{};
     value.name = "AnalyticsResult";
     value.type = DataType::kStruct;
-    value.package = "";
     value.definitionFormat = TypeDefinitionFormat::kNative;
     value.publicType = false;
     value.transferByValue = false;
@@ -964,7 +961,6 @@ inline Config MakeConfig() {
     TypeConfig value{};
     value.name = "OrderProcessed";
     value.type = DataType::kStruct;
-    value.package = "";
     value.module = "model";
     value.definitionFormat = TypeDefinitionFormat::kNative;
     value.publicType = false;

@@ -20,7 +20,7 @@ void ServiceStreams::build(const config::Config& cfg, ServiceGenerated& service,
   auto& bindings_ = bindings;
   (void)streams_; (void)functions_; (void)bindings_; (void)cfg; (void)service;
 
-  auto& get_inventory_item_data = (*streams_.process_inventory_item).process(cfg.streams.getInventoryItemData, servicelib::StreamType<example::model::types::OrderItemResult>{}, servicelib::StreamType<std::exception_ptr>{}, servicelib::StreamFunction(std::ref(*functions_.get_inventory_item_data)));
+  auto& get_inventory_item_data = (*streams_.process_inventory_item).process(cfg.streams.getInventoryItemData, servicelib::StreamType<example::model::types::OrderItemResult>{}, servicelib::StreamType<example::inventory_service::types::InventoryFailure>{}, servicelib::StreamFunction(std::ref(*functions_.get_inventory_item_data)));
   streams_.get_inventory_item_data = std::addressof(get_inventory_item_data);
   auto& map_inventory_item_error = get_inventory_item_data.getErrorStream().map(cfg.streams.mapInventoryItemError, servicelib::StreamType<example::model::types::OrderItemResult>{}, servicelib::StreamFunction(std::ref(*functions_.get_inventory_item_error)));
   streams_.map_inventory_item_error = std::addressof(map_inventory_item_error);

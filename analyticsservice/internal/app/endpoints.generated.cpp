@@ -96,7 +96,8 @@ void ServiceEndpoints::initDataSources(const config::Config& cfg, ServiceGenerat
           component_context_
               .FindComponent<userver::kafka::ConsumerComponent>(
                   "kafka-consumer-order-events"),
-          cfg.endpoints.orderProcessed.topic);
+          cfg.endpoints.orderProcessed.topic,
+          service.getTracing() != nullptr);
   endpoints_.consume_order_processed = ConsumeOrderProcessedKafkaSourceEndpoint::make(
       service, *streams_.consume_order_processed, connectors_.consume_order_processed_consumer->client,
       *functions_.order_processed_endpoint_source);

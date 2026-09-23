@@ -7,6 +7,8 @@ components_manager:
 
   default_task_processor: main-task-processor
   components:
+    servicelib-server-middlewares:
+    servicelib-handler-middlewares:
     servicelib-disabled-server-middlewares:
     servicelib-noop-tracing-manager:
     logging:
@@ -18,6 +20,7 @@ components_manager:
           overflow_behavior: discard
     testsuite-support:
     server:
+      middleware-pipeline-builder: servicelib-server-middlewares
       listener:
         port: 9092
         task_processor: main-task-processor
@@ -25,42 +28,60 @@ components_manager:
       path: /metrics
       method: GET
       task_processor: main-task-processor
+      middlewares:
+        pipeline-builder: servicelib-handler-middlewares
 
     servicelib-status-handler:
       path: /status
       method: GET
       task_processor: main-task-processor
+      middlewares:
+        pipeline-builder: servicelib-handler-middlewares
     servicelib-status-data-handler:
       path: /status/data
       method: GET
       task_processor: main-task-processor
+      middlewares:
+        pipeline-builder: servicelib-handler-middlewares
     servicelib-status-graph-handler:
       path: /status/graph
       method: GET
       task_processor: main-task-processor
+      middlewares:
+        pipeline-builder: servicelib-handler-middlewares
     servicelib-status-js-handler:
       path: /status/vis.min.js
       method: GET
       task_processor: main-task-processor
+      middlewares:
+        pipeline-builder: servicelib-handler-middlewares
     servicelib-status-css-handler:
       path: /status/vis.min.css
       method: GET
       task_processor: main-task-processor
+      middlewares:
+        pipeline-builder: servicelib-handler-middlewares
 
     servicelib-startup-handler:
       path: /health/startup
       method: GET
       task_processor: main-task-processor
+      middlewares:
+        pipeline-builder: servicelib-handler-middlewares
 
     servicelib-readiness-handler:
       path: /health/ready
       method: GET
       task_processor: main-task-processor
+      middlewares:
+        pipeline-builder: servicelib-handler-middlewares
 
     servicelib-liveness-handler:
       path: /health/live
       method: GET
       task_processor: main-task-processor
+      middlewares:
+        pipeline-builder: servicelib-handler-middlewares
 
 
 

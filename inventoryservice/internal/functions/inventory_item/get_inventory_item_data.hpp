@@ -7,7 +7,7 @@
 
 #include <userver/engine/task/task_with_result.hpp>
 #include <userver/utils/async.hpp>
-#include <stdexcept>
+#include <inventoryservice/internal/types/inventory_failure.hpp>
 #include <tuple>
 #include <unordered_map>
 #include <utility>
@@ -22,23 +22,6 @@
 
 namespace example::inventory_service::functions {
 
-class InventoryFailureError final : public std::exception {
- public:
-  InventoryFailureError(example::model::types::OrderItem item,
-                        std::int32_t available_qty)
-      : item_(std::move(item)), available_qty_(available_qty) {}
-
-  const char* what() const noexcept override {
-    return "inventory is out of stock";
-  }
-
-  const example::model::types::OrderItem& Item() const noexcept { return item_; }
-  std::int32_t AvailableQty() const noexcept { return available_qty_; }
-
- private:
-  example::model::types::OrderItem item_;
-  std::int32_t available_qty_;
-};
 
 // User-owned callable. Its operator is checked by servicelib::StreamFunction
 // when the generated stream graph binds it to an operator.
@@ -88,7 +71,7 @@ struct GetInventoryItemData final {
       out.out(std::move(context), std::move(result));
     } else {
       errors.out(std::move(context),
-                 std::make_exception_ptr(InventoryFailureError{value, available}));
+                 example::inventory_service::types::InventoryFailure{value, available});
     }
   }
 
