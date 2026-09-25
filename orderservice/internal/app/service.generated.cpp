@@ -16,6 +16,7 @@
 #include <userver/utils/async.hpp>
 
 #include <servicelib/runtime/environment_variable.hpp>
+#include <servicelib/runtime/process_shutdown.hpp>
 
 #include "orderservice/internal/app/service.hpp"
 
@@ -43,6 +44,7 @@ void ServiceGenerated::start() {
     user_lifecycle_started_ = true;
     serviceStarted();
   } catch (...) {
+    shutdown_exit_code_ = 1;
     stop();
     releaseRuntime();
     throw;
@@ -97,6 +99,19 @@ void ServiceGenerated::initDataSources(const config::Config& cfg) {
 
 
 void ServiceGenerated::stop() noexcept {
+  servicelib::Context shutdown_context;
+  try {
+    const auto config = getServiceConfigSnapshot();
+    if (config && config->shutdownTimeout > 0) {
+      shutdown_context = shutdown_context.bounded(
+          std::chrono::milliseconds{config->shutdownTimeout});
+    }
+    shutdown_context = shutdown_context.withDeadline(
+        servicelib::ProcessShutdownGuard::arm(
+            shutdown_context.deadline(), shutdown_exit_code_));
+  } catch (...) {
+    std::_Exit(1);
+  }
   const auto report_failure =
       [this](std::string_view operation, std::string_view error) noexcept {
         try {
@@ -121,12 +136,14 @@ void ServiceGenerated::stop() noexcept {
   }
 
   try {
-    servicelib::ServiceApp<ServiceGenerated, DataTypes>::stop();
+    servicelib::ServiceApp<ServiceGenerated, DataTypes>::stop(shutdown_context);
   } catch (const std::exception& ex) {
     report_failure("ServiceApp::stop", ex.what());
   } catch (...) {
     report_failure("ServiceApp::stop", "unknown exception");
   }
+  servicelib::ProcessShutdownGuard::exitIfExpired(
+      shutdown_context.deadline(), shutdown_exit_code_);
   releaseRuntime();
 }
 

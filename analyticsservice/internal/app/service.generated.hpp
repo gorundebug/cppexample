@@ -140,6 +140,7 @@ class ServiceGenerated
   bool use_noop_metrics_{false};
   bool use_noop_tracing_{false};
   bool user_lifecycle_started_{false};
+  int shutdown_exit_code_{};
 };
 
 class Service;

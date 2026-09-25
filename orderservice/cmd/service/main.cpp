@@ -21,6 +21,7 @@
 
 #include <userver/utils/daemon_run.hpp>
 #include <servicelib/runtime/environment_variable.hpp>
+#include <servicelib/runtime/process_shutdown.hpp>
 
 #include <servicelib/runtime/telemetry/userver/metrics.hpp>
 
@@ -124,6 +125,7 @@ class NoopTracingManager final
 }  // namespace
 
 int main(int argc, char* argv[]) {
+  servicelib::ProcessShutdownGuard shutdown_guard;
   auto components =
       userver::components::MinimalServerComponentList()
           .Append<ServiceLibServerMiddlewarePipeline>()
