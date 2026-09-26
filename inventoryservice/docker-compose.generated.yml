@@ -1,6 +1,6 @@
 services:
   inventoryservice:
-    image: cppexample-inventoryservice:local
+    image: cppexample-inventoryservice:${DOCKER_IMAGE_TAG:-local}
     working_dir: /app
     command:
       - --config

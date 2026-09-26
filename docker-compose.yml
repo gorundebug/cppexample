@@ -1,6 +1,6 @@
 services:
   analyticsservice:
-    image: cppexample-analyticsservice:local
+    image: cppexample-analyticsservice:${DOCKER_IMAGE_TAG:-local}
     working_dir: /app
     command:
       - --config
@@ -24,7 +24,7 @@ services:
       - app_net
 
   automationservice:
-    image: automationservice:local
+    image: automationservice:${DOCKER_IMAGE_TAG:-local}
     restart: unless-stopped
     environment:
       - DEBUG=${AUTOMATION_SERVICE_DEBUG:-0}
@@ -43,7 +43,7 @@ services:
       - app_net
 
   inventoryservice:
-    image: cppexample-inventoryservice:local
+    image: cppexample-inventoryservice:${DOCKER_IMAGE_TAG:-local}
     working_dir: /app
     command:
       - --config
@@ -63,7 +63,7 @@ services:
       - app_net
 
   orderservice:
-    image: cppexample-orderservice:local
+    image: cppexample-orderservice:${DOCKER_IMAGE_TAG:-local}
     working_dir: /app
     command:
       - --config

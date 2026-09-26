@@ -1,6 +1,6 @@
 services:
   orderservice:
-    image: cppexample-orderservice:local
+    image: cppexample-orderservice:${DOCKER_IMAGE_TAG:-local}
     working_dir: /app
     command:
       - --config
