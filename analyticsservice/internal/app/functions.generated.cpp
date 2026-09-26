@@ -47,6 +47,7 @@ void ServiceFunctions::initFunctions(servicelib::Context context, const config::
   (void)functions_;
   (void)makers_;
   (void)context;
+  (void)cfg;
   (void)environment;
   {
   if (!makers_.advance_cycle_analytics) {
@@ -136,7 +137,7 @@ void ServiceFunctions::initFunctions(servicelib::Context context, const config::
   maker_tasks.reserve(26);
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-advance_cycle_analytics",
-        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
             auto maker_task = makers_.advance_cycle_analytics(maker_context, environment);
             functions_.advance_cycle_analytics = maker_task.Get();
@@ -206,7 +207,7 @@ void ServiceFunctions::initFunctions(servicelib::Context context, const config::
         }));
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-build_substream_analytics_result",
-        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
             auto maker_task = makers_.build_substream_analytics_result(maker_context, environment);
             functions_.build_substream_analytics_result = maker_task.Get();
@@ -220,7 +221,7 @@ void ServiceFunctions::initFunctions(servicelib::Context context, const config::
         }));
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-complete_cycle_analytics",
-        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
             auto maker_task = makers_.complete_cycle_analytics(maker_context, environment);
             functions_.complete_cycle_analytics = maker_task.Get();
@@ -234,7 +235,7 @@ void ServiceFunctions::initFunctions(servicelib::Context context, const config::
         }));
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-continue_cycle_analytics",
-        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
             auto maker_task = makers_.continue_cycle_analytics(maker_context, environment);
             functions_.continue_cycle_analytics = maker_task.Get();
@@ -248,7 +249,7 @@ void ServiceFunctions::initFunctions(servicelib::Context context, const config::
         }));
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-count_order_processed",
-        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
             auto maker_task = makers_.count_order_processed(maker_context, environment);
             functions_.count_order_processed = maker_task.Get();
@@ -304,7 +305,7 @@ void ServiceFunctions::initFunctions(servicelib::Context context, const config::
         }));
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-invoke_analytics_substream",
-        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
             auto maker_task = makers_.invoke_analytics_substream(maker_context, environment);
             functions_.invoke_analytics_substream = maker_task.Get();
@@ -318,7 +319,7 @@ void ServiceFunctions::initFunctions(servicelib::Context context, const config::
         }));
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-join_order_payment_analytics",
-        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
             auto maker_task = makers_.join_order_payment_analytics(maker_context, environment);
             functions_.join_order_payment_analytics = maker_task.Get();
@@ -346,7 +347,7 @@ void ServiceFunctions::initFunctions(servicelib::Context context, const config::
         }));
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-key_orders_for_join",
-        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
             auto maker_task = makers_.key_orders_for_join(maker_context, environment);
             functions_.key_orders_for_join = maker_task.Get();
@@ -360,7 +361,7 @@ void ServiceFunctions::initFunctions(servicelib::Context context, const config::
         }));
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-key_orders_for_multi_join",
-        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
             auto maker_task = makers_.key_orders_for_multi_join(maker_context, environment);
             functions_.key_orders_for_multi_join = maker_task.Get();
@@ -374,7 +375,7 @@ void ServiceFunctions::initFunctions(servicelib::Context context, const config::
         }));
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-key_payments_for_join",
-        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
             auto maker_task = makers_.key_payments_for_join(maker_context, environment);
             functions_.key_payments_for_join = maker_task.Get();
@@ -388,7 +389,7 @@ void ServiceFunctions::initFunctions(servicelib::Context context, const config::
         }));
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-key_payments_for_multi_join",
-        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
             auto maker_task = makers_.key_payments_for_multi_join(maker_context, environment);
             functions_.key_payments_for_multi_join = maker_task.Get();
@@ -402,7 +403,7 @@ void ServiceFunctions::initFunctions(servicelib::Context context, const config::
         }));
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-key_shipments_for_multi_join",
-        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
             auto maker_task = makers_.key_shipments_for_multi_join(maker_context, environment);
             functions_.key_shipments_for_multi_join = maker_task.Get();
@@ -416,7 +417,7 @@ void ServiceFunctions::initFunctions(servicelib::Context context, const config::
         }));
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-multi_join_analytics_events",
-        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
             auto maker_task = makers_.multi_join_analytics_events(maker_context, environment);
             functions_.multi_join_analytics_events = maker_task.Get();
@@ -444,7 +445,7 @@ void ServiceFunctions::initFunctions(servicelib::Context context, const config::
         }));
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-route_analytics_result",
-        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
             auto maker_task = makers_.route_analytics_result(maker_context, environment);
             functions_.route_analytics_result = maker_task.Get();

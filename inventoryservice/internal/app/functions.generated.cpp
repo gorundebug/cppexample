@@ -24,6 +24,7 @@ void ServiceFunctions::initFunctions(servicelib::Context context, const config::
   (void)functions_;
   (void)makers_;
   (void)context;
+  (void)cfg;
   (void)environment;
   {
   if (!makers_.get_inventory_item_data) {
@@ -44,7 +45,7 @@ void ServiceFunctions::initFunctions(servicelib::Context context, const config::
   maker_tasks.reserve(3);
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-get_inventory_item_data",
-        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
             auto maker_task = makers_.get_inventory_item_data(maker_context, environment);
             functions_.get_inventory_item_data = maker_task.Get();
@@ -58,7 +59,7 @@ void ServiceFunctions::initFunctions(servicelib::Context context, const config::
         }));
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-get_inventory_item_error",
-        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
             auto maker_task = makers_.get_inventory_item_error(maker_context, environment);
             functions_.get_inventory_item_error = maker_task.Get();

@@ -29,6 +29,7 @@ void ServiceFunctions::initFunctions(servicelib::Context context, const config::
   (void)functions_;
   (void)makers_;
   (void)context;
+  (void)cfg;
   (void)environment;
   {
   if (!makers_.map_order_item_result_to_order_state) {
@@ -64,7 +65,7 @@ void ServiceFunctions::initFunctions(servicelib::Context context, const config::
   maker_tasks.reserve(8);
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-map_order_item_result_to_order_state",
-        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
             auto maker_task = makers_.map_order_item_result_to_order_state(maker_context, environment);
             functions_.map_order_item_result_to_order_state = maker_task.Get();
@@ -78,7 +79,7 @@ void ServiceFunctions::initFunctions(servicelib::Context context, const config::
         }));
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-map_to_order_processed",
-        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
             auto maker_task = makers_.map_to_order_processed(maker_context, environment);
             functions_.map_to_order_processed = maker_task.Get();
@@ -92,7 +93,7 @@ void ServiceFunctions::initFunctions(servicelib::Context context, const config::
         }));
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-map_to_order_state",
-        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
             auto maker_task = makers_.map_to_order_state(maker_context, environment);
             functions_.map_to_order_state = maker_task.Get();
@@ -134,7 +135,7 @@ void ServiceFunctions::initFunctions(servicelib::Context context, const config::
         }));
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-process_order_items",
-        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
             auto maker_task = makers_.process_order_items(maker_context, environment);
             functions_.process_order_items = maker_task.Get();
@@ -162,7 +163,7 @@ void ServiceFunctions::initFunctions(servicelib::Context context, const config::
         }));
     maker_tasks.push_back(userver::utils::Async(
         "service-function-maker-soft_deadline",
-        [&makers_, &functions_, &cfg, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
+        [&makers_, &functions_, &environment, maker_context, &maker_cancellation, &maker_error_mutex, &first_maker_error] {
           try {
             auto maker_task = makers_.soft_deadline(maker_context, environment);
             functions_.soft_deadline = maker_task.Get();
