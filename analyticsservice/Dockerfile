@@ -102,7 +102,7 @@ RUN set -eu; \
     fi; \
     manifest=$(find "$source_dir" -type f -path '*/model_cpp/CMakeLists.txt' -print -quit); \
     if [ -z "$manifest" ]; then manifest="$source_dir/CMakeLists.txt"; fi; \
-    if [ ! -f "$manifest" ]; then manifest=$(find "$source_dir" -mindepth 2 -maxdepth 2 -type f -name CMakeLists.txt -print -quit); fi; \
+    if [ ! -f "$manifest" ]; then manifest=$(find "$source_dir" -mindepth 2 -maxdepth 2 -type f -path '*/CMakeLists.txt' -print -quit); fi; \
     if [ -z "$manifest" ] || [ ! -f "$manifest" ]; then echo "module model_cpp source context has no CMakeLists.txt" >&2; exit 1; fi; \
     source_dir=${manifest%/CMakeLists.txt}; \
     mkdir -p /workspace/modules/model_cpp; \

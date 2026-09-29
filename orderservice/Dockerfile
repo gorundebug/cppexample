@@ -102,11 +102,11 @@ RUN set -eu; \
       tar -xf "$archive" -C /tmp/module-inventory_service_api-archive; \
       source_dir=/tmp/module-inventory_service_api-archive; \
     fi; \
-    manifest=$(find "$source_dir" -type f -path '*/inventory_service_api/CMakeLists.txt' -print -quit); \
-    if [ -z "$manifest" ]; then manifest="$source_dir/CMakeLists.txt"; fi; \
-    if [ ! -f "$manifest" ]; then manifest=$(find "$source_dir" -mindepth 2 -maxdepth 2 -type f -name CMakeLists.txt -print -quit); fi; \
+    manifest=$(find "$source_dir" -type f -path '*/inventory_service_api/cpp/CMakeLists.txt' -print -quit); \
+    if [ -z "$manifest" ]; then manifest="$source_dir/cpp/CMakeLists.txt"; fi; \
+    if [ ! -f "$manifest" ]; then manifest=$(find "$source_dir" -mindepth 2 -maxdepth 3 -type f -path '*/cpp/CMakeLists.txt' -print -quit); fi; \
     if [ -z "$manifest" ] || [ ! -f "$manifest" ]; then echo "module inventory_service_api source context has no CMakeLists.txt" >&2; exit 1; fi; \
-    source_dir=${manifest%/CMakeLists.txt}; \
+    source_dir=${manifest%/cpp/CMakeLists.txt}; \
     mkdir -p /workspace/modules/inventory_service_api; \
     cp -R "$source_dir/." /workspace/modules/inventory_service_api/; \
     rm -rf /tmp/module-inventory_service_api-source /tmp/module-inventory_service_api-archive
@@ -121,7 +121,7 @@ RUN set -eu; \
     fi; \
     manifest=$(find "$source_dir" -type f -path '*/model_cpp/CMakeLists.txt' -print -quit); \
     if [ -z "$manifest" ]; then manifest="$source_dir/CMakeLists.txt"; fi; \
-    if [ ! -f "$manifest" ]; then manifest=$(find "$source_dir" -mindepth 2 -maxdepth 2 -type f -name CMakeLists.txt -print -quit); fi; \
+    if [ ! -f "$manifest" ]; then manifest=$(find "$source_dir" -mindepth 2 -maxdepth 2 -type f -path '*/CMakeLists.txt' -print -quit); fi; \
     if [ -z "$manifest" ] || [ ! -f "$manifest" ]; then echo "module model_cpp source context has no CMakeLists.txt" >&2; exit 1; fi; \
     source_dir=${manifest%/CMakeLists.txt}; \
     mkdir -p /workspace/modules/model_cpp; \
@@ -136,11 +136,11 @@ RUN set -eu; \
       tar -xf "$archive" -C /tmp/module-order_service_api-archive; \
       source_dir=/tmp/module-order_service_api-archive; \
     fi; \
-    manifest=$(find "$source_dir" -type f -path '*/order_service_api/CMakeLists.txt' -print -quit); \
-    if [ -z "$manifest" ]; then manifest="$source_dir/CMakeLists.txt"; fi; \
-    if [ ! -f "$manifest" ]; then manifest=$(find "$source_dir" -mindepth 2 -maxdepth 2 -type f -name CMakeLists.txt -print -quit); fi; \
+    manifest=$(find "$source_dir" -type f -path '*/order_service_api/cpp/CMakeLists.txt' -print -quit); \
+    if [ -z "$manifest" ]; then manifest="$source_dir/cpp/CMakeLists.txt"; fi; \
+    if [ ! -f "$manifest" ]; then manifest=$(find "$source_dir" -mindepth 2 -maxdepth 3 -type f -path '*/cpp/CMakeLists.txt' -print -quit); fi; \
     if [ -z "$manifest" ] || [ ! -f "$manifest" ]; then echo "module order_service_api source context has no CMakeLists.txt" >&2; exit 1; fi; \
-    source_dir=${manifest%/CMakeLists.txt}; \
+    source_dir=${manifest%/cpp/CMakeLists.txt}; \
     mkdir -p /workspace/modules/order_service_api; \
     cp -R "$source_dir/." /workspace/modules/order_service_api/; \
     rm -rf /tmp/module-order_service_api-source /tmp/module-order_service_api-archive

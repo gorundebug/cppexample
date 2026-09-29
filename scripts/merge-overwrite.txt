@@ -24,9 +24,9 @@ docker/userver-packages.txt
 analyticsservice/docker/userver-packages.txt
 inventoryservice/docker/userver-packages.txt
 orderservice/docker/userver-packages.txt
-inventory_service_api/CMakeLists.txt
-model/CMakeLists.txt
-order_service_api/CMakeLists.txt
+inventory_service_api/cpp/CMakeLists.txt
+model_cpp/CMakeLists.txt
+order_service_api/cpp/CMakeLists.txt
 analyticsservice/grafana/Dockerfile
 analyticsservice/grafana/dashboards/_lib.libsonnet
 analyticsservice/helm/Chart.yaml

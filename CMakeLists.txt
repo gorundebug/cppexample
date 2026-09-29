@@ -58,7 +58,7 @@ set(SERVICELIB_REPOSITORY
     "https://github.com/gorundebug/cppservicelib.git" CACHE STRING
     "Standalone cppservicelib repository")
 set(SERVICELIB_REVISION
-    "v0.2.148" CACHE STRING
+    "v0.2.149" CACHE STRING
     "Pinned cppservicelib revision")
 if(FETCH_CPP_DEPENDENCIES)
   include(FetchContent)
@@ -102,9 +102,9 @@ if(NOT TARGET servicelib::servicelib)
       "(target servicelib::servicelib)")
 endif()
 
-add_subdirectory(inventory_service_api)
+add_subdirectory(inventory_service_api/cpp)
 add_subdirectory(model_cpp)
-add_subdirectory(order_service_api)
+add_subdirectory(order_service_api/cpp)
 add_subdirectory(analyticsservice)
 add_subdirectory(inventoryservice)
 add_subdirectory(orderservice)

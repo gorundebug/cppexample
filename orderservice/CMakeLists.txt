@@ -60,7 +60,7 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
          "Fetch missing pinned servicelib and contract modules" ON)
   set(SERVICELIB_REPOSITORY "https://github.com/gorundebug/cppservicelib.git" CACHE STRING
       "Standalone cppservicelib repository")
-  set(SERVICELIB_REVISION "v0.2.148" CACHE STRING
+  set(SERVICELIB_REVISION "v0.2.149" CACHE STRING
       "Pinned cppservicelib revision")
   if(FETCH_CPP_DEPENDENCIES)
     include(FetchContent)
@@ -119,7 +119,7 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
   endif()
 
   if(NOT TARGET example_inventory_service_api)
-    set(_servicegen_module_source "${MODULES_ROOT}/inventory_service_api")
+    set(_servicegen_module_source "${MODULES_ROOT}/inventory_service_api/cpp")
     if(EXISTS "${_servicegen_module_source}/CMakeLists.txt")
       add_subdirectory(
           "${_servicegen_module_source}"
@@ -128,17 +128,17 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
       include(FetchContent)
       FetchContent_Declare(servicegen_module_inventory_service_api
           GIT_REPOSITORY "https://github.com/gorundebug/cppexample.git"
-          GIT_TAG "v0.2.148"
+          GIT_TAG "v0.2.149"
           GIT_SHALLOW FALSE)
       FetchContent_GetProperties(servicegen_module_inventory_service_api)
       if(NOT servicegen_module_inventory_service_api_POPULATED)
         FetchContent_Populate(servicegen_module_inventory_service_api)
       endif()
       set(_servicegen_fetched_module_source
-          "${servicegen_module_inventory_service_api_SOURCE_DIR}/inventory_service_api")
+          "${servicegen_module_inventory_service_api_SOURCE_DIR}/inventory_service_api/cpp")
       if(NOT EXISTS "${_servicegen_fetched_module_source}/CMakeLists.txt")
         set(_servicegen_fetched_module_source
-            "${servicegen_module_inventory_service_api_SOURCE_DIR}")
+            "${servicegen_module_inventory_service_api_SOURCE_DIR}/cpp")
       endif()
       add_subdirectory(
           "${_servicegen_fetched_module_source}"
@@ -159,7 +159,7 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
       include(FetchContent)
       FetchContent_Declare(servicegen_module_model
           GIT_REPOSITORY "https://github.com/gorundebug/cppexample.git"
-          GIT_TAG "v0.2.148"
+          GIT_TAG "v0.2.149"
           GIT_SHALLOW FALSE)
       FetchContent_GetProperties(servicegen_module_model)
       if(NOT servicegen_module_model_POPULATED)
@@ -181,7 +181,7 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     endif()
   endif()
   if(NOT TARGET example_order_service_api)
-    set(_servicegen_module_source "${MODULES_ROOT}/order_service_api")
+    set(_servicegen_module_source "${MODULES_ROOT}/order_service_api/cpp")
     if(EXISTS "${_servicegen_module_source}/CMakeLists.txt")
       add_subdirectory(
           "${_servicegen_module_source}"
@@ -190,17 +190,17 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
       include(FetchContent)
       FetchContent_Declare(servicegen_module_order_service_api
           GIT_REPOSITORY "https://github.com/gorundebug/cppexample.git"
-          GIT_TAG "v0.2.148"
+          GIT_TAG "v0.2.149"
           GIT_SHALLOW FALSE)
       FetchContent_GetProperties(servicegen_module_order_service_api)
       if(NOT servicegen_module_order_service_api_POPULATED)
         FetchContent_Populate(servicegen_module_order_service_api)
       endif()
       set(_servicegen_fetched_module_source
-          "${servicegen_module_order_service_api_SOURCE_DIR}/order_service_api")
+          "${servicegen_module_order_service_api_SOURCE_DIR}/order_service_api/cpp")
       if(NOT EXISTS "${_servicegen_fetched_module_source}/CMakeLists.txt")
         set(_servicegen_fetched_module_source
-            "${servicegen_module_order_service_api_SOURCE_DIR}")
+            "${servicegen_module_order_service_api_SOURCE_DIR}/cpp")
       endif()
       add_subdirectory(
           "${_servicegen_fetched_module_source}"
