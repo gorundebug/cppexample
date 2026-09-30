@@ -3,13 +3,16 @@
 #include <functional>
 #include <memory>
 #include <optional>
+
+#include <proto/inventoryserviceapi/processorderitem/processorderitem.pb.h>
+
 #include <servicelib/transformation/streams.hpp>
+
 #include "inventoryservice/internal/app/bindings.generated.hpp"
 #include "inventoryservice/config/config.generated.hpp"
 #include <example/model/types/order_item.hpp>
 #include <example/model/types/order_item_result.hpp>
 #include <inventoryservice/internal/types/inventory_failure.hpp>
-#include <proto/inventoryserviceapi/processorderitem/processorderitem.pb.h>
 
 namespace example::inventory_service::app {
 class ServiceGenerated;

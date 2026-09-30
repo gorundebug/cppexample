@@ -1,22 +1,22 @@
 #pragma once
 
 #include <memory>
-
-#include <userver/engine/task/task_with_result.hpp>
-#include <userver/utils/async.hpp>
-
 #include <exception>
 #include <stdexcept>
 #include <string>
 #include <utility>
 #include <variant>
 
+#include <userver/engine/task/task_with_result.hpp>
+#include <userver/utils/async.hpp>
+#include <proto/inventoryserviceapi/processorderitem/processorderitem.pb.h>
+
 #include <servicelib/runtime/common.hpp>
 #include <servicelib/runtime/config/endpoint_types.hpp>
 #include <servicelib/runtime/environment/environment.hpp>
+
 #include <example/model/types/order_item.hpp>
 #include <example/model/types/order_item_result.hpp>
-#include <proto/inventoryserviceapi/processorderitem/processorderitem.pb.h>
 
 
 namespace example::inventory_service::functions {

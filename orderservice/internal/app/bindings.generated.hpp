@@ -2,16 +2,19 @@
 #pragma once
 #include <functional>
 #include <stdexcept>
+
+#include <handlers/order_service_api/processorder/requests.hpp>
+#include <handlers/order_service_api/processorder/responses.hpp>
+#include <proto/inventoryserviceapi/inventoryserviceapi.generated_client.usrv.pb.hpp>
+#include <proto/inventoryserviceapi/processorderitem/processorderitem.pb.h>
+
 #include <servicelib/runtime/context.hpp>
+
 #include <example/model/types/order_item.hpp>
 #include <example/model/types/order_item_result.hpp>
 #include <example/model/types/order_processed.hpp>
-#include <handlers/order_service_api/processorder/requests.hpp>
-#include <handlers/order_service_api/processorder/responses.hpp>
 #include <orderservice/internal/types/order.hpp>
 #include <orderservice/internal/types/order_state.hpp>
-#include <proto/inventoryserviceapi/inventoryserviceapi.generated_client.usrv.pb.hpp>
-#include <proto/inventoryserviceapi/processorderitem/processorderitem.pb.h>
 
 namespace example::order_service::app {
   struct ProcessOrderItemSinkBinding final {

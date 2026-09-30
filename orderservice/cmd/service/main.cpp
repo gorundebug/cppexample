@@ -18,16 +18,12 @@
 
 #include <userver/ugrpc/client/client_factory_component.hpp>
 #include <userver/ugrpc/client/component_list.hpp>
-
 #include <userver/utils/daemon_run.hpp>
+
 #include <servicelib/runtime/environment_variable.hpp>
 #include <servicelib/runtime/process_shutdown.hpp>
-
 #include <servicelib/runtime/telemetry/userver/metrics.hpp>
-
-
 #include <servicelib/runtime/telemetry/userver/status.hpp>
-
 
 #include "orderservice/internal/app/service.generated.hpp"
 #include "orderservice/internal/app/http_service.generated.hpp"

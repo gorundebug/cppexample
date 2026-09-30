@@ -4,7 +4,6 @@ import (
 	"context"
 
 	temporalsource "github.com/gorundebug/servicelib/datasource/temporal"
-
 	"github.com/gorundebug/servicelib/runtime/environment"
 )
 

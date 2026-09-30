@@ -14,8 +14,9 @@
 #include <userver/formats/yaml/serialize.hpp>
 #include <userver/formats/yaml/value.hpp>
 
-#include "inventoryservice/config/custom_config.hpp"
 #include <servicelib/runtime/config/config.hpp>
+
+#include "inventoryservice/config/custom_config.hpp"
 
 namespace example::inventory_service::config {
 

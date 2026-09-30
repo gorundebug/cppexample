@@ -1,22 +1,21 @@
 #pragma once
 
 #include <memory>
-
-#include <userver/engine/task/task_with_result.hpp>
-#include <userver/utils/async.hpp>
-
 #include <exception>
 #include <stdexcept>
 #include <string>
 #include <utility>
 #include <variant>
 
+#include <userver/engine/task/task_with_result.hpp>
+#include <userver/utils/async.hpp>
 #include <userver/formats/json/serialize.hpp>
 
 #include <servicelib/runtime/common.hpp>
 #include <servicelib/runtime/config/endpoint_types.hpp>
 #include <servicelib/runtime/environment/environment.hpp>
 #include <servicelib/datasource/kafka/userver.hpp>
+
 #include <example/model/types/order_processed.hpp>
 
 

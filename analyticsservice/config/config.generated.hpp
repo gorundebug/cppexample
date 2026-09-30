@@ -14,8 +14,9 @@
 #include <userver/formats/yaml/serialize.hpp>
 #include <userver/formats/yaml/value.hpp>
 
-#include "analyticsservice/config/custom_config.hpp"
 #include <servicelib/runtime/config/config.hpp>
+
+#include "analyticsservice/config/custom_config.hpp"
 
 namespace example::analytics_service::config {
 

@@ -2,8 +2,10 @@
 #pragma once
 #include <memory>
 #include <optional>
+
 #include <servicelib/runtime/context.hpp>
 #include <servicelib/runtime/environment/environment.hpp>
+
 #include "analyticsservice/config/config.generated.hpp"
 #include <analyticsservice/internal/types/analytics_event.hpp>
 #include <analyticsservice/internal/types/analytics_key.hpp>

@@ -6,10 +6,6 @@
 #include <ctime>
 #include <exception>
 #include <memory>
-
-#include <userver/engine/mutex.hpp>
-#include <userver/engine/task/task_with_result.hpp>
-#include <userver/utils/async.hpp>
 #include <mutex>
 #include <optional>
 #include <stdexcept>
@@ -18,6 +14,9 @@
 #include <utility>
 #include <vector>
 
+#include <userver/engine/mutex.hpp>
+#include <userver/engine/task/task_with_result.hpp>
+#include <userver/utils/async.hpp>
 #include <userver/formats/common/type.hpp>
 #include <userver/formats/json/serialize.hpp>
 #include <userver/formats/json/value.hpp>
@@ -26,13 +25,14 @@
 #include <userver/server/http/http_status.hpp>
 #include <userver/utils/datetime_light.hpp>
 #include <userver/utils/uuid7.hpp>
+#include <handlers/order_service_api/processorder/requests.hpp>
+#include <handlers/order_service_api/processorder/responses.hpp>
 
 #include <servicelib/datasource/http/userver.hpp>
 #include <servicelib/runtime/common.hpp>
 #include <servicelib/runtime/config/endpoint_types.hpp>
 #include <servicelib/runtime/environment/environment.hpp>
-#include <handlers/order_service_api/processorder/requests.hpp>
-#include <handlers/order_service_api/processorder/responses.hpp>
+
 #include <example/model/types/order_item.hpp>
 #include <example/model/types/order_item_result.hpp>
 #include <orderservice/internal/types/order.hpp>

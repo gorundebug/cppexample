@@ -1,8 +1,9 @@
+#include <memory>
+
+#include <userver/utils/async.hpp>
+
 #include "analyticsservice/internal/app/service.hpp"
 #include "analyticsservice/internal/functions/substreamanalytics/invoke_analytics_substream.hpp"
-
-#include <memory>
-#include <userver/utils/async.hpp>
 
 namespace example::analytics_service::app {
 

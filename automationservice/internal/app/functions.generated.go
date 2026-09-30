@@ -3,14 +3,17 @@ package app
 
 import (
 	"context"
+	"time"
+
+	temporalworkflow "go.temporal.io/sdk/workflow"
+	"golang.org/x/sync/errgroup"
+
+	"github.com/gorundebug/servicelib/runtime"
+
 	activity "github.com/gorundebug/cppexample-automationservice/internal/functions/activity"
 	automation "github.com/gorundebug/cppexample-automationservice/internal/functions/automation"
 	cron "github.com/gorundebug/cppexample-automationservice/internal/functions/cron"
 	workflow "github.com/gorundebug/cppexample-automationservice/internal/functions/workflow"
-	"github.com/gorundebug/servicelib/runtime"
-	temporalworkflow "go.temporal.io/sdk/workflow"
-	"golang.org/x/sync/errgroup"
-	"time"
 )
 
 type serviceFunctions struct {

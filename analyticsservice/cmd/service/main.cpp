@@ -18,17 +18,12 @@
 #include <userver/kafka/consumer_component.hpp>
 #include <userver/storages/secdist/component.hpp>
 #include <userver/storages/secdist/provider_component.hpp>
-
-
 #include <userver/utils/daemon_run.hpp>
+
 #include <servicelib/runtime/environment_variable.hpp>
 #include <servicelib/runtime/process_shutdown.hpp>
-
 #include <servicelib/runtime/telemetry/userver/metrics.hpp>
-
-
 #include <servicelib/runtime/telemetry/userver/status.hpp>
-
 
 #include "analyticsservice/internal/app/service.generated.hpp"
 

@@ -4,7 +4,9 @@
 #include <memory>
 #include <stdexcept>
 #include <utility>
+
 #include <servicelib/transformation/streams.hpp>
+
 #include <analyticsservice/internal/types/analytics_event.hpp>
 #include <analyticsservice/internal/types/analytics_key.hpp>
 #include <analyticsservice/internal/types/analytics_result.hpp>

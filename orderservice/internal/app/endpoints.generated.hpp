@@ -5,7 +5,6 @@
 
 
 #include <memory>
-
 #include <functional>
 #include <exception>
 #include <stop_token>
@@ -23,10 +22,12 @@
 #include <userver/engine/mutex.hpp>
 #include <userver/ugrpc/client/client_factory_component.hpp>
 #include <userver/ugrpc/client/client_settings.hpp>
+#include <userver/kafka/producer_component.hpp>
+#include <handlers/order_service_api/processorder/requests.hpp>
+#include <handlers/order_service_api/processorder/responses.hpp>
+#include <proto/inventoryserviceapi/inventoryserviceapi.generated_client.usrv.pb.hpp>
+#include <proto/inventoryserviceapi/processorderitem/processorderitem.pb.h>
 
-
-#include "orderservice/config/config.generated.hpp"
-#include "orderservice/internal/serdes/serde_registration.generated.hpp"
 #include <servicelib/runtime/config/component.hpp>
 #include <servicelib/runtime/serviceapp.hpp>
 #include <servicelib/runtime/telemetry/userver/log.hpp>
@@ -36,20 +37,14 @@
 #include <servicelib/datasink/grpc/userver.hpp>
 #include <servicelib/datasource/http/userver.hpp>
 #include <servicelib/datasink/kafka/userver.hpp>
-#include <userver/kafka/producer_component.hpp>
 
+#include "orderservice/config/config.generated.hpp"
+#include "orderservice/internal/serdes/serde_registration.generated.hpp"
 #include <example/model/types/order_item.hpp>
 #include <example/model/types/order_item_result.hpp>
 #include <example/model/types/order_processed.hpp>
-#include <handlers/order_service_api/processorder/requests.hpp>
-#include <handlers/order_service_api/processorder/responses.hpp>
 #include <orderservice/internal/types/order.hpp>
 #include <orderservice/internal/types/order_state.hpp>
-#include <proto/inventoryserviceapi/inventoryserviceapi.generated_client.usrv.pb.hpp>
-#include <proto/inventoryserviceapi/processorderitem/processorderitem.pb.h>
-
-
-
 #include "orderservice/internal/app/streams.generated.hpp"
 #include <orderservice/internal/functions/endpoint/order_processed_endpoint_sink.hpp>
 #include <orderservice/internal/functions/endpoint/process_order_item_sink.hpp>

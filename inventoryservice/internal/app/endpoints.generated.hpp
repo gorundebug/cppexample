@@ -5,7 +5,6 @@
 
 
 #include <memory>
-
 #include <functional>
 #include <exception>
 #include <stop_token>
@@ -21,10 +20,8 @@
 #include <userver/components/statistics_storage.hpp>
 #include <userver/engine/task/task_with_result.hpp>
 #include <userver/engine/mutex.hpp>
+#include <proto/inventoryserviceapi/processorderitem/processorderitem.pb.h>
 
-
-#include "inventoryservice/config/config.generated.hpp"
-#include "inventoryservice/internal/serdes/serde_registration.generated.hpp"
 #include <servicelib/runtime/config/component.hpp>
 #include <servicelib/runtime/serviceapp.hpp>
 #include <servicelib/runtime/telemetry/userver/log.hpp>
@@ -33,13 +30,11 @@
 #include <servicelib/transformation/streams.hpp>
 #include <servicelib/datasource/grpc/userver.hpp>
 
+#include "inventoryservice/config/config.generated.hpp"
+#include "inventoryservice/internal/serdes/serde_registration.generated.hpp"
 #include <example/model/types/order_item.hpp>
 #include <example/model/types/order_item_result.hpp>
 #include <inventoryservice/internal/types/inventory_failure.hpp>
-#include <proto/inventoryserviceapi/processorderitem/processorderitem.pb.h>
-
-
-
 #include "inventoryservice/internal/app/streams.generated.hpp"
 #include <inventoryservice/internal/functions/endpoint/process_order_item_source.hpp>
 

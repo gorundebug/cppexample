@@ -6,7 +6,6 @@
 
 #include <memory>
 #include <atomic>
-
 #include <functional>
 #include <exception>
 #include <stop_token>
@@ -22,10 +21,8 @@
 #include <userver/components/statistics_storage.hpp>
 #include <userver/engine/task/task_with_result.hpp>
 #include <userver/engine/mutex.hpp>
+#include <userver/kafka/consumer_component.hpp>
 
-
-#include "analyticsservice/config/config.generated.hpp"
-#include "analyticsservice/internal/serdes/serde_registration.generated.hpp"
 #include <servicelib/runtime/config/component.hpp>
 #include <servicelib/runtime/serviceapp.hpp>
 #include <servicelib/runtime/telemetry/userver/log.hpp>
@@ -33,19 +30,17 @@
 #include <servicelib/runtime/telemetry/userver/tracing.hpp>
 #include <servicelib/transformation/streams.hpp>
 #include <servicelib/datasource/kafka/userver.hpp>
-#include <userver/kafka/consumer_component.hpp>
 #include <servicelib/datasource/localsource/custom.hpp>
 #include <servicelib/datasource/cron/libcron.hpp>
 #include <servicelib/datasink/localsink/custom.hpp>
 
+#include "analyticsservice/config/config.generated.hpp"
+#include "analyticsservice/internal/serdes/serde_registration.generated.hpp"
 #include <analyticsservice/internal/types/analytics_event.hpp>
 #include <analyticsservice/internal/types/analytics_key.hpp>
 #include <analyticsservice/internal/types/analytics_result.hpp>
 #include <example/model/types/automation_job.hpp>
 #include <example/model/types/order_processed.hpp>
-
-
-
 #include "analyticsservice/internal/app/streams.generated.hpp"
 #include <analyticsservice/internal/functions/endpoint/analytics_orders_source.hpp>
 #include <analyticsservice/internal/functions/endpoint/analytics_payments_source.hpp>

@@ -7,12 +7,14 @@
 #include <utility>
 #include <variant>
 
+#include <userver/engine/task/task_with_result.hpp>
+#include <userver/utils/async.hpp>
+
 #include <servicelib/runtime/common.hpp>
 #include <servicelib/runtime/config/endpoint_types.hpp>
 #include <servicelib/runtime/environment/environment.hpp>
-#include <userver/engine/task/task_with_result.hpp>
-#include <userver/utils/async.hpp>
 #include <servicelib/datasource/localsource/custom.hpp>
+
 #include <analyticsservice/internal/types/analytics_event.hpp>
 
 

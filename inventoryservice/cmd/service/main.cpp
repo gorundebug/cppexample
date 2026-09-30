@@ -17,16 +17,12 @@
 #endif
 
 #include <userver/ugrpc/server/component_list.hpp>
-
 #include <userver/utils/daemon_run.hpp>
+
 #include <servicelib/runtime/environment_variable.hpp>
 #include <servicelib/runtime/process_shutdown.hpp>
-
 #include <servicelib/runtime/telemetry/userver/metrics.hpp>
-
-
 #include <servicelib/runtime/telemetry/userver/status.hpp>
-
 
 #include "inventoryservice/internal/app/service.generated.hpp"
 #include "inventoryservice/internal/app/grpc_service.generated.hpp"

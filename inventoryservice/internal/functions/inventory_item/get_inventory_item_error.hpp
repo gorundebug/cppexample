@@ -8,14 +8,16 @@
 #include <utility>
 #include <vector>
 
+#include <userver/engine/task/task_with_result.hpp>
+#include <userver/utils/async.hpp>
+
 #include <servicelib/runtime/context.hpp>
 #include <servicelib/runtime/common.hpp>
 #include <servicelib/runtime/base.hpp>
 #include <servicelib/runtime/consumer.hpp>
 #include <servicelib/runtime/config/stream_types.hpp>
 #include <servicelib/runtime/environment/environment.hpp>
-#include <userver/engine/task/task_with_result.hpp>
-#include <userver/utils/async.hpp>
+
 #include <inventoryservice/internal/types/inventory_failure.hpp>
 #include <example/model/types/order_item_result.hpp>
 

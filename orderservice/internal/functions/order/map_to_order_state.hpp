@@ -1,10 +1,6 @@
 #pragma once
 
 #include <memory>
-
-#include <userver/engine/task/task_with_result.hpp>
-#include <userver/utils/async.hpp>
-
 #include <chrono>
 #include <cstddef>
 #include <stdexcept>
@@ -12,9 +8,13 @@
 #include <utility>
 #include <vector>
 
+#include <userver/engine/task/task_with_result.hpp>
+#include <userver/utils/async.hpp>
+
 #include <servicelib/runtime/context.hpp>
 #include <servicelib/runtime/config/stream_types.hpp>
 #include <servicelib/runtime/environment/environment.hpp>
+
 #include <orderservice/internal/types/order.hpp>
 #include <orderservice/internal/types/order_state.hpp>
 

@@ -3,7 +3,9 @@
 #include <functional>
 #include <memory>
 #include <optional>
+
 #include <servicelib/transformation/streams.hpp>
+
 #include "analyticsservice/internal/app/bindings.generated.hpp"
 #include "analyticsservice/config/config.generated.hpp"
 #include <analyticsservice/internal/types/analytics_event.hpp>

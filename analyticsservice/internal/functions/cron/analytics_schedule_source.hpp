@@ -1,15 +1,16 @@
 #pragma once
 
 #include <memory>
+#include <utility>
 
 #include <userver/engine/task/task_with_result.hpp>
 #include <userver/utils/async.hpp>
-#include <utility>
 
 #include <servicelib/runtime/common.hpp>
 #include <servicelib/runtime/config/endpoint_types.hpp>
 #include <servicelib/runtime/environment/environment.hpp>
 #include <servicelib/runtime/schedule.hpp>
+
 #include <example/model/types/automation_job.hpp>
 
 
