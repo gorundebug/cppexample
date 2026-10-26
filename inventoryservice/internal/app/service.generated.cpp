@@ -29,22 +29,29 @@ ServiceGenerated::ServiceGenerated(
       use_noop_metrics_(servicelib::EnvironmentFlagEnabled("SERVICELIB_NOOP_METRICS")),
       use_noop_tracing_(servicelib::EnvironmentFlagEnabled("SERVICELIB_NOOP_TRACING")) {}
 
-ServiceGenerated::~ServiceGenerated() { stop(); }
+ServiceGenerated::~ServiceGenerated() {
+  if (lifecycle_context_) stop(*lifecycle_context_);
+  if (!servicelib::ServiceApp<ServiceGenerated, DataTypes>::isStopped()) {
+    // Destruction cannot leave callbacks referring to destroyed graph fields.
+    std::_Exit(1);
+  }
+  releaseRuntime();
+}
 
-void ServiceGenerated::start() {
+void ServiceGenerated::start(servicelib::Context context) {
+  lifecycle_context_ = context;
   try {
-    const servicelib::Context context;
-    serviceInit();
+
+    serviceInit(context);
     initMakers();
     customMakersInit(context);
     initRuntime(context);
-    servicelib::ServiceApp<ServiceGenerated, DataTypes>::start();
+    servicelib::ServiceApp<ServiceGenerated, DataTypes>::start(context);
     user_lifecycle_started_ = true;
-    serviceStarted();
+    serviceStarted(context);
   } catch (...) {
     shutdown_exit_code_ = 1;
-    stop();
-    releaseRuntime();
+    stop(context);
     throw;
   }
 }
@@ -91,8 +98,9 @@ void ServiceGenerated::initDataSources(const config::Config& cfg) {
 }
 
 
-void ServiceGenerated::stop() noexcept {
-  servicelib::Context shutdown_context;
+void ServiceGenerated::stop(servicelib::Context context) noexcept {
+  if (!lifecycle_context_) return;
+  auto shutdown_context = context;
   try {
     const auto config = getServiceConfigSnapshot();
     if (config && config->shutdownTimeout > 0) {
@@ -120,7 +128,7 @@ void ServiceGenerated::stop() noexcept {
   try {
     if (user_lifecycle_started_) {
       user_lifecycle_started_ = false;
-      serviceStopping();
+      serviceStopping(shutdown_context);
     }
   } catch (const std::exception& ex) {
     report_failure("serviceStopping", ex.what());
@@ -137,7 +145,9 @@ void ServiceGenerated::stop() noexcept {
   }
   servicelib::ProcessShutdownGuard::exitIfExpired(
       shutdown_context.deadline(), shutdown_exit_code_);
+  if (!servicelib::ServiceApp<ServiceGenerated, DataTypes>::isStopped()) return;
   releaseRuntime();
+  lifecycle_context_.reset();
 }
 
 void ServiceGenerated::releaseRuntime() noexcept {
@@ -180,12 +190,12 @@ InventoryServiceComponent::InventoryServiceComponent(
               .GetStorage(),
           context)) {
   context.FindComponent<RuntimeConfigComponent>();
-  service_->start();
+  service_->start(lifecycle_context_);
 }
 
-InventoryServiceComponent::~InventoryServiceComponent() { service_->stop(); }
+InventoryServiceComponent::~InventoryServiceComponent() { service_->stop(lifecycle_context_); }
 
-void InventoryServiceComponent::OnAllComponentsAreStopping() { service_->stop(); }
+void InventoryServiceComponent::OnAllComponentsAreStopping() { service_->stop(lifecycle_context_); }
 
 
 

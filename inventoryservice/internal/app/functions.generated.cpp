@@ -95,7 +95,7 @@ void ServiceFunctions::initFunctions(servicelib::Context context, const config::
       // The task recorded the first failure before requesting cancellation.
     }
   }
-  maker_cancellation.request_stop();
+  // Successful maker contexts retain the caller lifetime.
   if (first_maker_error) std::rethrow_exception(first_maker_error);
   }
 }

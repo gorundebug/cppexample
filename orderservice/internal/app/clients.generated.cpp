@@ -48,7 +48,7 @@ std::stop_source maker_cancellation;
       // The task recorded the first failure before requesting cancellation.
     }
   }
-  maker_cancellation.request_stop();
+  // Successful makers retain this scope until their owner is cancelled.
   if (first_maker_error) std::rethrow_exception(first_maker_error);
 }
 
