@@ -99,6 +99,8 @@ components_manager:
       topics:
         - order-processed
       auto_offset_reset: smallest
+      rd_kafka_custom_options:
+        isolation.level: read_committed
       max_batch_size: 100
       poll_timeout: 500ms
       security_protocol#env: ORDER_EVENTS_SECURITY_PROTOCOL

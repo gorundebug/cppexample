@@ -26,6 +26,11 @@ struct OrderProcessedEndpointSource final {
 
   int concurrency(auto&) const noexcept { return 0; }
 
+  void onError(servicelib::MessageContext context, auto& stream,
+               std::exception_ptr error) const {
+    stream.collectError(std::move(context), std::move(error));
+  }
+
   servicelib::BeginResult<State> beginRequest(
       servicelib::MessageContext context, auto&) const {
     return {std::move(context), {}};
