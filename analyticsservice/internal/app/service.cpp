@@ -24,8 +24,8 @@ void Service::customFunctionsInit(servicelib::Context context) {
   (void)context;
   // Add only explicit post-construction customization here.
 }
-void Service::serviceInit() {}
-void Service::serviceStarted() {}
-void Service::serviceStopping() noexcept {}
+void Service::serviceInit(servicelib::Context) {}
+void Service::serviceStarted(servicelib::Context) {}
+void Service::serviceStopping(servicelib::Context) noexcept {}
 
 }  // namespace example::analytics_service::app

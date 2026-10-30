@@ -13,9 +13,9 @@ class Service final : public ServiceGenerated {
  protected:
   void customMakersInit(servicelib::Context context) override;
   void customFunctionsInit(servicelib::Context context) override;
-  void serviceInit() override;
-  void serviceStarted() override;
-  void serviceStopping() noexcept override;
+  void serviceInit(servicelib::Context context) override;
+  void serviceStarted(servicelib::Context context) override;
+  void serviceStopping(servicelib::Context context) noexcept override;
 };
 
 }  // namespace example::order_service::app
