@@ -1,3 +1,5 @@
+analyticsOrdersEnabled: true
+analyticsPaymentsEnabled: true
 analyticsScheduleEnabled: true
 analyticsScheduleMissedRunPolicy: FireOnce
 analyticsScheduleOverlapPolicy: Skip
@@ -11,9 +13,17 @@ analyticsServiceGrpcHost: 0.0.0.0
 analyticsServiceGrpcPort: 9203
 analyticsServiceHttpHost: 0.0.0.0
 analyticsServiceHttpPort: 9093
+analyticsShipmentsEnabled: true
+cycleAnalyticsInputEnabled: true
+cycleAnalyticsResultEnabled: true
+highValueAnalyticsEnabled: true
+joinedAnalyticsEnabled: true
 orderEventsBrokers: redpanda:9092
 orderEventsPassword: ""
 orderEventsSaslMechanism: SCRAM-SHA-512
 orderEventsSecurityProtocol: PLAINTEXT
 orderEventsUsername: ""
 orderProcessedEnabled: true
+standardAnalyticsEnabled: true
+substreamAnalyticsInputEnabled: true
+substreamAnalyticsResultEnabled: true
