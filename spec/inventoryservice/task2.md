@@ -34,6 +34,7 @@ Preserve the order and item identity and requested quantity, and record the fail
 - [ ] Inspect output type `OrderItemResult` in `model_cpp/include/example/model/types/order_item_result.hpp`
 - [ ] Implement the C++ function object without retaining borrowed payload/context references
 - [ ] Run `./scripts/test.generated.sh`
+
 - [ ] Implement meaningful assertions in `inventoryservice/internal/functions/inventory_item/get_inventory_item_error_test.cpp`
 - [ ] Re-read this checklist
 - [ ] Append to `spec/progress.md`: `- [x] inventoryservice/task2.md — GetInventoryItemError — C++/userver — done`

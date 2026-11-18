@@ -82,7 +82,11 @@ class ServiceGenerated;
 
 
 
+
+
 struct ServiceEndpoints final {
+
+
   void initDataSinks(const config::Config& cfg, ServiceGenerated& service);
   void initDataSources(const config::Config& cfg, ServiceGenerated& service);
     std::shared_ptr<ProcessOrderItemGrpcSinkEndpoint> process_order_item;

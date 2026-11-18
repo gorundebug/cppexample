@@ -23,7 +23,10 @@ orderEventsPassword: ""
 orderEventsSaslMechanism: SCRAM-SHA-512
 orderEventsSecurityProtocol: PLAINTEXT
 orderEventsUsername: ""
+orderProcessedCreateTopic: true
 orderProcessedEnabled: true
+orderProcessedPartitions: 1
+orderProcessedTopic: order-processed
 standardAnalyticsEnabled: true
 substreamAnalyticsInputEnabled: true
 substreamAnalyticsResultEnabled: true

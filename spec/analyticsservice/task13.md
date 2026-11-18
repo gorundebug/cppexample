@@ -33,6 +33,7 @@ Combine matching order, payment, and shipment analytics events.
 - [ ] Inspect output type `AnalyticsResult` in `analyticsservice/internal/types/analytics_result.hpp`
 - [ ] Implement the C++ function object without retaining borrowed payload/context references
 - [ ] Run `./scripts/test.generated.sh`
+
 - [ ] Implement meaningful assertions in `analyticsservice/internal/functions/multijoinanalytics/multi_join_analytics_events_test.cpp`
 - [ ] Re-read this checklist
 - [ ] Append to `spec/progress.md`: `- [x] analyticsservice/task13.md — MultiJoinAnalyticsEvents — C++/userver — done`

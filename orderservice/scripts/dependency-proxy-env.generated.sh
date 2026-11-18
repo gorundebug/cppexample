@@ -13,6 +13,7 @@ if [[ -n "${DEPENDENCY_PROXY_DIR:-}" ]]; then
   export DEPENDENCY_CONAN_VOLUME="${DEPENDENCY_CONAN_VOLUME:-dependency-conan2}"
   export DEPENDENCY_DOCKER_REGISTRY="${dependency_proxy_host}:${DEPENDENCY_PROXY_DOCKER_PORT:-18083}"
   export DEPENDENCY_GITHUB_RAW_URL="${dependency_proxy_base}/github-raw"
+  export DEPENDENCY_APACHE_ARCHIVE_URL="${dependency_proxy_base}/apache-archive"
   export DEPENDENCY_CONAN_REMOTE_URL="${dependency_proxy_base}/conan-proxy"
   export DEPENDENCY_CONAN_UPLOAD_URL="${dependency_proxy_base}/conan-hosted"
   export DEPENDENCY_CONAN_PUBLISH=1
@@ -22,6 +23,6 @@ if [[ -n "${DEPENDENCY_PROXY_DIR:-}" ]]; then
   export DEPENDENCY_APT_UBUNTU_ARCHIVE_URL="${dependency_proxy_base}/apt-ubuntu-archive"
   export DEPENDENCY_APT_UBUNTU_SECURITY_URL="${dependency_proxy_base}/apt-ubuntu-security"
   export DEPENDENCY_APT_UBUNTU_PORTS_URL="${dependency_proxy_base}/apt-ubuntu-ports"
-  export SERVICELIB_SOURCE_CONTEXT="${SERVICELIB_SOURCE_CONTEXT:-${dependency_git_mirror_base}/github.com/gorundebug/cppservicelib.git#v0.2.181}"
+  export SERVICELIB_SOURCE_CONTEXT="${SERVICELIB_SOURCE_CONTEXT:-${dependency_git_mirror_base}/github.com/gorundebug/cppservicelib.git#v0.2.182}"
   export USERVER_SOURCE_CONTEXT="${USERVER_SOURCE_CONTEXT:-${dependency_git_mirror_base}/github.com/userver-framework/userver.git#19472cc41deda3fb1c7aa7d13d53235a0161a224}"
 fi

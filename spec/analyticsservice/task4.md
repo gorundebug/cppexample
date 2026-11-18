@@ -32,6 +32,7 @@ Keep intermediate analytics events whose cycle counter is below three.
 - [ ] Inspect output type `AnalyticsEvent` in `analyticsservice/internal/types/analytics_event.hpp`
 - [ ] Implement the C++ function object without retaining borrowed payload/context references
 - [ ] Run `./scripts/test.generated.sh`
+
 - [ ] Implement meaningful assertions in `analyticsservice/internal/functions/cycleanalytics/continue_cycle_analytics_test.cpp`
 - [ ] Re-read this checklist
 - [ ] Append to `spec/progress.md`: `- [x] analyticsservice/task4.md — ContinueCycleAnalytics — C++/userver — done`

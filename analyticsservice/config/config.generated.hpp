@@ -1147,8 +1147,26 @@ inline void ApplyConfig(const userver::formats::yaml::Value& value,
   }
   {
     const auto object = value["endpoints"]["orderProcessed"];
+    if (const auto field = object["createTopic"]; !field.IsMissing()) {
+      config.endpoints.orderProcessed.createTopic = field.As<bool>();
+    }
+  }
+  {
+    const auto object = value["endpoints"]["orderProcessed"];
     if (const auto field = object["enabled"]; !field.IsMissing()) {
       config.endpoints.orderProcessed.enabled = field.As<bool>();
+    }
+  }
+  {
+    const auto object = value["endpoints"]["orderProcessed"];
+    if (const auto field = object["partitions"]; !field.IsMissing()) {
+      config.endpoints.orderProcessed.partitions = field.As<int>();
+    }
+  }
+  {
+    const auto object = value["endpoints"]["orderProcessed"];
+    if (const auto field = object["topic"]; !field.IsMissing()) {
+      config.endpoints.orderProcessed.topic = field.As<std::string>();
     }
   }
   {
@@ -1368,12 +1386,26 @@ inline void ApplyEnvironment(Config& config) {
   if (const auto* value = std::getenv("ORDER_EVENTS_USERNAME")) {
     config.dataConnectors.orderEvents.username = value;
   }
+  if (const auto* value = std::getenv("ORDER_PROCESSED_CREATE_TOPIC")) {
+    const std::string_view parsed{value};
+    if (parsed != "true" && parsed != "false") {
+      throw std::invalid_argument("invalid boolean in ORDER_PROCESSED_CREATE_TOPIC");
+    }
+    config.endpoints.orderProcessed.createTopic = parsed == "true";
+  }
   if (const auto* value = std::getenv("ORDER_PROCESSED_ENABLED")) {
     const std::string_view parsed{value};
     if (parsed != "true" && parsed != "false") {
       throw std::invalid_argument("invalid boolean in ORDER_PROCESSED_ENABLED");
     }
     config.endpoints.orderProcessed.enabled = parsed == "true";
+  }
+  if (const auto* value = std::getenv("ORDER_PROCESSED_PARTITIONS")) {
+    config.endpoints.orderProcessed.partitions =
+        ParseEnvironmentInt("ORDER_PROCESSED_PARTITIONS", value);
+  }
+  if (const auto* value = std::getenv("ORDER_PROCESSED_TOPIC")) {
+    config.endpoints.orderProcessed.topic = value;
   }
   if (const auto* value = std::getenv("STANDARD_ANALYTICS_ENABLED")) {
     const std::string_view parsed{value};

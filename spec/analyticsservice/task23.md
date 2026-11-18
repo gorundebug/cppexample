@@ -30,6 +30,7 @@ Validate and record analytics results routed to the high-value Case branch.
 - [ ] Inspect input type `AnalyticsResult` in `analyticsservice/internal/types/analytics_result.hpp`
 - [ ] Implement the C++ function object without retaining borrowed payload/context references
 - [ ] Run `./scripts/test.generated.sh`
+
 - [ ] Implement meaningful assertions in `analyticsservice/internal/functions/endpoint/high_value_analytics_sink_test.cpp`
 - [ ] Re-read this checklist
 - [ ] Append to `spec/progress.md`: `- [x] analyticsservice/task23.md — HighValueAnalyticsSink — C++/userver — done`

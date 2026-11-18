@@ -34,6 +34,7 @@ Preserve each item's data and assign the parent order ID.
 - [ ] Inspect output type `OrderItem` in `model_cpp/include/example/model/types/order_item.hpp`
 - [ ] Implement the C++ function object without retaining borrowed payload/context references
 - [ ] Run `./scripts/test.generated.sh`
+
 - [ ] Implement meaningful assertions in `orderservice/internal/functions/order/process_order_items_test.cpp`
 - [ ] Re-read this checklist
 - [ ] Append to `spec/progress.md`: `- [x] orderservice/task4.md — ProcessOrderItems — C++/userver — done`

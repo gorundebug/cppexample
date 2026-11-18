@@ -6,7 +6,10 @@ orderEventsPassword: ""
 orderEventsSaslMechanism: SCRAM-SHA-512
 orderEventsSecurityProtocol: PLAINTEXT
 orderEventsUsername: ""
+orderProcessedCreateTopic: true
 orderProcessedEnabled: true
+orderProcessedPartitions: 1
+orderProcessedTopic: order-processed
 orderServiceConfigOverridePath: config/overrides.yaml
 orderServiceDefaultGrpcTimeout: 0
 orderServiceEnvironment: ""

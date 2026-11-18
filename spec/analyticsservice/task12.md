@@ -32,6 +32,7 @@ Key the shipment analytics event for the multi-way join.
 - [ ] Inspect output type `AnalyticsEvent` in `analyticsservice/internal/types/analytics_event.hpp`
 - [ ] Implement the C++ function object without retaining borrowed payload/context references
 - [ ] Run `./scripts/test.generated.sh`
+
 - [ ] Implement meaningful assertions in `analyticsservice/internal/functions/multijoinanalytics/key_shipments_for_multi_join_test.cpp`
 - [ ] Re-read this checklist
 - [ ] Append to `spec/progress.md`: `- [x] analyticsservice/task12.md — KeyShipmentsForMultiJoin — C++/userver — done`

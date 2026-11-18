@@ -1,5 +1,4 @@
 # Order Service
-
 Standalone generated C++/userver service. All compile, test and runtime
 commands use the generated Docker toolchain, so the host needs only Make,
 Docker and Docker Compose v2.

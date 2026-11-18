@@ -34,6 +34,7 @@ Preserve the order ID, status, and processing time. Count all item results and r
 - [ ] Inspect output type `OrderProcessed` in `model_cpp/include/example/model/types/order_processed.hpp`
 - [ ] Implement the C++ function object without retaining borrowed payload/context references
 - [ ] Run `./scripts/test.generated.sh`
+
 - [ ] Implement meaningful assertions in `orderservice/internal/functions/order/map_to_order_processed_test.cpp`
 - [ ] Re-read this checklist
 - [ ] Append to `spec/progress.md`: `- [x] orderservice/task2.md — MapToOrderProcessed — C++/userver — done`

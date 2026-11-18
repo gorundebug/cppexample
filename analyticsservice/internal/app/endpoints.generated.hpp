@@ -111,7 +111,11 @@ class ServiceGenerated;
           example::analytics_service::types::AnalyticsResult, std::monostate, functions::SubstreamAnalyticsResultSink, std::exception_ptr>;
 
 
+
+
 struct ServiceEndpoints final {
+
+
   void initDataSinks(const config::Config& cfg, ServiceGenerated& service);
   void initDataSources(const config::Config& cfg, ServiceGenerated& service);
     std::shared_ptr<ConsumeOrderProcessedKafkaSourceEndpoint> consume_order_processed;

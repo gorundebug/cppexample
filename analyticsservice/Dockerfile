@@ -6,6 +6,7 @@ FROM module-model_cpp AS module-model_cpp
 FROM --platform=$TARGETPLATFORM ${DEPENDENCY_DOCKER_REGISTRY}/library/ubuntu:24.04 AS development
 
 ARG TARGETARCH
+ARG DEPENDENCY_APACHE_ARCHIVE_URL=https://archive.apache.org
 ARG DEPENDENCY_GITHUB_RAW_URL=
 ARG DEPENDENCY_APT_UBUNTU_ARCHIVE_URL=
 ARG DEPENDENCY_APT_UBUNTU_SECURITY_URL=
@@ -17,6 +18,7 @@ ARG PIP_INDEX_URL=https://pypi.org/simple
 ARG PIP_TRUSTED_HOST=
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Etc/UTC
+ENV DEPENDENCY_APACHE_ARCHIVE_URL=${DEPENDENCY_APACHE_ARCHIVE_URL}
 ENV DEPENDENCY_GITHUB_RAW_URL=${DEPENDENCY_GITHUB_RAW_URL}
 ENV DEPENDENCY_CONAN_REMOTE_URL=${DEPENDENCY_CONAN_REMOTE_URL}
 ENV DEPENDENCY_CONAN_UPLOAD_URL=${DEPENDENCY_CONAN_UPLOAD_URL}
@@ -44,6 +46,8 @@ RUN --mount=type=cache,id=servicegen-apt-lists-${TARGETARCH},target=/var/lib/apt
        < /tmp/userver-packages.txt \
     && locale-gen en_US.UTF-8 \
     && rm -f /tmp/userver-packages.txt
+
+
 
 RUN python3 -m venv /opt/conan \
     && PIP_TRUSTED_HOST="$PIP_TRUSTED_HOST" \
@@ -211,3 +215,4 @@ COPY --from=runtime-builder /opt/service-bin/example_analytics_service /usr/loca
 COPY static_config.yaml /app/static_config.yaml
 COPY config/*.yaml /app/config/
 ENTRYPOINT ["/usr/local/bin/example_analytics_service"]
+CMD ["--config", "/app/static_config.yaml", "--config_vars", "/app/config/config_vars.yaml"]

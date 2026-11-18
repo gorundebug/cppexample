@@ -32,6 +32,7 @@ Transform one callable SubStream input into its analytics result.
 - [ ] Inspect output type `AnalyticsResult` in `analyticsservice/internal/types/analytics_result.hpp`
 - [ ] Implement the C++ function object without retaining borrowed payload/context references
 - [ ] Run `./scripts/test.generated.sh`
+
 - [ ] Implement meaningful assertions in `analyticsservice/internal/functions/substreamanalytics/build_substream_analytics_result_test.cpp`
 - [ ] Re-read this checklist
 - [ ] Append to `spec/progress.md`: `- [x] analyticsservice/task2.md — BuildSubstreamAnalyticsResult — C++/userver — done`

@@ -32,6 +32,7 @@ Route high-value analytics results to the first branch and all others to the sec
 - [ ] Inspect output type `AnalyticsResult` in `analyticsservice/internal/types/analytics_result.hpp`
 - [ ] Implement the C++ function object without retaining borrowed payload/context references
 - [ ] Run `./scripts/test.generated.sh`
+
 - [ ] Implement meaningful assertions in `analyticsservice/internal/functions/multijoinanalytics/route_analytics_result_test.cpp`
 - [ ] Re-read this checklist
 - [ ] Append to `spec/progress.md`: `- [x] analyticsservice/task14.md — RouteAnalyticsResult — C++/userver — done`

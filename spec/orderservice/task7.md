@@ -43,6 +43,7 @@ If the inventory call fails, the caller returns a non-reserved PROCESSING_ERROR 
 - [ ] Inspect output type `OrderItemResult` in `model_cpp/include/example/model/types/order_item_result.hpp`
 - [ ] Implement the C++ function object without retaining borrowed payload/context references
 - [ ] Run `./scripts/test.generated.sh`
+
 - [ ] Implement meaningful assertions in `orderservice/internal/functions/endpoint/process_order_item_sink_test.cpp`
 - [ ] Verify the endpoint/result lifecycle, including completion and error paths
 - [ ] Re-read this checklist

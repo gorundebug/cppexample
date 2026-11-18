@@ -44,6 +44,7 @@ Calculate the total from processed item prices, falling back to the submitted to
 - [ ] Inspect graph result type `OrderState` in `orderservice/internal/types/order_state.hpp`
 - [ ] Implement the C++ function object without retaining borrowed payload/context references
 - [ ] Run `./scripts/test.generated.sh`
+
 - [ ] Implement meaningful assertions in `orderservice/internal/functions/endpoint/process_order_source_test.cpp`
 - [ ] Verify the endpoint/result lifecycle, including completion and error paths
 - [ ] Re-read this checklist

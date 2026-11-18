@@ -11,6 +11,7 @@ if [[ ! -x "$framework_dir/scripts/conan-install.sh" ]]; then
   exit 2
 fi
 
+export CPPSERVICELIB_ENABLE_NATS=False
 export CPPSERVICELIB_ENABLE_CRON=False
 
 "$framework_dir/scripts/conan-install.sh" "$build_type" "$output_dir" \
