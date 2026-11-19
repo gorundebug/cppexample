@@ -22,6 +22,7 @@
 namespace example::order_service::app {
 struct ServiceMakers;
 struct ServiceClients final {
+
   void initClients(servicelib::Context context, const config::Config& cfg, servicelib::IServiceEnvironment& environment, ServiceMakers& makers);
   std::optional<::inventoryserviceapi::InventoryServiceApiClient> inventory_service_api_client;
   std::unique_ptr<servicelib::datasink::kafka::UserverProducerClient> publish_order_processed_producer;

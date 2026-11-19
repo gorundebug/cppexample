@@ -32,7 +32,6 @@ Increment the cycle counter while preserving the analytics event identity.
 - [ ] Inspect output type `AnalyticsEvent` in `analyticsservice/internal/types/analytics_event.hpp`
 - [ ] Implement the C++ function object without retaining borrowed payload/context references
 - [ ] Run `./scripts/test.generated.sh`
-
 - [ ] Implement meaningful assertions in `analyticsservice/internal/functions/cycleanalytics/advance_cycle_analytics_test.cpp`
 - [ ] Re-read this checklist
 - [ ] Append to `spec/progress.md`: `- [x] analyticsservice/task1.md — AdvanceCycleAnalytics — C++/userver — done`

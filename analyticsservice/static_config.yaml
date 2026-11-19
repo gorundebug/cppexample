@@ -94,6 +94,7 @@ components_manager:
       missing-ok: true
       environment-secrets-key: SECDIST_CONFIG
 
+
     kafka-consumer-order-events:
       group_id: analytics-service
       topics:

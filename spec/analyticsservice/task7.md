@@ -33,7 +33,6 @@ Join matching order and payment analytics events and emit their combined total.
 - [ ] Inspect output type `AnalyticsResult` in `analyticsservice/internal/types/analytics_result.hpp`
 - [ ] Implement the C++ function object without retaining borrowed payload/context references
 - [ ] Run `./scripts/test.generated.sh`
-
 - [ ] Implement meaningful assertions in `analyticsservice/internal/functions/joinanalytics/join_order_payment_analytics_test.cpp`
 - [ ] Re-read this checklist
 - [ ] Append to `spec/progress.md`: `- [x] analyticsservice/task7.md — JoinOrderPaymentAnalytics — C++/userver — done`

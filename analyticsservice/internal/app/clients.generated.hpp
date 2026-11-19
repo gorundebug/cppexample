@@ -16,6 +16,7 @@
 namespace example::analytics_service::app {
 struct ServiceMakers;
 struct ServiceClients final {
+
   void initClients(servicelib::Context context, const config::Config& cfg, servicelib::IServiceEnvironment& environment, ServiceMakers& makers);
 };
 

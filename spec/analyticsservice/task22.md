@@ -30,7 +30,6 @@ Validate and record the result of the two-way analytics join.
 - [ ] Inspect input type `AnalyticsResult` in `analyticsservice/internal/types/analytics_result.hpp`
 - [ ] Implement the C++ function object without retaining borrowed payload/context references
 - [ ] Run `./scripts/test.generated.sh`
-
 - [ ] Implement meaningful assertions in `analyticsservice/internal/functions/endpoint/joined_analytics_sink_test.cpp`
 - [ ] Re-read this checklist
 - [ ] Append to `spec/progress.md`: `- [x] analyticsservice/task22.md — JoinedAnalyticsSink — C++/userver — done`

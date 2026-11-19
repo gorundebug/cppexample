@@ -31,7 +31,6 @@ Create an analytics job message identifying the local scheduled firing.
 - [ ] Inspect emitted message type `AnalyticsKey` in `analyticsservice/internal/types/analytics_key.hpp`
 - [ ] Implement the C++ function object without retaining borrowed payload/context references
 - [ ] Run `./scripts/test.generated.sh`
-
 - [ ] Implement meaningful assertions in `analyticsservice/internal/functions/cron/analytics_schedule_source_test.cpp`
 - [ ] Re-read this checklist
 - [ ] Append to `spec/progress.md`: `- [x] analyticsservice/task15.md — AnalyticsScheduleSource — C++/userver — done`

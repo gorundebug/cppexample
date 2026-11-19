@@ -34,7 +34,6 @@ When no request deadline exists, use the configured duration itself. Never wait 
 - [ ] Inspect output type `Order` in `orderservice/internal/types/order.hpp`
 - [ ] Implement the C++ function object without retaining borrowed payload/context references
 - [ ] Run `./scripts/test.generated.sh`
-
 - [ ] Implement meaningful assertions in `orderservice/internal/functions/order/soft_deadline_test.cpp`
 - [ ] Re-read this checklist
 - [ ] Append to `spec/progress.md`: `- [x] orderservice/task5.md — SoftDeadline — C++/userver — done`

@@ -36,6 +36,7 @@ namespace example::analytics_service::app {
 void ServiceMakers::initMakers(const userver::components::ComponentContext& components) {
   auto& makers_ = *this;
   (void)makers_; (void)components;
+
   advance_cycle_analytics = [](servicelib::Context context, servicelib::IServiceEnvironment& environment) {
     return functions::MakeAdvanceCycleAnalytics(std::move(context), environment);
   };

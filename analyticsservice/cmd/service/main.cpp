@@ -18,6 +18,7 @@
 #include <userver/kafka/consumer_component.hpp>
 #include <userver/storages/secdist/component.hpp>
 #include <userver/storages/secdist/provider_component.hpp>
+
 #include <userver/utils/daemon_run.hpp>
 
 #include <servicelib/runtime/environment_variable.hpp>

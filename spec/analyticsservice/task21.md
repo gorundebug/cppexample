@@ -30,7 +30,6 @@ Validate the terminal event emitted after three passes through the feedback cycl
 - [ ] Inspect input type `AnalyticsEvent` in `analyticsservice/internal/types/analytics_event.hpp`
 - [ ] Implement the C++ function object without retaining borrowed payload/context references
 - [ ] Run `./scripts/test.generated.sh`
-
 - [ ] Implement meaningful assertions in `analyticsservice/internal/functions/endpoint/cycle_analytics_result_sink_test.cpp`
 - [ ] Re-read this checklist
 - [ ] Append to `spec/progress.md`: `- [x] analyticsservice/task21.md — CycleAnalyticsResultSink — C++/userver — done`

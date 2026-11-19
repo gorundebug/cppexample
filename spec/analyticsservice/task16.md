@@ -35,7 +35,6 @@ Consumers decode the event and mark its Kafka message processed only after the p
 - [ ] Inspect graph result type `OrderProcessed` in `model_cpp/include/example/model/types/order_processed.hpp`
 - [ ] Implement the C++ function object without retaining borrowed payload/context references
 - [ ] Run `./scripts/test.generated.sh`
-
 - [ ] Implement meaningful assertions in `analyticsservice/internal/functions/endpoint/order_processed_endpoint_source_test.cpp`
 - [ ] Re-read this checklist
 - [ ] Append to `spec/progress.md`: `- [x] analyticsservice/task16.md — OrderProcessedEndpointSource — C++/userver — done`

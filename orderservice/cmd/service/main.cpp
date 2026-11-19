@@ -18,6 +18,7 @@
 
 #include <userver/ugrpc/client/client_factory_component.hpp>
 #include <userver/ugrpc/client/component_list.hpp>
+
 #include <userver/utils/daemon_run.hpp>
 
 #include <servicelib/runtime/environment_variable.hpp>

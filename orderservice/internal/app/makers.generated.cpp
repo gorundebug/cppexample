@@ -20,6 +20,7 @@ namespace example::order_service::app {
 void ServiceMakers::initMakers(const userver::components::ComponentContext& components) {
   auto& makers_ = *this;
   (void)makers_; (void)components;
+
   map_order_item_result_to_order_state = [](servicelib::Context context, servicelib::IServiceEnvironment& environment) {
     return functions::MakeMapOrderItemResultToOrderState(std::move(context), environment);
   };

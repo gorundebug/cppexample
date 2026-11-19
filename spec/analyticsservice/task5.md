@@ -33,7 +33,6 @@ Count successful and unsuccessful orders independently, then return the event un
 - [ ] Inspect output type `OrderProcessed` in `model_cpp/include/example/model/types/order_processed.hpp`
 - [ ] Implement the C++ function object without retaining borrowed payload/context references
 - [ ] Run `./scripts/test.generated.sh`
-
 - [ ] Implement meaningful assertions in `analyticsservice/internal/functions/analytics/count_order_processed_test.cpp`
 - [ ] Re-read this checklist
 - [ ] Append to `spec/progress.md`: `- [x] analyticsservice/task5.md — CountOrderProcessed — C++/userver — done`

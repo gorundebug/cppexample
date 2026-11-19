@@ -30,7 +30,6 @@ Produce one deterministic analytics event that exercises the finite feedback cyc
 - [ ] Inspect emitted message type `AnalyticsEvent` in `analyticsservice/internal/types/analytics_event.hpp`
 - [ ] Implement the C++ function object without retaining borrowed payload/context references
 - [ ] Run `./scripts/test.generated.sh`
-
 - [ ] Implement meaningful assertions in `analyticsservice/internal/functions/endpoint/cycle_analytics_input_source_test.cpp`
 - [ ] Re-read this checklist
 - [ ] Append to `spec/progress.md`: `- [x] analyticsservice/task20.md — CycleAnalyticsInputSource — C++/userver — done`

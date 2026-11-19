@@ -13,6 +13,7 @@ namespace example::inventory_service::app {
 void ServiceMakers::initMakers(const userver::components::ComponentContext& components) {
   auto& makers_ = *this;
   (void)makers_; (void)components;
+
   get_inventory_item_data = [](servicelib::Context context, servicelib::IServiceEnvironment& environment) {
     return functions::MakeGetInventoryItemData(std::move(context), environment);
   };

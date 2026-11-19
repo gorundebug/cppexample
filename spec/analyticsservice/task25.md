@@ -30,7 +30,6 @@ Produce one deterministic analytics event that invokes the service-local SubStre
 - [ ] Inspect emitted message type `AnalyticsEvent` in `analyticsservice/internal/types/analytics_event.hpp`
 - [ ] Implement the C++ function object without retaining borrowed payload/context references
 - [ ] Run `./scripts/test.generated.sh`
-
 - [ ] Implement meaningful assertions in `analyticsservice/internal/functions/endpoint/substream_analytics_input_source_test.cpp`
 - [ ] Re-read this checklist
 - [ ] Append to `spec/progress.md`: `- [x] analyticsservice/task25.md — SubstreamAnalyticsInputSource — C++/userver — done`

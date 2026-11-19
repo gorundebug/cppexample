@@ -30,7 +30,6 @@ Produce a deterministic order analytics event for the canonical join examples.
 - [ ] Inspect emitted message type `AnalyticsEvent` in `analyticsservice/internal/types/analytics_event.hpp`
 - [ ] Implement the C++ function object without retaining borrowed payload/context references
 - [ ] Run `./scripts/test.generated.sh`
-
 - [ ] Implement meaningful assertions in `analyticsservice/internal/functions/endpoint/analytics_orders_source_test.cpp`
 - [ ] Re-read this checklist
 - [ ] Append to `spec/progress.md`: `- [x] analyticsservice/task17.md — AnalyticsOrdersSource — C++/userver — done`

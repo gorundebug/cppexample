@@ -13,6 +13,8 @@ fi
 
 export CPPSERVICELIB_ENABLE_NATS=False
 export CPPSERVICELIB_ENABLE_CRON=True
+export CPPSERVICELIB_ENABLE_POSTGRESQL=False
+export CPPSERVICELIB_ENABLE_S3=False
 
 "$framework_dir/scripts/conan-install.sh" "$build_type" "$output_dir" \
   "${@:3}"

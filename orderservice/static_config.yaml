@@ -88,6 +88,7 @@ components_manager:
 
 
 
+
     grpc-client-common:
       blocking-task-processor: grpc-blocking-task-processor
     grpc-client-factory:
